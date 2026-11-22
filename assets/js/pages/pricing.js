@@ -23,14 +23,14 @@ export default function () {
         <span class="price">${p.price ? money(p.price) : 'Miễn phí'}</span>
         <span class="unit">${esc(p.unit) || 'không cần thanh toán'}</span>
         <ul>${p.features.map((f) => `<li>${icon('check')}<span>${esc(f)}</span></li>`).join('')}</ul>
-        <a class="btn ${p.featured ? 'btn-gold' : 'btn-line'} btn-block" href="${p.id === 'enterprise' ? '/chinh-sach/lien-he' : '/nha-tuyen-dung/thanh-toan?goi=' + p.id}">${esc(p.cta)}</a>
+        <a class="btn ${p.featured ? 'btn-gold' : 'btn-line'} btn-block" href="${p.id === 'free' ? '/nha-tuyen-dung/dang-tin' : '/chinh-sach/lien-he'}">${esc(p.cta)}</a>
       </div>`).join('')}</div>
     </section>
     <section class="sec" id="quang-cao">
       <div class="sec-head"><div><h2>Dịch vụ thêm và quảng cáo</h2><p>Banner chỉ đặt ở vị trí riêng, không bao giờ che nút Gọi hay Ứng tuyển.</p></div></div>
       <div class="tbl-wrap"><table class="tbl">
         <thead><tr><th>Dịch vụ</th><th>Mô tả</th><th class="num">Giá</th><th></th></tr></thead>
-        <tbody>${V.addons.map((a) => `<tr><td><b>${esc(a.name)}</b></td><td class="mute">${esc(a.desc)}</td><td class="num"><b>${esc(a.price)}</b></td><td class="num"><a class="btn btn-quiet btn-s" href="/nha-tuyen-dung/thanh-toan">Mua</a></td></tr>`).join('')}</tbody>
+        <tbody>${V.addons.map((a) => `<tr><td><b>${esc(a.name)}</b></td><td class="mute">${esc(a.desc)}</td><td class="num"><b>${esc(a.price)}</b></td><td class="num"><a class="btn btn-quiet btn-s" href="/chinh-sach/lien-he">Mua</a></td></tr>`).join('')}</tbody>
       </table></div>
     </section>
     <section class="sec">

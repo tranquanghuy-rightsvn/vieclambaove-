@@ -4,30 +4,21 @@ export default function ({ params: [id] }) {
   const c = company(id);
   if (!c) return { redirect: '/viec-lam' };
   const jobs = activeJobs().filter((j) => j.company === c.id);
-  const reviews = [
-    ['Anh Tuấn, bảo vệ 2 năm', 'Lương về đúng ngày 5, có đóng bảo hiểm. Ca đêm hơi vất nhưng có phụ cấp.'],
-    ['Chú Hòa, chỉ huy mục tiêu', 'Công ty cấp đồng phục miễn phí, không thu đồng nào khi nhận việc.'],
-    ['Anh Phong, mới vào 3 tháng', 'Được hướng dẫn nghiệp vụ tuần đầu, đội trưởng dễ trao đổi.']
-  ];
   const html = `
   <div class="phead"><div class="wrap">
     ${crumbs([['Trang chủ', '/'], ['Công ty bảo vệ', '/viec-lam'], [c.short, null]])}
     <div class="co-head">${mono(c, 'mono-l')}<div>
       <h1>${esc(c.name)}</h1>
       <p>${c.verified ? `<span class="verified">${icon('check')}Đã xác thực giấy phép kinh doanh dịch vụ bảo vệ</span>` : '<span class="tag tag-off">Đang chờ xác thực</span>'}
-      · <span class="stars">★ ${c.rating}</span> <span class="mute">${c.reviews} đánh giá từ nhân viên</span></p>
+      ${c.rating ? `· <span class="stars">★ ${c.rating}</span> <span class="mute">${c.reviews} đánh giá từ nhân viên</span>` : ''}</p>
     </div></div>
   </div></div>
   <div class="wrap detail">
     <div>
-      <section class="d-sec" style="margin-top:8px"><h2>Giới thiệu</h2><p>${esc(c.about)}</p></section>
+      ${c.about ? `<section class="d-sec" style="margin-top:8px"><h2>Giới thiệu</h2><p>${esc(c.about)}</p></section>` : ''}
       <section class="d-sec">
         <div class="sec-head"><h2>Đang tuyển ${jobs.length} vị trí</h2></div>
         <div class="jlist">${jobs.length ? jobs.map(jobRow).join('') : '<div class="empty"><h3>Hiện chưa có tin tuyển</h3></div>'}</div>
-      </section>
-      <section class="d-sec">
-        <div class="sec-head"><h2>Nhân viên nói gì</h2></div>
-        <ul class="notes">${reviews.map(([who, t]) => `<li><div><b>${who}</b><p>${t}</p></div></li>`).join('')}</ul>
       </section>
     </div>
     <aside class="aside">

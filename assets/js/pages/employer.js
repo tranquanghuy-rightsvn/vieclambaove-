@@ -1,12 +1,18 @@
-import { V, $, $$, esc, icon, store, user, toast, deskNav, url, pay, num, money, province, shift, target, company, modal, closeModal, mono } from '../core.js';
+import { V, $, $$, esc, icon, user, toast, deskNav, url, num, modal, closeModal, api, busy, syncMe } from '../core.js';
 import { go } from '../router.js';
 
-const CO = 'long-hai';
-const STAGES = [['new', 'Mới'], ['called', 'Đã gọi'], ['interview', 'Hẹn PV / nhận đồng phục'], ['hired', 'Đi làm'], ['rejected', 'Loại']];
-const STATUS = { draft: ['st-draft', 'Nháp'], pending: ['st-wait', 'Chờ duyệt'], live: ['st-live', 'Đang hiển thị'], soon: ['st-soon', 'Sắp hết hạn'], off: ['st-off', 'Hết hạn'], hidden: ['st-off', 'Đã ẩn'] };
+const DAY = 864e5;
+const STAGES = [['new', 'Mới'], ['called', 'Đã gọi'], ['interview', 'Hẹn phỏng vấn'], ['hired', 'Đi làm'], ['rejected', 'Không phù hợp']];
+const STATUS = { draft: ['st-draft', 'Nháp'], pending: ['st-wait', 'Chờ duyệt'], live: ['st-live', 'Đang hiển thị'], soon: ['st-soon', 'Sắp hết hạn'], hidden: ['st-off', 'Đã ẩn'], rejected: ['st-soon', 'Bị từ chối'], removed: ['st-off', 'Bị gỡ'], expired: ['st-off', 'Hết hạn'] };
+const WEEKS = [1, 2, 3, 4];
+const tr = (n) => String(n).replace('.', ',');
+const pay = (j) => (j.salaryMin === j.salaryMax ? tr(j.salaryMin) : `${tr(j.salaryMin)}–${tr(j.salaryMax)}`);
+const daysLeft = (j) => (j.expiresAt ? Math.floor((j.expiresAt - Date.now()) / DAY) : null);
+const shown = (j) => (j.status === 'live' && daysLeft(j) !== null && daysLeft(j) <= 3 ? 'soon' : j.status);
+const ago = (ms) => { const m = Math.floor((Date.now() - ms) / 60000); return m < 60 ? `${Math.max(1, m)} phút trước` : m < 1440 ? `${Math.floor(m / 60)} giờ trước` : new Date(ms).toLocaleDateString('vi-VN'); };
 
-/* ---- Kiểm tra rủi ro: chỉ cảnh báo, không tự sửa nội dung ---- */
-export function riskCheck(f) {
+/* ---- Kiểm tra rủi ro (theo quy tắc, giống máy chủ): chỉ báo trước, không tự sửa nội dung ---- */
+function riskCheck(f) {
   const text = `${f.title || ''} ${f.desc || ''}`.toLowerCase();
   const out = [];
   if (/(phí|đóng tiền|nộp tiền|thu tiền).{0,20}(đồng phục|hồ sơ|đào tạo)|đồng phục.{0,12}(phí|\d+ ?k|\d{3}\.?000)/.test(text)) out.push('Có nội dung thu phí đồng phục hoặc hồ sơ. Quy chế cấm thu tiền người xin việc.');
@@ -16,336 +22,270 @@ export function riskCheck(f) {
   return out;
 }
 
-/* ---- Bóc tách mô tả tự nhiên. Không đoán: thiếu thì hỏi lại ---- */
-function parse(text, cur) {
-  const t = text.toLowerCase();
-  const f = { ...cur };
-  const p = V.provinces.find((x) => [x.name, x.short, x.slug.replace(/-/g, ' ')].some((n) => t.includes(n.toLowerCase())) || (x.slug === 'tp-hcm' && /(sài gòn|hcm|sg\b)/.test(t)) || (x.slug === 'ha-noi' && /hn\b/.test(t)));
-  if (p) f.province = p.slug;
-  const pv = V.provinces.find((x) => x.slug === f.province);
-  const d = (pv ? pv.districts : V.provinces.flatMap((x) => x.districts)).find((x) => t.includes(x.toLowerCase()));
-  if (d) { f.district = d; if (!f.province) f.province = V.provinces.find((x) => x.districts.includes(d)).slug; }
-  const tg = [['ngan-hang', /ngân hàng/], ['kcn', /(kcn|khu công nghiệp|nhà máy|kho)/], ['toa-nha', /(tòa nhà|chung cư|văn phòng)/], ['su-kien', /sự kiện|triển lãm/], ['ve-si', /vệ sĩ/], ['truong-hoc', /trường|bệnh viện/]].find(([, r]) => r.test(t));
-  if (tg) f.target = tg[0];
-  const sh = /24\/24|24 ?(tiếng|h)/.test(t) ? '24h' : /ca đêm|trực đêm/.test(t) ? 'dem' : /ca gãy/.test(t) ? 'gay' : /12 ?(tiếng|h)/.test(t) ? '12h' : /8 ?(tiếng|h)|hành chính/.test(t) ? '8h' : '';
-  if (sh) f.shift = sh;
-  const m = t.match(/(\d+(?:[.,]\d+)?)\s*(?:-|–|đến)\s*(\d+(?:[.,]\d+)?)\s*(?:tr|triệu)/) || t.match(/(\d+(?:[.,]\d+)?)\s*(?:tr|triệu)/);
-  if (m) { f.salaryMin = parseFloat(m[1].replace(',', '.')); f.salaryMax = parseFloat((m[2] || m[1]).replace(',', '.')); }
-  const q = t.match(/(\d+)\s*(?:người|bảo vệ|nhân viên|bv)/);
-  if (q) f.qty = Number(q[1]);
-  if (/bao ở|ký túc|chỗ ở/.test(t)) f.housing = true;
-  if (/bao ăn|bao cơm|ăn trưa|ăn ca/.test(t)) f.meals = true;
-  const addr = text.match(/(?:địa chỉ|tại|ở)\s*[:：]?\s*([^,.;\n]{8,80}(?:,[^,.;\n]{2,40}){0,2})/i);
-  if (addr && !/^(quận|huyện)?\s*\d*$/i.test(addr[1].trim())) f.address = addr[1].trim();
-  f.desc = [cur.desc, text].filter(Boolean).join('\n');
-  return f;
-}
-const ASK = [
-  ['province', 'Mục tiêu ở tỉnh/thành và quận nào?'],
-  ['target', 'Đây là loại mục tiêu gì: tòa nhà, nhà máy/KCN, ngân hàng, sự kiện hay vệ sĩ?'],
-  ['shift', 'Làm ca mấy tiếng: 8 tiếng, 12 tiếng, ca đêm, ca gãy hay 24/24?'],
-  ['salaryMin', 'Lương bao nhiêu một tháng? Ví dụ "8 – 9 triệu".'],
-  ['address', 'Địa chỉ mục tiêu cụ thể là ở đâu? Ứng viên cần biết chỗ làm.']
-];
-
-export default function ({ params: [tab = ''], query }) {
+export default async function ({ params: [tab = ''], query }) {
   const u = user();
   if (!u) return { redirect: '/dang-nhap?vai-tro=nha-tuyen-dung&tiep=/nha-tuyen-dung' };
   if (u.role !== 'employer') return { redirect: '/ung-vien' };
-  const c = company(CO);
-  const mine = store.get('myJobs', []);
-  const jobs = [...mine.map((j) => ({ ...j, own: true })), ...V.jobs.filter((j) => j.company === CO).map((j) => ({ ...j, status: j.daysLeft < 0 ? 'off' : j.daysLeft <= 3 ? 'soon' : 'live' }))];
-  const ats = store.get('ats', null) || V.candidates.map((x, i) => ({ ...x, id: i + 1 }));
-  const points = store.get('points', 20);
-  const verify = store.get('verify', 'done');
-  const tabs = [['', 'Tổng quan', 'chart'], ['dang-tin', 'Đăng tin', 'plus'], ['tin-dang', 'Tin đã đăng', 'list', jobs.length], ['ung-vien', 'Ứng viên', 'users', ats.filter((x) => x.status === 'new').length || ''], ['tim-ung-vien', 'Tìm ứng viên', 'search'], ['xac-thuc', 'Xác thực công ty', 'shield'], ['thanh-toan', 'Gói & thanh toán', 'card']];
-  if (!tabs.some((t) => t[0] === tab)) return { redirect: '/nha-tuyen-dung' };
 
-  const count = (s) => jobs.filter((j) => j.status === s).length;
-  const statusCell = (s) => `<span class="${STATUS[s][0]}"><b>${STATUS[s][1]}</b></span>`;
+  // Đăng nhập Google lần đầu: chưa có công ty
+  if (!u.company) return onboarding(u);
+
+  let data;
+  try { data = await api('/employer/overview'); } catch (e) {
+    if (e.status === 401) return { redirect: '/dang-nhap?vai-tro=nha-tuyen-dung&tiep=' + location.pathname };
+    return { nav: 'employer', noindex: true, title: 'Nhà tuyển dụng', html: `<div class="wrap"><div class="empty"><h3>Không tải được dữ liệu</h3><p>${esc(e.message)}</p><a class="btn btn-primary" href="${location.pathname}">Thử lại</a></div></div>` };
+  }
+  const { company: c, jobs, applications: apps, approveMode } = data;
+  const newApps = apps.filter((a) => a.status === 'new').length;
+  const tabs = [['', 'Tổng quan', 'chart'], ['dang-tin', 'Đăng tin', 'plus'], ['tin-dang', 'Tin đã đăng', 'list', jobs.length || ''], ['ung-vien', 'Ứng viên', 'users', newApps || ''], ['xac-thuc', 'Xác thực công ty', 'shield'], ['cong-ty', 'Thông tin công ty', 'building']];
+  if (!tabs.some((t) => t[0] === tab)) return { redirect: '/nha-tuyen-dung' };
+  const count = (s) => jobs.filter((j) => shown(j) === s).length;
+  const statusCell = (j) => `<span class="${STATUS[shown(j)][0]}"><b>${STATUS[shown(j)][1]}</b></span>${j.status === 'rejected' || j.status === 'removed' ? `<br><small class="mute">${esc(j.rejectReason)}</small>` : j.status === 'pending' && j.risks.length ? `<br><small class="mute">${esc(j.risks[0])}</small>` : ''}`;
+  const verifyTag = c.verified ? `<span class="verified">${icon('check')}Đã xác thực</span>` : c.verifyStatus === 'pending' ? '<span class="tag tag-off">Đang chờ duyệt</span>' : c.verifyStatus === 'rejected' ? '<span class="tag tag-urgent">Bị từ chối</span>' : '<span class="tag tag-off">Chưa xác thực</span>';
 
   const views = {
-    '': () => {
-      const week = [42, 58, 51, 73, 66, 88, 97];
-      const max = Math.max(...week);
-      return `
-      <div class="desk-title"><div><h1>Chào ${esc(u.name || c.short)}</h1><p>Số liệu 7 ngày qua của ${esc(c.name)}.</p></div><a class="btn btn-primary" href="/nha-tuyen-dung/dang-tin">${icon('plus')}Đăng tin mới</a></div>
+    '': () => `
+      <div class="desk-title"><div><h1>Chào ${esc(u.name || c.short)}</h1><p>${esc(c.name)} · ${verifyTag}</p></div><a class="btn btn-primary" href="/nha-tuyen-dung/dang-tin">${icon('plus')}Đăng tin mới</a></div>
+      ${!c.verified && c.verifyStatus !== 'pending' ? `<div class="notice notice-warn" style="margin-bottom:16px">${icon('shield')}<p><b>Xác thực công ty</b> để tin được gắn dấu "Đã xác thực giấy phép" và ứng viên tin tưởng hơn. <a href="/nha-tuyen-dung/xac-thuc">Gửi giấy tờ</a></p></div>` : ''}
       <div class="kpis">
-        <div><span>Lượt xem tin</span><b>${num(jobs.reduce((a, j) => a + (j.views || 0), 0))}</b><small><span class="up">+18%</span> so với tuần trước</small></div>
-        <div><span>Lượt gọi</span><b>${num(jobs.reduce((a, j) => a + (j.calls || 0), 0))}</b><small><span class="up">+9%</span></small></div>
-        <div><span>Ứng viên mới</span><b>${ats.filter((x) => x.status === 'new').length}</b><small>chưa gọi lại</small></div>
-        <div><span>Điểm còn lại</span><b>${points}</b><small>mở được ${points} hồ sơ</small></div>
+        <div><span>Tin đang hiển thị</span><b>${count('live') + count('soon')}</b><small>${count('soon')} tin sắp hết hạn</small></div>
+        <div><span>Lượt xem tin</span><b>${num(jobs.reduce((a, j) => a + (j.views || 0), 0))}</b><small>tất cả tin</small></div>
+        <div><span>Lượt bấm Gọi / Zalo</span><b>${num(jobs.reduce((a, j) => a + (j.calls || 0) + (j.zalos || 0), 0))}</b><small>tất cả tin</small></div>
+        <div><span>Ứng viên mới</span><b>${newApps}</b><small>chưa gọi lại</small></div>
       </div>
-      <section class="panel"><div class="panel-h"><h2>Vòng đời tin</h2><span class="mute">Nhắc gia hạn trước 3 ngày</span></div>
-        <div class="life">${['draft', 'pending', 'live', 'soon', 'off'].map((s) => `<div class="${s === 'soon' ? 'warn' : ''}"><b>${count(s)}</b><span>${STATUS[s][1]}</span></div>`).join('')}</div>
+      <section class="panel"><div class="panel-h"><h2>Vòng đời tin</h2><span class="mute">${approveMode === 'manual' ? 'Mọi tin được kiểm duyệt trước khi hiển thị' : 'Tin không có dấu hiệu rủi ro lên ngay'}</span></div>
+        <div class="life">${['draft', 'pending', 'live', 'soon', 'expired'].map((s) => `<div class="${s === 'soon' ? 'warn' : ''}"><b>${count(s)}</b><span>${STATUS[s][1]}</span></div>`).join('')}</div>
       </section>
-      <div class="two">
-        <section class="panel"><div class="panel-h"><h2>Lượt gọi theo ngày</h2></div>
-          <div class="bars">${week.map((v) => `<div><span>${v}</span><i style="height:${(v / max) * 100}%"></i></div>`).join('')}</div>
-          <div class="bars-x">${['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map((d) => `<span>${d}</span>`).join('')}</div>
-        </section>
-        <section class="panel"><div class="panel-h"><h2>Ứng viên mới nhất</h2><a class="more" href="/nha-tuyen-dung/ung-vien">Mở bảng ${icon('arrow', 'ico-s')}</a></div>
-          <ul class="notes">${ats.slice(0, 4).map((x) => `<li><div><b>${esc(x.name)}</b><p>${x.age} tuổi · ${esc(x.exp)}</p></div><time class="mute">${esc(x.time)}</time></li>`).join('')}</ul>
-        </section>
-      </div>`;
-    },
+      <section class="panel"><div class="panel-h"><h2>Ứng viên mới nhất</h2><a class="more" href="/nha-tuyen-dung/ung-vien">Xem tất cả ${icon('arrow', 'ico-s')}</a></div>
+        ${apps.length ? `<ul class="notes">${apps.slice(0, 5).map((a) => `<li><div><b>${esc(a.name)}</b> · <a href="tel:${esc(a.phone)}">${esc(a.phone)}</a><p>${esc(a.title)}</p></div><time class="mute">${ago(a.created_at)}</time></li>`).join('')}</ul>` : '<p class="mute">Chưa có ứng viên nào.</p>'}
+      </section>`,
+
     'dang-tin': () => {
-      const src = query.get('sao-chep') ? jobs.find((j) => String(j.id) === query.get('sao-chep')) : null;
-      const f = src || {};
+      const src = query.get('sua') ? jobs.find((j) => String(j.id) === query.get('sua')) : null;
+      if (query.get('sua') && !src) return '<div class="empty"><h3>Không tìm thấy tin</h3><a class="btn btn-primary" href="/nha-tuyen-dung/tin-dang">Về danh sách tin</a></div>';
+      if (src?.status === 'removed') return '<div class="empty"><h3>Tin đã bị quản trị gỡ, không sửa được</h3><a class="btn btn-primary" href="/nha-tuyen-dung/tin-dang">Về danh sách tin</a></div>';
+      const f = src || { qty: 1, weeks: 4, phone: c.phone };
+      const live = src && ['live', 'hidden'].includes(src.status);
       return `
-      <div class="desk-title"><div><h1>${src ? 'Sao chép tin' : 'Đăng tin tuyển'}</h1><p>Kể bằng lời như nhắn Zalo, trợ lý sẽ điền vào form. Trợ lý chỉ điền điều bạn nói, thiếu thì hỏi lại.</p></div></div>
-      <div class="compose">
-        <div class="chat">
-          <div class="chat-head"><b>Trợ lý đăng tin</b><span>Không tự bịa thông tin</span></div>
-          <div class="chat-body" id="cb"><div class="msg msg-bot"><b>Trợ lý</b>Anh/chị cần tuyển bảo vệ ở đâu, làm ca nào, lương bao nhiêu? Ví dụ: <i>"Cần 3 bảo vệ ngân hàng ở Cầu Giấy, Hà Nội, ca 8 tiếng, lương 9 – 11 triệu, bao ăn trưa, địa chỉ 25 Trần Duy Hưng"</i>.</div></div>
-          <form class="chat-form" id="cf"><input class="input" name="m" placeholder="Nhập mô tả…" autocomplete="off" aria-label="Mô tả công việc"><button class="btn btn-primary" type="submit" aria-label="Gửi">${icon('send')}</button></form>
+      <div class="desk-title"><div><h1>${src ? 'Sửa tin' : 'Đăng tin tuyển'}</h1><p>Đăng tin miễn phí. ${approveMode === 'manual' ? 'Tin được kiểm duyệt trước khi hiển thị, thường trong 2 giờ.' : 'Tin không có dấu hiệu rủi ro được hiển thị ngay.'}</p></div></div>
+      ${src?.status === 'rejected' ? `<div class="notice notice-warn" style="margin-bottom:16px">${icon('alert')}<p><b>Tin bị từ chối:</b> ${esc(src.rejectReason)}. Sửa lại rồi gửi duyệt.</p></div>` : ''}
+      <form class="formcard" id="jf">
+        <label class="field" style="margin-bottom:16px"><span>Tiêu đề</span><input class="input" name="title" required minlength="10" maxlength="150" value="${esc(f.title || '')}" placeholder="Tuyển 5 bảo vệ tòa nhà Quận 1, ca 12 tiếng, bao ở"></label>
+        <div class="grid2">
+          <label class="field"><span>Tỉnh/thành</span><select class="select" name="province" required><option value="">Chọn</option>${V.provinces.map((p) => `<option value="${p.slug}" ${f.province === p.slug ? 'selected' : ''}>${p.name}</option>`).join('')}</select></label>
+          <label class="field"><span>Quận/huyện</span><select class="select" name="district" required>${districtOpts(f.province, f.district)}</select></label>
         </div>
-        <form class="formcard" id="jf">
-          <h3>Nội dung tin</h3>
-          <label class="field" style="margin-bottom:16px"><span>Tiêu đề</span><input class="input" name="title" required value="${esc(f.title || '')}" placeholder="Tuyển bảo vệ tòa nhà Quận 1, ca 12 tiếng"></label>
-          <div class="grid2">
-            <label class="field"><span>Tỉnh/thành</span><select class="select" name="province" required><option value="">Chọn</option>${V.provinces.map((p) => `<option value="${p.slug}" ${f.province === p.slug ? 'selected' : ''}>${p.name}</option>`).join('')}</select></label>
-            <label class="field"><span>Quận/huyện</span><select class="select" name="district" required>${districtOpts(f.province, f.district)}</select></label>
-          </div>
-          <label class="field" style="margin-bottom:16px"><span>Địa chỉ mục tiêu</span><input class="input" name="address" value="${esc(f.address || '')}" placeholder="Số nhà, đường, tên tòa nhà/KCN"></label>
-          <div class="grid3">
-            <label class="field"><span>Loại mục tiêu</span><select class="select" name="target" required><option value="">Chọn</option>${V.targets.map((x) => `<option value="${x.id}" ${f.target === x.id ? 'selected' : ''}>${x.name}</option>`).join('')}</select></label>
-            <label class="field"><span>Ca làm</span><select class="select" name="shift" required><option value="">Chọn</option>${V.shifts.map((x) => `<option value="${x.id}" ${f.shift === x.id ? 'selected' : ''}>${x.name}</option>`).join('')}</select></label>
-            <label class="field"><span>Số lượng</span><input class="input" name="qty" type="number" min="1" value="${f.qty || 1}"></label>
-          </div>
-          <div class="grid2">
-            <label class="field"><span>Lương từ (triệu)</span><input class="input" name="salaryMin" type="number" step="0.5" min="1" required value="${f.salaryMin || ''}"></label>
-            <label class="field"><span>Đến (triệu)</span><input class="input" name="salaryMax" type="number" step="0.5" min="1" required value="${f.salaryMax || ''}"></label>
-          </div>
-          <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px"><label class="check"><input type="checkbox" name="housing" ${f.housing ? 'checked' : ''}>Bao ở</label><label class="check"><input type="checkbox" name="meals" ${f.meals ? 'checked' : ''}>Bao ăn</label><label class="check"><input type="checkbox" name="urgent" ${f.urgent ? 'checked' : ''}>Tin gấp (149.000đ)</label></div>
-          <label class="field"><span>Mô tả, yêu cầu</span><textarea class="textarea" name="desc" rows="4" placeholder="Tuổi, chiều cao, giấy tờ cần mang…">${esc(f.desc || '')}</textarea></label>
-          <div id="risk" style="margin-top:16px"></div>
-          <div class="form-foot"><button class="btn btn-quiet" type="button" id="draft">Lưu nháp</button><button class="btn btn-primary" type="submit">Gửi duyệt</button></div>
-        </form>
-      </div>`;
+        <label class="field" style="margin-bottom:16px"><span>Địa chỉ mục tiêu</span><input class="input" name="address" maxlength="200" value="${esc(f.address || '')}" placeholder="Số nhà, đường, tên tòa nhà/KCN"></label>
+        <div class="grid3">
+          <label class="field"><span>Loại mục tiêu</span><select class="select" name="target" required><option value="">Chọn</option>${V.targets.map((x) => `<option value="${x.id}" ${f.target === x.id ? 'selected' : ''}>${x.name}</option>`).join('')}</select></label>
+          <label class="field"><span>Ca làm</span><select class="select" name="shift" required><option value="">Chọn</option>${V.shifts.map((x) => `<option value="${x.id}" ${f.shift === x.id ? 'selected' : ''}>${x.name}</option>`).join('')}</select></label>
+          <label class="field"><span>Số lượng cần tuyển</span><input class="input" name="qty" type="number" min="1" max="999" value="${f.qty || 1}"></label>
+        </div>
+        <div class="grid2">
+          <label class="field"><span>Lương từ (triệu/tháng)</span><input class="input" name="salaryMin" type="number" step="0.1" min="1" required value="${f.salaryMin ?? ''}"></label>
+          <label class="field"><span>Đến (triệu/tháng)</span><input class="input" name="salaryMax" type="number" step="0.1" min="1" required value="${f.salaryMax ?? ''}"></label>
+        </div>
+        <div class="grid3">
+          <label class="field"><span>Độ tuổi</span><input class="input" name="age" maxlength="60" value="${esc(f.age || '')}" placeholder="Nam 20–50 tuổi"></label>
+          <label class="field"><span>Chiều cao</span><input class="input" name="height" maxlength="60" value="${esc(f.height || '')}" placeholder="Từ 1m65"></label>
+          <label class="field"><span>SĐT liên hệ (Gọi/Zalo)</span><input class="input" name="phone" inputmode="tel" maxlength="20" value="${esc(f.phone || '')}" placeholder="0909 123 456"></label>
+        </div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px"><label class="check"><input type="checkbox" name="housing" ${f.housing ? 'checked' : ''}>Bao ở</label><label class="check"><input type="checkbox" name="meals" ${f.meals ? 'checked' : ''}>Bao ăn</label><label class="check"><input type="checkbox" name="urgent" ${f.urgent ? 'checked' : ''}>Tuyển gấp</label></div>
+        <label class="field"><span>Mô tả công việc, quyền lợi, yêu cầu</span><textarea class="textarea" name="desc" rows="6" maxlength="5000" placeholder="Công việc cụ thể, chế độ lương thưởng, giấy tờ cần mang…">${esc(f.desc || '')}</textarea></label>
+        ${live ? '' : `<div class="field" style="margin-top:16px"><span>Thời gian hiển thị</span>
+          <div class="pills">${WEEKS.map((w) => `<label class="pill"><input type="radio" name="weeks" value="${w}" ${Number(f.weeks || 4) === w ? 'checked' : ''}><span>${w} tuần</span></label>`).join('')}</div>
+          <small>Hết thời gian, tin tự động bị gỡ khỏi website. Có thể gia hạn trong mục Tin đã đăng.</small></div>`}
+        <div id="risk" style="margin-top:16px"></div>
+        <div class="form-foot">${live ? '' : '<button class="btn btn-quiet" type="button" id="draft">Lưu nháp</button>'}<button class="btn btn-primary" type="submit">${live ? 'Lưu thay đổi' : 'Đăng tin'}</button></div>
+      </form>`;
     },
+
     'tin-dang': () => `
-      <div class="desk-title"><div><h1>Tin đã đăng</h1><p>${count('live')} tin đang hiển thị · ${count('soon')} tin sắp hết hạn</p></div><a class="btn btn-primary" href="/nha-tuyen-dung/dang-tin">${icon('plus')}Đăng tin</a></div>
-      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tin</th><th>Trạng thái</th><th class="num">Xem</th><th class="num">Gọi</th><th class="num">Còn</th><th class="num">Thao tác</th></tr></thead><tbody>
-      ${jobs.map((j) => `<tr><td>${j.status === 'live' || j.status === 'soon' ? `<a href="${url.job(j)}"><b>${esc(j.title)}</b></a>` : `<b>${esc(j.title)}</b>`}<br><small class="mute">${esc(j.district || '')} · ${pay(j)} triệu</small></td><td>${statusCell(j.status)}</td><td class="num">${num(j.views || 0)}</td><td class="num">${num(j.calls || 0)}</td><td class="num">${j.daysLeft < 0 ? '–' : (j.daysLeft ?? 30) + ' ngày'}</td>
+      <div class="desk-title"><div><h1>Tin đã đăng</h1><p>${count('live') + count('soon')} tin đang hiển thị · ${count('soon')} tin sắp hết hạn</p></div><a class="btn btn-primary" href="/nha-tuyen-dung/dang-tin">${icon('plus')}Đăng tin</a></div>
+      ${jobs.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tin</th><th>Trạng thái</th><th class="num">Xem</th><th class="num">Gọi/Zalo</th><th class="num">Còn</th><th class="num">Thao tác</th></tr></thead><tbody>
+      ${jobs.map((j) => {
+        const d = daysLeft(j);
+        const isLive = j.status === 'live' && d >= 0;
+        return `<tr><td>${isLive ? `<a href="${url.job(j)}"><b>${esc(j.title)}</b></a>` : `<b>${esc(j.title)}</b>`}<br><small class="mute">${esc(j.district || '')}${j.salaryMin ? ' · ' + pay(j) + ' triệu' : ''}</small></td>
+        <td>${statusCell(j)}</td><td class="num">${num(j.views || 0)}</td><td class="num">${num((j.calls || 0) + (j.zalos || 0))}</td>
+        <td class="num">${['live', 'hidden'].includes(j.status) && d !== null ? (d < 0 ? '–' : d + ' ngày') : '–'}</td>
         <td><div class="acts">
-          <button class="btn btn-quiet btn-s" type="button" data-renew="${j.id}" title="Gia hạn 30 ngày">${icon('refresh')}<span class="sr">Gia hạn</span></button>
-          <a class="btn btn-quiet btn-s" href="/nha-tuyen-dung/dang-tin?sao-chep=${j.id}" title="Sao chép">${icon('copy')}<span class="sr">Sao chép</span></a>
-          ${j.own ? `<button class="btn btn-quiet btn-s" type="button" data-hide="${j.id}" title="${j.status === 'hidden' ? 'Hiện lại' : 'Ẩn tin'}">${icon(j.status === 'hidden' ? 'eye' : 'pause')}<span class="sr">Ẩn/hiện</span></button>` : ''}
-        </div></td></tr>`).join('')}
-      </tbody></table></div>`,
-    'ung-vien': () => `
-      <div class="desk-title"><div><h1>Ứng viên</h1><p>Kéo thẻ sang cột kế tiếp, hoặc chọn trạng thái trên thẻ.</p></div></div>
-      <div class="ats">${STAGES.map(([k, l]) => `<div class="ats-col" data-col="${k}"><h3>${l}<span>${ats.filter((x) => x.status === k).length}</span></h3>
-        ${ats.filter((x) => x.status === k).map((x) => `<div class="cand" draggable="true" data-id="${x.id}"><b>${esc(x.name)}</b><p>${x.age} tuổi · ${esc(x.height)} · ${esc(x.area)}</p><p>${esc(x.exp)}</p>
-          <div class="row">${x.certs.map((t) => `<span class="tag tag-ok">${esc(t)}</span>`).join('')}<select aria-label="Chuyển trạng thái" data-move="${x.id}">${STAGES.map(([s, n]) => `<option value="${s}" ${s === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div></div>`).join('')}
-      </div>`).join('')}</div>`,
-    'tim-ung-vien': () => {
-      const pool = [
-        ['Phạm Văn Đức', 31, '1m71', 'Gò Vấp, TP.HCM', 'Xuất ngũ · 3 năm bảo vệ siêu thị', 2.1],
-        ['Đỗ Thành Nam', 26, '1m74', 'Quận 12, TP.HCM', 'Công an nghĩa vụ · Võ thuật', 3.4],
-        ['Huỳnh Tấn Lộc', 48, '1m65', 'Bình Thạnh, TP.HCM', '10 năm chỉ huy mục tiêu · PCCC', 4.8],
-        ['Võ Minh Khang', 23, '1m69', 'Thủ Đức, TP.HCM', 'Mới vào nghề · Có xe máy', 6.2],
-        ['Ngô Văn Sang', 39, '1m67', 'Tân Bình, TP.HCM', 'Bảo vệ ngân hàng 6 năm', 7.5]
-      ];
-      const open = store.get('unlocked', []);
+          ${j.status !== 'removed' ? `<a class="btn btn-quiet btn-s" href="/nha-tuyen-dung/dang-tin?sua=${j.id}" title="Sửa">${icon('edit')}<span class="sr">Sửa</span></a>` : ''}
+          ${['live', 'hidden', 'expired'].includes(j.status) ? `<button class="btn btn-quiet btn-s" type="button" data-renew="${j.id}" title="Gia hạn">${icon('refresh')}<span class="sr">Gia hạn</span></button>` : ''}
+          ${j.status === 'live' ? `<button class="btn btn-quiet btn-s" type="button" data-hide="${j.id}" data-on="1" title="Tạm ẩn">${icon('pause')}<span class="sr">Ẩn</span></button>` : ''}
+          ${j.status === 'hidden' ? `<button class="btn btn-quiet btn-s" type="button" data-hide="${j.id}" data-on="" title="Hiện lại">${icon('eye')}<span class="sr">Hiện lại</span></button>` : ''}
+        </div></td></tr>`;
+      }).join('')}
+      </tbody></table></div>` : '<div class="empty"><h3>Chưa có tin nào</h3><p>Đăng tin miễn phí, hiển thị 1 – 4 tuần.</p><a class="btn btn-primary" href="/nha-tuyen-dung/dang-tin">Đăng tin đầu tiên</a></div>'}`,
+
+    'ung-vien': () => {
+      const only = query.get('tin');
+      const list = only ? apps.filter((a) => String(a.job_id) === only) : apps;
+      const titles = [...new Map(apps.map((a) => [a.job_id, a.title])).entries()];
       return `
-      <div class="desk-title"><div><h1>Tìm ứng viên</h1><p>Ứng viên đã bật "cho công ty tìm thấy". Mở số điện thoại tốn 1 điểm.</p></div><span class="tag tag-vip">Còn ${points} điểm</span></div>
-      <form class="bar-tools" id="near">
-        <label class="field"><span>Gần địa chỉ</span><input class="input" name="addr" value="Saigon Centre, Quận 1"></label>
-        <label class="field" style="max-width:150px"><span>Bán kính</span><select class="select" name="r"><option value="3">3 km</option><option value="5" selected>5 km</option><option value="10">10 km</option></select></label>
-        <button class="btn btn-primary" type="submit">${icon('search')}Tìm</button>
-      </form>
-      <div class="people">${pool.map(([n, a, h, area, exp, km], i) => `<div class="person" data-km="${km}">${mono({ initials: n.split(' ').pop()[0] }, '')}<div><b>${n}</b><p>${a} tuổi · ${h} · ${area} · cách ${String(km).replace('.', ',')} km</p><p class="mute">${exp}</p></div>
-        <div class="acts">${open.includes(i) ? `<a class="btn btn-call btn-s" href="tel:0909${String(100000 + i * 7311).slice(0, 6)}">${icon('phone')}0909 ${String(100000 + i * 7311).slice(0, 3)} ${String(100000 + i * 7311).slice(3, 6)}</a>` : `<span class="phone-mask">0909 *** ***</span><button class="btn btn-line btn-s" type="button" data-unlock="${i}">${icon('lock')}Mở số · 1 điểm</button>`}</div></div>`).join('')}</div>`;
+      <div class="desk-title"><div><h1>Ứng viên</h1><p>${apps.length} hồ sơ · ${newApps} hồ sơ mới. Hãy gọi lại sớm, ứng viên thường nhận việc ở nơi gọi trước.</p></div>
+        ${titles.length > 1 ? `<label class="field" style="min-width:240px"><span>Lọc theo tin</span><select class="select" id="byJob"><option value="">Tất cả tin</option>${titles.map(([id, t]) => `<option value="${id}" ${String(id) === only ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></label>` : ''}</div>
+      ${list.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Ứng viên</th><th>Liên hệ</th><th>Tin ứng tuyển</th><th>Ngày gửi</th><th>Trạng thái</th></tr></thead><tbody>
+        ${list.map((a) => `<tr><td><b>${esc(a.name)}</b><br><small class="mute">${[a.year && 'Sinh ' + esc(a.year), a.height && 'Cao ' + esc(a.height)].filter(Boolean).join(' · ') || '&nbsp;'}</small></td>
+          <td><a class="btn btn-call btn-s" href="tel:${esc(a.phone)}">${icon('phone')}${esc(a.phone)}</a></td>
+          <td>${esc(a.title)}</td><td>${ago(a.created_at)}</td>
+          <td><select class="select" data-move="${a.id}" aria-label="Trạng thái">${STAGES.map(([s, n]) => `<option value="${s}" ${s === a.status ? 'selected' : ''}>${n}</option>`).join('')}</select></td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="empty"><h3>Chưa có ứng viên</h3><p>Ứng viên bấm "Ứng tuyển nhanh" ở tin của bạn sẽ hiện ở đây.</p></div>'}`;
     },
+
     'xac-thuc': () => `
-      <div class="desk-title"><div><h1>Xác thực công ty</h1><p>Tin của công ty đã xác thực được gắn dấu và ưu tiên hiển thị.</p></div>${verify === 'done' ? `<span class="verified">${icon('check')}Đã xác thực</span>` : '<span class="tag tag-off">Đang chờ duyệt</span>'}</div>
+      <div class="desk-title"><div><h1>Xác thực công ty</h1><p>Tin của công ty đã xác thực được gắn dấu và ưu tiên hiển thị.</p></div>${verifyTag}</div>
+      ${c.verifyStatus === 'rejected' && c.verifyNote ? `<div class="notice notice-warn" style="margin-bottom:16px">${icon('alert')}<p><b>Chưa được duyệt:</b> ${esc(c.verifyNote)}</p></div>` : ''}
+      ${c.verifyStatus === 'pending' ? `<div class="notice notice-ok" style="margin-bottom:16px">${icon('clock')}<p>Hồ sơ đang được kiểm tra, kết quả trong 1 ngày làm việc.</p></div>` : ''}
       <form class="formcard" id="vf">
         <div class="grid2">
-          <label class="field"><span>Tên công ty</span><input class="input" value="${esc(c.name)}" required></label>
-          <label class="field"><span>Mã số thuế</span><input class="input" value="${esc(c.mst)}" inputmode="numeric" required></label>
+          <label class="field"><span>Tên công ty (theo giấy phép)</span><input class="input" name="name" value="${esc(c.name)}" required></label>
+          <label class="field"><span>Mã số thuế</span><input class="input" name="mst" value="${esc(c.mst)}" inputmode="numeric" required></label>
         </div>
         <div class="grid2">
-          <label class="field"><span>Giấy chứng nhận đủ điều kiện ANTT</span><input class="input" value="${esc(c.license)}" required></label>
-          <label class="field"><span>Người đại diện</span><input class="input" value="Nguyễn Văn Hải" required></label>
+          <label class="field"><span>Giấy chứng nhận đủ điều kiện ANTT (số, ngày cấp)</span><input class="input" name="license" value="${esc(c.license)}" required></label>
+          <label class="field"><span>Người đại diện theo pháp luật</span><input class="input" name="rep" value="${esc(c.rep)}" required></label>
         </div>
-        <div class="grid2">
-          <div class="upload">${icon('file')}<br>Giấy phép kinh doanh (PDF, ảnh)<br><input type="file" accept=".pdf,image/*" aria-label="Tải giấy phép kinh doanh"></div>
-          <div class="upload">${icon('file')}<br>Giấy chứng nhận ANTT<br><input type="file" accept=".pdf,image/*" aria-label="Tải giấy chứng nhận ANTT"></div>
+        <div class="field"><span>Giấy tờ đã tải lên (PDF, JPG, PNG · tối đa 5MB/file)</span>
+          <ul class="docs" id="docs">${docList(c.docs)}</ul>
+          <div class="grid2">
+            <label class="upload">${icon('file')}<br>Giấy phép kinh doanh<input type="file" accept=".pdf,image/*" data-label="Giấy phép kinh doanh"></label>
+            <label class="upload">${icon('file')}<br>Giấy chứng nhận đủ điều kiện ANTT<input type="file" accept=".pdf,image/*" data-label="Giấy chứng nhận ANTT"></label>
+          </div>
         </div>
-        <div class="form-foot"><button class="btn btn-primary" type="submit">Gửi xác thực lại</button></div>
+        <div class="form-foot"><button class="btn btn-primary" type="submit">${c.verifyStatus === 'none' ? 'Gửi xác thực' : 'Gửi xác thực lại'}</button></div>
       </form>`,
-    'thanh-toan': () => {
-      const inv = store.get('invoices', [{ no: 'HD-2026-0981', item: 'Gói VIP · 1 tin', amount: 299000, date: '02/11/2026' }, { no: 'HD-2026-0742', item: '50 điểm xem hồ sơ', amount: 450000, date: '18/10/2026' }]);
-      const pick = query.get('goi');
-      return `
-      <div class="desk-title"><div><h1>Gói & thanh toán</h1><p>Giá đã gồm VAT. Hóa đơn điện tử gửi về email công ty.</p></div><a class="more" href="/bang-gia">So sánh các gói ${icon('arrow', 'ico-s')}</a></div>
-      <div class="tbl-wrap" style="margin-bottom:28px"><table class="tbl"><thead><tr><th>Gói</th><th>Mô tả</th><th class="num">Giá</th><th></th></tr></thead><tbody>
-        ${V.packages.filter((p) => p.price).map((p) => `<tr${p.id === pick ? ' style="background:var(--paper)"' : ''}><td><b>${esc(p.name)}</b></td><td class="mute">${esc(p.desc)}</td><td class="num"><b>${money(p.price)}</b></td><td class="num"><button class="btn ${p.id === pick ? 'btn-primary' : 'btn-line'} btn-s" type="button" data-buy="${p.id}">Mua</button></td></tr>`).join('')}
-        <tr><td><b>Gói 50 điểm</b></td><td class="mute">Mở số điện thoại 50 ứng viên, hạn 12 tháng</td><td class="num"><b>${money(450000)}</b></td><td class="num"><button class="btn btn-line btn-s" type="button" data-buy="points">Mua</button></td></tr>
-      </tbody></table></div>
-      <section class="panel"><div class="panel-h"><h2>Hóa đơn</h2></div>
-        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Số</th><th>Nội dung</th><th>Ngày</th><th class="num">Số tiền</th><th></th></tr></thead><tbody>
-        ${inv.map((x) => `<tr><td>${x.no}</td><td>${esc(x.item)}</td><td>${x.date}</td><td class="num"><b>${money(x.amount)}</b></td><td class="num"><button class="btn btn-quiet btn-s" type="button" data-toast="Bản mẫu: hóa đơn PDF sẽ tải về ở bản chính thức.">${icon('download')}PDF</button></td></tr>`).join('')}
-        </tbody></table></div>
-      </section>`;
-    }
+
+    'cong-ty': () => `
+      <div class="desk-title"><div><h1>Thông tin công ty</h1><p>Hiển thị trên trang công ty <a href="/cong-ty/${esc(c.id)}">/cong-ty/${esc(c.id)}</a>.</p></div></div>
+      <form class="formcard" id="cf">
+        <div class="grid3">
+          <label class="field"><span>Số điện thoại</span><input class="input" name="phone" value="${esc(c.phone)}" inputmode="tel"></label>
+          <label class="field"><span>Quy mô</span><input class="input" name="size" value="${esc(c.size)}" placeholder="200+ nhân viên"></label>
+          <label class="field"><span>Năm thành lập</span><input class="input" name="founded" value="${esc(c.founded)}" inputmode="numeric" maxlength="4"></label>
+        </div>
+        <label class="field"><span>Giới thiệu</span><textarea class="textarea" name="about" rows="6" maxlength="2000">${esc(c.about)}</textarea></label>
+        <div class="form-foot"><button class="btn btn-primary" type="submit">Lưu</button></div>
+      </form>`
   };
 
-  const html = `<div class="wrap desk">${deskNav('/nha-tuyen-dung', tabs, tab, `<b>${esc(c.short)}</b><small>${verify === 'done' ? 'Đã xác thực' : 'Chờ xác thực'} · ${points} điểm</small>`)}<div>${views[tab]()}</div></div>`;
+  const html = `<div class="wrap desk">${deskNav('/nha-tuyen-dung', tabs, tab, `<b>${esc(c.short)}</b><small>${c.verified ? 'Đã xác thực' : c.verifyStatus === 'pending' ? 'Chờ xác thực' : 'Chưa xác thực'}</small>`)}<div>${views[tab]()}</div></div>`;
 
   function mount(root) {
     const reload = () => go(location.pathname + location.search, { replace: true, keepScroll: true });
 
-    /* Đăng tin */
+    /* Đăng / sửa tin */
     const jf = $('#jf', root);
     if (jf) {
-      let draft = {};
-      const fill = (f) => {
-        ['title', 'address', 'qty', 'salaryMin', 'salaryMax', 'desc'].forEach((k) => { if (f[k] !== undefined && f[k] !== '') jf[k].value = f[k]; });
-        ['province', 'target', 'shift'].forEach((k) => { if (f[k]) jf[k].value = f[k]; });
-        if (f.province) jf.district.innerHTML = districtOpts(f.province, f.district);
-        ['housing', 'meals'].forEach((k) => { if (f[k]) jf[k].checked = true; });
-        if (!jf.title.value && f.target && f.district) jf.title.value = `Tuyển ${f.qty > 1 ? f.qty + ' ' : ''}bảo vệ ${target(f.target).name.toLowerCase()} ${f.district}${f.shift ? ', ' + shift(f.shift).name.toLowerCase() : ''}`;
-        showRisk();
-      };
-      const cb = $('#cb', root);
-      const say = (cls, h) => { cb.insertAdjacentHTML('beforeend', `<div class="msg ${cls}">${h}</div>`); cb.scrollTop = cb.scrollHeight; };
-      $('#cf', root).addEventListener('submit', (e) => {
-        e.preventDefault();
-        const m = e.target.m.value.trim();
-        if (!m) return;
-        e.target.m.value = '';
-        say('msg-me', esc(m));
-        say('msg-bot typing-row', '<span class="typing"><span></span><span></span><span></span></span>');
-        setTimeout(() => {
-          cb.lastElementChild.remove();
-          draft = parse(m, draft);
-          fill(draft);
-          const got = [['Khu vực', draft.district ? `${draft.district}, ${province(draft.province).short}` : draft.province && province(draft.province).name], ['Mục tiêu', draft.target && target(draft.target).name], ['Ca', draft.shift && shift(draft.shift).name], ['Lương', draft.salaryMin && `${draft.salaryMin}${draft.salaryMax !== draft.salaryMin ? ' – ' + draft.salaryMax : ''} triệu`], ['Chế độ', [draft.housing && 'Bao ở', draft.meals && 'Bao ăn'].filter(Boolean).join(', ')], ['Địa chỉ', draft.address]].filter(([, v]) => v);
-          const miss = ASK.find(([k]) => !draft[k]);
-          const risks = riskCheck(draft);
-          say('msg-bot', `<b>Đã điền</b>${got.length ? `<dl>${got.map(([k, v]) => `<dt>${k}</dt><dd>${esc(String(v))}</dd>`).join('')}</dl>` : 'Chưa nhận ra thông tin nào.'}
-            ${risks.length ? `<p style="margin:8px 0 0;color:var(--signal)"><b style="color:inherit">Cần xem lại</b>${esc(risks[0])}</p>` : ''}
-            <p style="margin:8px 0 0">${miss ? esc(miss[1]) : 'Đủ thông tin rồi. Anh/chị xem lại form bên cạnh rồi bấm <b style="display:inline;color:inherit;letter-spacing:0;text-transform:none;font-size:inherit">Gửi duyệt</b>.'}</p>`);
-        }, 700);
-      });
+      const editing = query.get('sua');
       const showRisk = () => {
         const r = riskCheck(Object.fromEntries(new FormData(jf)));
         $('#risk', root).innerHTML = r.length ? `<div class="risk hi"><h4>${icon('alert')}Tin sẽ được kiểm duyệt thủ công</h4><ul>${r.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : jf.title.value ? `<div class="risk lo"><h4>${icon('shield')}Không thấy dấu hiệu rủi ro</h4></div>` : '';
-        return r;
       };
       jf.province.addEventListener('change', () => (jf.district.innerHTML = districtOpts(jf.province.value)));
       jf.addEventListener('input', showRisk);
-      const save = (status) => {
+      const save = async (action, btn) => {
         const f = Object.fromEntries(new FormData(jf));
-        const risks = riskCheck(f);
-        const j = { id: Date.now() % 1e7, title: f.title, company: CO, province: f.province, district: f.district, address: f.address, target: f.target, shift: f.shift, qty: Number(f.qty) || 1, salaryMin: Number(f.salaryMin), salaryMax: Number(f.salaryMax) || Number(f.salaryMin), housing: !!f.housing, meals: !!f.meals, urgent: !!f.urgent, tier: f.urgent ? 'urgent' : 'normal', posted: 0, daysLeft: 30, views: 0, calls: 0, age: 'Theo mô tả', height: 'Theo mô tả', desc: f.desc, risks, status: status === 'draft' ? 'draft' : risks.length ? 'pending' : 'live' };
-        store.set('myJobs', [j, ...store.get('myJobs', [])]);
-        toast(j.status === 'live' ? 'Tin đã được duyệt tự động và đang hiển thị.' : j.status === 'pending' ? 'Tin cần kiểm duyệt thủ công, thường xong trong 2 giờ.' : 'Đã lưu nháp.');
-        go('/nha-tuyen-dung/tin-dang');
+        const payload = { ...f, housing: !!f.housing, meals: !!f.meals, urgent: !!f.urgent, action };
+        const stop = busy(btn, 'Đang lưu…');
+        try {
+          const r = await api(editing ? `/employer/jobs/${editing}` : '/employer/jobs', { method: editing ? 'PUT' : 'POST', body: payload });
+          toast(r.status === 'live' || r.status === 'hidden' ? 'Đã lưu. Tin đang hiển thị trên website.' : r.status === 'pending' ? 'Tin đang chờ kiểm duyệt, thường xong trong 2 giờ.' : 'Đã lưu nháp.');
+          go('/nha-tuyen-dung/tin-dang');
+        } catch (err) { stop(); toast(err.message, 'alert'); }
       };
-      jf.addEventListener('submit', (e) => { e.preventDefault(); save('submit'); });
-      $('#draft', root).addEventListener('click', () => { if (!jf.title.value) { toast('Cần có tiêu đề để lưu nháp.', 'alert'); return; } save('draft'); });
+      jf.addEventListener('submit', (e) => { e.preventDefault(); save('submit', e.submitter); });
+      $('#draft', root)?.addEventListener('click', (e) => { if (jf.title.value.trim().length < 10) { toast('Tiêu đề cần ít nhất 10 ký tự.', 'alert'); return; } save('draft', e.currentTarget); });
       showRisk();
     }
 
-    /* Tin đã đăng */
-    root.addEventListener('click', (e) => {
-      const rn = e.target.closest('[data-renew]');
+    /* Tin đã đăng: ẩn/hiện, gia hạn */
+    root.addEventListener('click', async (e) => {
       const hd = e.target.closest('[data-hide]');
-      const ul = e.target.closest('[data-unlock]');
-      const by = e.target.closest('[data-buy]');
-      if (rn) {
-        const list = store.get('myJobs', []);
-        const j = list.find((x) => String(x.id) === rn.dataset.renew);
-        if (j) { j.daysLeft = 30; if (j.status === 'off' || j.status === 'soon') j.status = 'live'; store.set('myJobs', list); reload(); }
-        toast('Đã gia hạn thêm 30 ngày.');
-      }
+      const rn = e.target.closest('[data-renew]');
       if (hd) {
-        const list = store.get('myJobs', []);
-        const j = list.find((x) => String(x.id) === hd.dataset.hide);
-        j.status = j.status === 'hidden' ? 'live' : 'hidden';
-        store.set('myJobs', list);
-        toast(j.status === 'hidden' ? 'Đã ẩn tin.' : 'Tin đã hiển thị lại.');
-        reload();
+        const stop = busy(hd, '…');
+        try { await api(`/employer/jobs/${hd.dataset.hide}/hide`, { method: 'POST', body: { hidden: !!hd.dataset.on } }); toast(hd.dataset.on ? 'Đã tạm ẩn tin.' : 'Tin đã hiển thị lại.'); reload(); } catch (err) { stop(); toast(err.message, 'alert'); }
       }
-      if (ul) {
-        if (points < 1) { toast('Hết điểm. Mua thêm trong mục Gói & thanh toán.', 'alert'); return; }
-        store.set('points', points - 1);
-        store.set('unlocked', [...store.get('unlocked', []), Number(ul.dataset.unlock)]);
-        toast('Đã mở số. Còn ' + (points - 1) + ' điểm.');
-        reload();
+      if (rn) {
+        const j = jobs.find((x) => String(x.id) === rn.dataset.renew);
+        const box = modal(`<h2>Gia hạn tin</h2><p>${esc(j.title)}</p>
+          <div class="pills" style="margin:12px 0 4px">${WEEKS.map((w) => `<label class="pill"><input type="radio" name="w" value="${w}" ${w === 4 ? 'checked' : ''}><span>${w} tuần</span></label>`).join('')}</div>
+          <p class="mute" style="font-size:14px">${j.status === 'expired' ? 'Tin sẽ hiển thị lại từ hôm nay.' : 'Thời gian được cộng thêm vào hạn hiện tại.'}</p>
+          <div class="form-foot"><button class="btn btn-quiet" data-close>Huỷ</button><button class="btn btn-primary" id="rnok">Gia hạn</button></div>`);
+        $('#rnok', box).addEventListener('click', async (ev) => {
+          const stop = busy(ev.currentTarget, 'Đang lưu…');
+          try { await api(`/employer/jobs/${j.id}/renew`, { method: 'POST', body: { weeks: Number($('input[name=w]:checked', box).value) } }); closeModal(); toast('Đã gia hạn tin.'); reload(); } catch (err) { stop(); toast(err.message, 'alert'); }
+        });
       }
-      if (by) checkout(by.dataset.buy, reload);
     });
 
-    $('#near', root)?.addEventListener('submit', (e) => {
+    /* Ứng viên */
+    $('#byJob', root)?.addEventListener('change', (e) => go('/nha-tuyen-dung/ung-vien' + (e.target.value ? '?tin=' + e.target.value : '')));
+    $$('[data-move]', root).forEach((s) => s.addEventListener('change', async () => {
+      try { await api(`/employer/applications/${s.dataset.move}`, { method: 'POST', body: { status: s.value } }); toast('Đã cập nhật trạng thái.'); } catch (err) { toast(err.message, 'alert'); }
+    }));
+
+    /* Xác thực công ty */
+    const vf = $('#vf', root);
+    if (vf) {
+      $$('input[type=file]', vf).forEach((inp) => inp.addEventListener('change', async () => {
+        const file = inp.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { toast('File tối đa 5MB.', 'alert'); inp.value = ''; return; }
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('label', inp.dataset.label);
+        toast('Đang tải lên…', 'download');
+        try { const r = await api('/employer/verify/file', { method: 'POST', body: fd }); $('#docs', root).innerHTML = docList(r.docs); toast('Đã tải lên.'); } catch (err) { toast(err.message, 'alert'); }
+        inp.value = '';
+      }));
+      $('#docs', root).addEventListener('click', async (e) => {
+        const d = e.target.closest('[data-deldoc]');
+        if (!d) return;
+        try { const r = await api(`/employer/verify/file/${d.dataset.deldoc}`, { method: 'DELETE' }); $('#docs', root).innerHTML = docList(r.docs); } catch (err) { toast(err.message, 'alert'); }
+      });
+      vf.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const stop = busy(e.submitter);
+        try { await api('/employer/verify', { method: 'POST', body: Object.fromEntries(new FormData(vf)) }); await syncMe(); toast('Đã gửi hồ sơ xác thực. Kết quả trong 1 ngày làm việc.'); reload(); } catch (err) { stop(); toast(err.message, 'alert'); }
+      });
+    }
+
+    /* Thông tin công ty */
+    $('#cf', root)?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const r = Number(e.target.r.value);
-      $$('.person', root).forEach((p) => (p.hidden = Number(p.dataset.km) > r));
-      toast(`${$$('.person:not([hidden])', root).length} ứng viên trong bán kính ${r} km.`, 'pin');
-    });
-
-    $('#vf', root)?.addEventListener('submit', (e) => { e.preventDefault(); store.set('verify', 'pending'); toast('Đã gửi hồ sơ xác thực. Kết quả trong 1 ngày làm việc.'); reload(); });
-
-    /* ATS */
-    const move = (id, st) => {
-      const it = ats.find((x) => String(x.id) === String(id));
-      if (!it || it.status === st) return;
-      it.status = st;
-      store.set('ats', ats);
-      toast(`${it.name} → ${STAGES.find((s) => s[0] === st)[1]}`);
-      reload();
-    };
-    $$('[data-move]', root).forEach((s) => s.addEventListener('change', () => move(s.dataset.move, s.value)));
-    $$('.cand', root).forEach((cd) => cd.addEventListener('dragstart', (e) => e.dataTransfer.setData('text/plain', cd.dataset.id)));
-    $$('.ats-col', root).forEach((col) => {
-      col.addEventListener('dragover', (e) => { e.preventDefault(); col.classList.add('drop'); });
-      col.addEventListener('dragleave', () => col.classList.remove('drop'));
-      col.addEventListener('drop', (e) => { e.preventDefault(); col.classList.remove('drop'); move(e.dataTransfer.getData('text/plain'), col.dataset.col); });
+      const stop = busy(e.submitter, 'Đang lưu…');
+      try { await api('/employer/company', { method: 'PUT', body: Object.fromEntries(new FormData(e.target)) }); toast('Đã lưu thông tin công ty.'); } catch (err) { toast(err.message, 'alert'); }
+      stop();
     });
   }
 
   return { nav: 'employer', html, mount, title: tabs.find((t) => t[0] === tab)[1] + ' – Nhà tuyển dụng', noindex: true };
 }
 
+function onboarding(u) {
+  const html = `<div class="wrap" style="max-width:560px;padding:48px 0">
+    <h1>Thông tin công ty</h1><p class="mute">Chào ${esc(u.name)}. Nhập tên công ty để bắt đầu đăng tin.</p>
+    <form class="formcard" id="ob">
+      <label class="field" style="margin-bottom:16px"><span>Tên công ty</span><input class="input" name="name" required placeholder="Công ty TNHH Dịch vụ Bảo vệ ..."></label>
+      <label class="field"><span>Số điện thoại công ty</span><input class="input" name="phone" inputmode="tel"></label>
+      <div class="form-foot"><button class="btn btn-primary" type="submit">Tiếp tục</button></div>
+    </form></div>`;
+  const mount = (root) => $('#ob', root).addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const stop = busy(e.submitter);
+    try { await api('/employer/company', { method: 'POST', body: Object.fromEntries(new FormData(e.target)) }); await syncMe(); go('/nha-tuyen-dung', { replace: true }); } catch (err) { stop(); toast(err.message, 'alert'); }
+  });
+  return { nav: 'employer', html, mount, title: 'Thông tin công ty', noindex: true };
+}
+
+const docList = (docs) => docs.length
+  ? docs.map((d, i) => `<li>${icon('file', 'ico-s')}<span>${esc(d.name)} <small class="mute">${Math.max(1, Math.round(d.size / 1024))} KB</small></span><button class="linkbtn" type="button" data-deldoc="${i}">Xoá</button></li>`).join('')
+  : '<li class="mute">Chưa có giấy tờ nào.</li>';
+
 function districtOpts(p, sel) {
   const pv = V.provinces.find((x) => x.slug === p);
   return pv ? `<option value="">Chọn</option>${pv.districts.map((d) => `<option ${d === sel ? 'selected' : ''}>${esc(d)}</option>`).join('')}` : '<option value="">Chọn tỉnh trước</option>';
 }
 
-function qrSvg(seed) {
-  let s = [...seed].reduce((a, ch) => a * 31 + ch.charCodeAt(0), 7) >>> 0;
-  const rnd = () => ((s = (s * 1103515245 + 12345) >>> 0) / 2 ** 32);
-  const n = 25;
-  const finder = (x, y) => [[0, 0], [n - 7, 0], [0, n - 7]].some(([a, b]) => x >= a && x < a + 7 && y >= b && y < b + 7);
-  const fill = (x, y) => { const [a, b] = [[0, 0], [n - 7, 0], [0, n - 7]].find(([a, b]) => x >= a && x < a + 7 && y >= b && y < b + 7); const dx = x - a, dy = y - b; return dx === 0 || dx === 6 || dy === 0 || dy === 6 || (dx >= 2 && dx <= 4 && dy >= 2 && dy <= 4); };
-  let r = '';
-  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (finder(x, y) ? fill(x, y) : rnd() > 0.52) r += `M${x} ${y}h1v1h-1z`;
-  return `<svg class="qr" viewBox="0 0 ${n} ${n}" role="img" aria-label="Mã QR chuyển khoản"><path d="${r}" fill="#0d1530"/></svg>`;
-}
-
-function checkout(id, done) {
-  const p = id === 'points' ? { name: 'Gói 50 điểm', price: 450000 } : V.packages.find((x) => x.id === id);
-  const code = 'VLBV' + String(Date.now()).slice(-6);
-  const box = modal(`
-    <h2>Thanh toán ${esc(p.name)}</h2>
-    <p class="mute">Số tiền <b style="color:var(--ink)">${money(p.price)}</b> · Nội dung chuyển khoản <b style="color:var(--ink)">${code}</b></p>
-    <div class="pay-tabs" role="radiogroup" aria-label="Phương thức">${['QR ngân hàng', 'VNPay', 'MoMo'].map((m, i) => `<label class="pill"><input type="radio" name="pm" value="${m}" ${i ? '' : 'checked'}><span>${m}</span></label>`).join('')}</div>
-    <div id="pmBody" style="text-align:center">${qrSvg(code)}<p class="mute" style="font-size:14px">Quét bằng app ngân hàng bất kỳ. Gói kích hoạt tự động khi nhận tiền.</p></div>
-    <div class="form-foot"><button class="btn btn-quiet" data-close>Hủy</button><button class="btn btn-primary" id="paid">Tôi đã thanh toán</button></div>`);
-  $$('input[name=pm]', box).forEach((r) => r.addEventListener('change', () => {
-    $('#pmBody', box).innerHTML = r.value === 'QR ngân hàng' ? `${qrSvg(code)}<p class="mute" style="font-size:14px">Quét bằng app ngân hàng bất kỳ.</p>` : `<p style="padding:28px 0">Bạn sẽ được chuyển sang cổng <b>${r.value}</b> để thanh toán.<br><span class="mute">Bản mẫu: không có giao dịch thật.</span></p>`;
-  }));
-  $('#paid', box).addEventListener('click', () => {
-    const inv = store.get('invoices', [{ no: 'HD-2026-0981', item: 'Gói VIP · 1 tin', amount: 299000, date: '02/11/2026' }, { no: 'HD-2026-0742', item: '50 điểm xem hồ sơ', amount: 450000, date: '18/10/2026' }]);
-    inv.unshift({ no: 'HD-2026-' + code.slice(-4), item: p.name, amount: p.price, date: new Date().toLocaleDateString('vi-VN') });
-    store.set('invoices', inv);
-    if (id === 'points') store.set('points', store.get('points', 20) + 50);
-    closeModal();
-    toast('Thanh toán thành công. Hóa đơn đã được tạo.');
-    done();
-  });
-}

@@ -6,14 +6,46 @@ export const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[đĐ]/g, 'd').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-export const SITE = 'https://vieclambaove.vn';
+// Tên miền lấy theo trang đang chạy (workers.dev hoặc tên miền thật khi gắn sau)
+export const SITE = location.origin;
 export const company = (id) => V.companies.find((c) => c.id === id);
 export const province = (s) => V.provinces.find((p) => p.slug === s);
 export const shift = (id) => V.shifts.find((s) => s.id === id);
 export const target = (id) => V.targets.find((t) => t.id === id);
 export const districtBySlug = (p, ds) => p?.districts.find((d) => slug(d) === ds);
 
-/* ---------- Lưu trữ cục bộ (bản tĩnh thay cho API) ---------- */
+/* ---------- Gọi API của Worker ---------- */
+export async function api(path, { method = 'GET', body } = {}) {
+  let res;
+  try {
+    res = await fetch('/api' + path, {
+      method, credentials: 'same-origin',
+      headers: body !== undefined && !(body instanceof FormData) ? { 'content-type': 'application/json' } : {},
+      body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body)
+    });
+  } catch {
+    throw new Error('Mất kết nối mạng, vui lòng thử lại.');
+  }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    if (res.status === 401 && store.get('user')) store.del('user');
+    const err = new Error(data.error || 'Có lỗi xảy ra, vui lòng thử lại.');
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
+// Nút đang gửi: khoá + đổi chữ, trả về hàm khôi phục
+export function busy(btn, label = 'Đang gửi…') {
+  if (!btn) return () => {};
+  const old = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = label;
+  return () => { btn.disabled = false; btn.innerHTML = old; };
+}
+
+/* ---------- Lưu trữ cục bộ trong trình duyệt ---------- */
 export const store = {
   get(k, d = null) { try { const v = localStorage.getItem('vlbv2_' + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { localStorage.setItem('vlbv2_' + k, JSON.stringify(v)); },
@@ -21,12 +53,30 @@ export const store = {
 };
 export const user = () => store.get('user');
 
-/* Tin của nhà tuyển dụng (tạo trong trình duyệt) được gộp vào danh sách chung */
-export function allJobs() {
-  const mine = store.get('myJobs', []).filter((j) => j.status === 'live');
-  return [...mine, ...V.jobs];
+// Đồng bộ phiên đăng nhập từ máy chủ (cookie HttpOnly) về bộ nhớ trình duyệt
+export async function syncMe() {
+  try {
+    const r = await api('/me');
+    if (r.user) {
+      store.set('user', r.user);
+      if (r.user.role === 'candidate') {
+        // Gộp tin đã lưu trên máy này vào tài khoản
+        const local = store.get('saved', []).filter((id) => !r.saved.includes(id));
+        if (local.length) api('/saved', { method: 'POST', body: { ids: local } }).catch(() => {});
+        store.set('saved', [...local, ...r.saved]);
+        if (r.profile) store.set('profile', r.profile);
+      }
+    } else if (store.get('user')) {
+      store.del('user');
+      store.del('profile');
+    }
+  } catch { /* mất mạng: giữ trạng thái cũ */ }
+  return user();
 }
-export const job = (id) => allJobs().find((j) => j.id === Number(id)) || store.get('myJobs', []).find((j) => j.id === Number(id));
+
+/* Tin công khai lấy từ file dữ liệu tĩnh /data/site.js (Worker sinh lại mỗi khi có thay đổi) */
+export const allJobs = () => V.jobs || [];
+export const job = (id) => allJobs().find((j) => j.id === Number(id));
 export const isExpired = (j) => j.daysLeft < 0;
 export const activeJobs = () => allJobs().filter((j) => !isExpired(j));
 
@@ -43,7 +93,7 @@ export const url = {
   job: (j) => `/tin/${slug(j.title)}-${j.id}`,
   area: (p, d) => '/viec-lam' + (p ? '/' + p : '') + (d ? '/' + slug(d) : ''),
   company: (c) => `/cong-ty/${c.id}`,
-  post: (p) => `/cam-nang/${p.id}`
+  post: (p) => `/tin-tuc/${p.id}`
 };
 
 /* ---------- Icon (nét mảnh, tự vẽ) ---------- */
@@ -73,6 +123,7 @@ const P = {
   settings: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
   logout: '<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',
   bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
+  play: '<path d="M8 5v14l11-7z"/>',
   bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
   send: '<path d="M21 3 3 10.5l7 3 3 7z"/><path d="m10 13.5 4-4"/>',
   mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
@@ -112,6 +163,7 @@ export function toggleSave(id) {
   const i = s.indexOf(id);
   i > -1 ? s.splice(i, 1) : s.unshift(id);
   store.set('saved', s);
+  if (user()?.role === 'candidate') api('/saved', { method: 'POST', body: { jobId: id, on: i === -1 } }).catch(() => {});
   return i === -1;
 }
 
@@ -166,7 +218,10 @@ export function jobRow(j) {
         ${j.housing ? '<span class="chip chip-ok">Bao ở</span>' : ""}${j.meals ? '<span class="chip chip-ok">Bao ăn</span>' : ""}
       </p>
     </div>
-    ${save}
+    <div class="jr-act">
+      ${off ? "" : `<button class="btn btn-primary jr-apply" type="button" data-apply="${j.id}">${icon("bolt")}Ứng tuyển nhanh</button>`}
+      ${save}
+    </div>
   </article>`;
 }
 
@@ -212,27 +267,34 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeMod
 /* ---------- Hành động dùng chung: ứng tuyển, báo cáo ---------- */
 export function applyJob(id) {
   const j = job(id);
+  if (!j) { toast('Tin này đã hết hạn.', 'alert'); return; }
   const u = user();
+  const p = store.get('profile', {});
+  const me = u?.role === 'candidate';
   const box = modal(`<h2>Ứng tuyển nhanh</h2><p>${esc(j.title)}</p>
     <form class="stack" id="applyForm">
-      <label class="field"><span>Họ và tên</span><input class="input" name="name" required autocomplete="name" value="${esc(u?.name || '')}"></label>
-      <label class="field"><span>Số điện thoại / Zalo</span><input class="input" name="phone" required inputmode="tel" autocomplete="tel" value="${esc(u?.phone || '')}"></label>
+      <label class="field"><span>Họ và tên</span><input class="input" name="name" required autocomplete="name" value="${esc(p.name || (me ? u.name : '') || '')}"></label>
+      <label class="field"><span>Số điện thoại / Zalo</span><input class="input" name="phone" required inputmode="tel" autocomplete="tel" placeholder="09xx xxx xxx" value="${esc(me ? u.phone : p.phone || '')}" ${me ? 'readonly' : ''}></label>
       <div class="grid2">
-        <label class="field"><span>Năm sinh</span><input class="input" name="year" inputmode="numeric" placeholder="1990" value="${esc(u?.year || '')}"></label>
-        <label class="field"><span>Chiều cao</span><input class="input" name="height" placeholder="1m68" value="${esc(u?.height || '')}"></label>
+        <label class="field"><span>Năm sinh</span><input class="input" name="year" inputmode="numeric" maxlength="4" placeholder="1990" value="${esc(p.year || '')}"></label>
+        <label class="field"><span>Chiều cao</span><input class="input" name="height" placeholder="1m68" value="${esc(p.height || '')}"></label>
       </div>
       <p class="mute" style="margin:0;font-size:14px">Nhà tuyển dụng sẽ gọi lại cho bạn. Không công ty nào được thu phí khi nhận hồ sơ.</p>
       <button class="btn btn-primary btn-l" type="submit">Gửi hồ sơ</button>
     </form>`);
-  box.querySelector('#applyForm').addEventListener('submit', (e) => {
+  box.querySelector('#applyForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const f = Object.fromEntries(new FormData(e.target));
-    const list = store.get('applied', []);
-    if (!list.find((a) => a.id === j.id)) list.unshift({ id: j.id, at: new Date().toLocaleDateString('vi-VN'), status: 'Đã gửi' });
-    store.set('applied', list);
-    if (!u) store.set('profileDraft', f);
-    closeModal();
-    toast('Đã gửi hồ sơ. Công ty thường gọi lại trong 24 giờ.');
+    const done = busy(e.submitter);
+    try {
+      const r = await api('/apply', { method: 'POST', body: { jobId: j.id, ...f } });
+      const list = store.get('applied', []);
+      if (!list.find((a) => a.id === j.id)) list.unshift({ id: j.id, at: new Date().toLocaleDateString('vi-VN') });
+      store.set('applied', list);
+      if (!me) store.set('profile', { ...p, name: f.name, phone: f.phone, year: f.year, height: f.height });
+      closeModal();
+      toast(r.duplicate ? 'Bạn đã ứng tuyển tin này trước đó.' : 'Đã gửi hồ sơ. Công ty thường gọi lại trong 24 giờ.');
+    } catch (err) { done(); toast(err.message, 'alert'); }
   });
 }
 
@@ -244,13 +306,14 @@ export function reportJob(id) {
       <label class="field"><span>Mô tả thêm (không bắt buộc)</span><textarea class="textarea" name="note" rows="3"></textarea></label>
       <button class="btn btn-primary" type="submit">Gửi báo cáo</button>
     </form>`);
-  box.querySelector('#repForm').addEventListener('submit', (e) => {
+  box.querySelector('#repForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const r = store.get('reports', []);
-    r.unshift({ job: Number(id), reason: reasons[e.target.r.value], at: new Date().toLocaleString('vi-VN') });
-    store.set('reports', r);
-    closeModal();
-    toast('Cảm ơn bạn. Báo cáo đã được ghi nhận.');
+    const done = busy(e.submitter);
+    try {
+      await api('/report', { method: 'POST', body: { jobId: Number(id), reason: reasons[e.target.r.value], note: e.target.note.value } });
+      closeModal();
+      toast('Cảm ơn bạn. Báo cáo đã được ghi nhận.');
+    } catch (err) { done(); toast(err.message, 'alert'); }
   });
 }
 
@@ -267,29 +330,34 @@ export const crumbs = (items) => `<ol class="crumbs">${items.map(([t, h]) => `<l
 /* ---------- Tạo hồ sơ 1 chạm: ít gõ, chọn là xong ---------- */
 const QUICK_EXP = ['Xuất ngũ', 'Công an nghĩa vụ', 'Chứng chỉ PCCC', 'Võ thuật', 'Chưa có kinh nghiệm'];
 export function quickProfile() {
-  const u = user() || {};
+  const u = user();
+  if (u?.role === 'employer') { toast('Bạn đang đăng nhập tài khoản nhà tuyển dụng.', 'alert'); return; }
+  const me = u?.role === 'candidate';
   const p = store.get('profile', {});
   const box = modal(`<h2>Tạo hồ sơ 1 chạm</h2>
     <p>Chỉ cần tên và số điện thoại. Công ty bảo vệ đã xác thực gần bạn sẽ gọi hoặc nhắn Zalo.</p>
     <form class="stack" id="quickForm">
-      <label class="field"><span>Họ và tên</span><input class="input" name="name" required autocomplete="name" value="${esc(p.name || u.name || '')}"></label>
-      <label class="field"><span>Số điện thoại / Zalo</span><input class="input" name="phone" required inputmode="tel" autocomplete="tel" pattern="[0-9 .+]{9,13}" placeholder="09xx xxx xxx" value="${esc(p.phone || u.phone || '')}"></label>
+      <label class="field"><span>Họ và tên</span><input class="input" name="name" required autocomplete="name" value="${esc(p.name || u?.name || '')}"></label>
+      <label class="field"><span>Số điện thoại / Zalo</span><input class="input" name="phone" required inputmode="tel" autocomplete="tel" pattern="[0-9 .+]{9,13}" placeholder="09xx xxx xxx" value="${esc(me ? u.phone : p.phone || '')}" ${me ? 'readonly' : ''}></label>
       <div class="grid2">
-        <label class="field"><span>Năm sinh</span><input class="input" name="year" inputmode="numeric" placeholder="1995" value="${esc(p.year || '')}"></label>
+        <label class="field"><span>Năm sinh</span><input class="input" name="year" inputmode="numeric" maxlength="4" placeholder="1995" value="${esc(p.year || '')}"></label>
         <label class="field"><span>Muốn làm ở</span><select class="select" name="area">${V.provinces.map((x) => `<option value="${x.slug}" ${p.area === x.slug ? 'selected' : ''}>${x.name}</option>`).join('')}</select></label>
       </div>
       <div class="field"><span>Kinh nghiệm (chọn nếu có)</span>
         <div class="pills">${QUICK_EXP.map((e) => `<label class="pill"><input type="checkbox" name="exp" value="${e}" ${(p.exp || []).includes(e) ? 'checked' : ''}><span>${e}</span></label>`).join('')}</div>
       </div>
       <button class="btn btn-quick btn-l btn-block" type="submit">Gửi hồ sơ – nhận cuộc gọi tuyển dụng</button>
-      <p class="mute" style="margin:0;font-size:13.5px">Miễn phí hoàn toàn. Không công ty nào được thu phí đồng phục hay đặt cọc.</p>
+      <p class="mute" style="margin:0;font-size:13.5px">Miễn phí hoàn toàn. Không công ty nào được thu phí đồng phục hay đặt cọc.${me ? '' : ' Muốn xem lại và sửa hồ sơ? <a href="/dang-nhap?dang-ky=1">Tạo tài khoản</a> bằng chính số điện thoại này.'}</p>
     </form>`);
-  box.querySelector('#quickForm').addEventListener('submit', (e) => {
+  box.querySelector('#quickForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const f = new FormData(e.target);
-    store.set('profile', { ...p, ...Object.fromEntries(f), exp: f.getAll('exp') });
-    if (!user()) store.set('user', { name: f.get('name'), phone: f.get('phone'), role: 'candidate' });
-    closeModal();
-    toast('Đã gửi hồ sơ. Nhà tuyển dụng sẽ liên hệ bạn sớm.');
+    const done = busy(e.submitter);
+    try {
+      const r = await api('/profile', { method: 'POST', body: { ...Object.fromEntries(f), exp: f.getAll('exp') } });
+      store.set('profile', r.profile);
+      closeModal();
+      toast('Đã gửi hồ sơ. Nhà tuyển dụng sẽ liên hệ bạn sớm.');
+    } catch (err) { done(); toast(err.message, 'alert'); }
   });
 }

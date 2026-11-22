@@ -1,97 +1,92 @@
-import { $, $$, icon, store, toast } from '../core.js';
+import { $, $$, icon, store, user, toast, api, busy, syncMe } from '../core.js';
 import { go } from '../router.js';
 
-export default function ({ query }) {
-  const want = query.get('vai-tro') === 'nha-tuyen-dung' ? 'employer' : '';
-  const back = query.get('tiep') || '';
+const ERR = {
+  'google-chua-cau-hinh': 'Đăng nhập Google chưa được cấu hình. Vui lòng dùng email và mật khẩu.',
+  'google-that-bai': 'Đăng nhập Google không thành công. Vui lòng thử lại.',
+  'tai-khoan-bi-khoa': 'Tài khoản đã bị khoá. Liên hệ hỗ trợ để biết thêm.'
+};
+
+export default async function ({ query }) {
+  let role = query.get('vai-tro') === 'nha-tuyen-dung' ? 'employer' : 'candidate';
+  let mode = query.get('dang-ky') ? 'register' : 'login';
+  const back = (query.get('tiep') || '').startsWith('/') ? query.get('tiep') : '';
+  const u = user();
+  if (u) return { redirect: back || (u.role === 'employer' ? '/nha-tuyen-dung' : '/ung-vien') };
+  const cfg = await api('/auth/config').catch(() => ({ google: false }));
+
+  const side = {
+    candidate: ['Tìm việc bảo vệ gần nhà', 'Đăng nhập bằng số điện thoại để lưu tin, xem lại các việc đã ứng tuyển và sửa hồ sơ bất cứ lúc nào.', ['Ứng tuyển 1 chạm, không cần CV', 'Số điện thoại chỉ hiện với công ty bạn ứng tuyển', 'Hoàn toàn miễn phí']],
+    employer: ['Tuyển bảo vệ nhanh, miễn phí', 'Đăng tin miễn phí trong giai đoạn ra mắt. Tin hiển thị 1 – 4 tuần tuỳ bạn chọn, nhận hồ sơ ứng viên ngay trong tài khoản.', ['Đăng nhập bằng email công ty hoặc Gmail', 'Xác thực giấy phép để được gắn dấu tin cậy', 'Theo dõi lượt xem, lượt gọi từng tin']]
+  };
+
   const html = `
   <div class="auth">
-    <div class="auth-side">
-      <p class="kicker">Việc Làm Bảo Vệ</p>
-      <h2>Không cần mật khẩu. Chỉ cần số điện thoại.</h2>
-      <p>Mã xác nhận gửi qua tin nhắn. Số của bạn chỉ hiện với công ty khi bạn bấm ứng tuyển.</p>
-      <ol>
-        <li><span>Nhập số điện thoại đang dùng Zalo</span></li>
-        <li><span>Nhập mã 6 số vừa nhận</span></li>
-        <li><span>Chọn bạn tìm việc hay tuyển người</span></li>
-      </ol>
-    </div>
+    <div class="auth-side" id="authSide"></div>
     <div class="auth-main"><div class="auth-form">
-      <div class="stepper" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
-
-      <form id="s1">
-        <h1>Đăng nhập</h1>
-        <p>Tài khoản mới sẽ được tạo tự động.</p>
-        <label class="lbl" for="ph">Số điện thoại</label>
-        <div class="phone" style="margin:6px 0 16px"><span>+84</span><input id="ph" name="phone" inputmode="tel" autocomplete="tel" placeholder="909 123 456" required></div>
-        <button class="btn btn-primary btn-l btn-block" type="submit">Gửi mã xác nhận</button>
-        <div class="or">hoặc</div>
-        <div class="grid2">
-          <button class="btn btn-quiet" type="button" data-social="Google">${icon('google')}Google</button>
-          <button class="btn btn-quiet" type="button" data-social="Zalo">${icon('chat')}Zalo</button>
-        </div>
-        <p class="mute" style="font-size:14px;margin-top:20px">Tiếp tục nghĩa là bạn đồng ý với <a href="/chinh-sach/dieu-khoan">Điều khoản</a> và <a href="/chinh-sach/bao-mat">Chính sách bảo mật</a>.</p>
-      </form>
-
-      <form id="s2" hidden>
-        <h1>Nhập mã xác nhận</h1>
-        <p>Đã gửi tới <b id="phShow"></b>. <button class="linkbtn" type="button" data-back>Đổi số</button></p>
-        <div class="otp" style="margin:20px 0 8px">${Array.from({ length: 6 }, (_, i) => `<input inputmode="numeric" maxlength="1" aria-label="Số thứ ${i + 1}" autocomplete="${i ? 'off' : 'one-time-code'}">`).join('')}</div>
-        <p class="mute" style="font-size:14px">Bản mẫu: nhập 6 số bất kỳ. <button class="linkbtn" type="button" id="resend" disabled>Gửi lại sau <span id="cd">60</span>s</button></p>
-        <button class="btn btn-primary btn-l btn-block" type="submit">Xác nhận</button>
-      </form>
-
-      <form id="s3" hidden>
-        <h1>Bạn đến đây để…</h1>
-        <p>Có thể đổi lại sau trong phần cài đặt.</p>
-        <div class="roles" style="margin:16px 0 20px">
-          <label class="role"><input type="radio" name="role" value="candidate" ${want ? '' : 'checked'}><span><b>Tìm việc bảo vệ</b><small>Xem việc gần nhà, lưu tin, ứng tuyển bằng một chạm.</small></span></label>
-          <label class="role"><input type="radio" name="role" value="employer" ${want ? 'checked' : ''}><span><b>Tuyển người cho công ty</b><small>Đăng tin, quản lý ứng viên, mua gói dịch vụ.</small></span></label>
-        </div>
-        <label class="field" style="margin-bottom:16px"><span>Họ tên hoặc tên công ty</span><input class="input" name="name" required autocomplete="name"></label>
-        <button class="btn btn-primary btn-l btn-block" type="submit">Vào tài khoản</button>
-      </form>
+      <div class="seg" role="tablist" aria-label="Bạn là">
+        <button type="button" role="tab" data-role="candidate">${icon('user')}Người tìm việc</button>
+        <button type="button" role="tab" data-role="employer">${icon('building')}Nhà tuyển dụng</button>
+      </div>
+      <h1 id="authH"></h1>
+      <p id="authP" class="mute"></p>
+      ${query.get('loi') && ERR[query.get('loi')] ? `<div class="notice notice-warn" role="alert">${icon('alert')}<p>${ERR[query.get('loi')]}</p></div>` : ''}
+      <form id="authForm" class="stack" novalidate></form>
+      <p class="mute" style="font-size:14px;margin-top:20px">Tiếp tục nghĩa là bạn đồng ý với <a href="/chinh-sach/dieu-khoan">Điều khoản</a> và <a href="/chinh-sach/bao-mat">Chính sách bảo mật</a>.</p>
     </div></div>
   </div>`;
 
   function mount(root) {
-    const steps = ['#s1', '#s2', '#s3'].map((s) => $(s, root));
-    let phone = '';
-    let timer;
-    const show = (n) => {
-      steps.forEach((s, i) => (s.hidden = i !== n));
-      $$('.stepper i', root).forEach((b, i) => b.classList.toggle('on', i <= n));
-      (steps[n].querySelector('input') || steps[n]).focus();
+    const form = $('#authForm', root);
+    const draw = () => {
+      $$('[data-role]', root).forEach((b) => { const on = b.dataset.role === role; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+      const [h, p, list] = side[role];
+      $('#authSide', root).innerHTML = `<p class="kicker">vieclambaove.vn</p><h2>${h}</h2><p>${p}</p><ol>${list.map((x) => `<li><span>${x}</span></li>`).join('')}</ol>`;
+      const reg = mode === 'register';
+      $('#authH', root).textContent = reg ? (role === 'employer' ? 'Đăng ký nhà tuyển dụng' : 'Tạo tài khoản tìm việc') : 'Đăng nhập';
+      $('#authP', root).innerHTML = reg ? 'Đã có tài khoản? <button class="linkbtn" type="button" data-mode="login">Đăng nhập</button>' : `Chưa có tài khoản? <button class="linkbtn" type="button" data-mode="register">Đăng ký miễn phí</button>`;
+      const pw = `<label class="field"><span>Mật khẩu</span><input class="input" type="password" name="password" required minlength="6" autocomplete="${reg ? 'new-password' : 'current-password'}" placeholder="${reg ? 'Ít nhất 6 ký tự' : ''}"></label>`;
+      const google = role === 'employer' ? `<div class="or">hoặc</div>
+        <a class="btn btn-quiet btn-l btn-block${cfg.google ? '' : ' is-off'}" href="/api/auth/google/start?tiep=${encodeURIComponent(back || '/nha-tuyen-dung')}" ${cfg.google ? '' : 'aria-disabled="true" data-nogoogle'}>${icon('google')}${reg ? 'Đăng ký' : 'Đăng nhập'} với Google</a>` : '';
+      form.innerHTML = role === 'candidate'
+        ? `${reg ? '<label class="field"><span>Họ và tên</span><input class="input" name="name" required autocomplete="name"></label>' : ''}
+           <div class="field"><span class="lbl">Số điện thoại</span><div class="phone"><span>+84</span><input name="phone" inputmode="tel" autocomplete="tel" placeholder="909 123 456" required></div></div>
+           ${pw}<button class="btn btn-primary btn-l btn-block" type="submit">${reg ? 'Tạo tài khoản' : 'Đăng nhập'}</button>`
+        : `${reg ? `<label class="field"><span>Tên công ty</span><input class="input" name="companyName" required placeholder="Công ty TNHH Dịch vụ Bảo vệ ..." autocomplete="organization"></label>
+           <div class="grid2"><label class="field"><span>Người liên hệ</span><input class="input" name="name" required autocomplete="name"></label>
+           <label class="field"><span>Số điện thoại công ty</span><input class="input" name="companyPhone" inputmode="tel" autocomplete="tel"></label></div>` : ''}
+           <label class="field"><span>Email</span><input class="input" type="email" name="email" required autocomplete="email" placeholder="tuyendung@congty.vn"></label>
+           ${pw}<button class="btn btn-primary btn-l btn-block" type="submit">${reg ? 'Đăng ký' : 'Đăng nhập'}</button>${google}`;
+      form.querySelector('input')?.focus();
     };
-    const finish = (role, name) => {
-      store.set('user', { name, phone, role, since: new Date().toLocaleDateString('vi-VN') });
-      toast('Đăng nhập thành công.');
-      go(back || (role === 'employer' ? '/nha-tuyen-dung' : '/ung-vien'));
-    };
-    steps[0].addEventListener('submit', (e) => {
+    root.addEventListener('click', (e) => {
+      const r = e.target.closest('[data-role]');
+      const md = e.target.closest('[data-mode]');
+      if (r && r.dataset.role !== role) { role = r.dataset.role; draw(); }
+      if (md) { mode = md.dataset.mode; draw(); }
+      if (e.target.closest('[data-nogoogle]')) { e.preventDefault(); toast(ERR['google-chua-cau-hinh'], 'lock'); }
+    });
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const v = e.target.phone.value.replace(/\D/g, '').replace(/^84/, '').replace(/^0/, '');
-      if (v.length !== 9) { toast('Số điện thoại cần 10 số, ví dụ 0909 123 456.', 'alert'); return; }
-      phone = '0' + v;
-      $('#phShow', root).textContent = phone.replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3');
-      show(1);
-      let n = 60;
-      clearInterval(timer);
-      timer = setInterval(() => { n--; const cd = $('#cd', root); if (cd) cd.textContent = n; if (n <= 0) { clearInterval(timer); const r = $('#resend', root); if (r) { r.disabled = false; r.textContent = 'Gửi lại mã'; } } }, 1000);
+      const f = Object.fromEntries(new FormData(form));
+      if (role === 'candidate') {
+        const d = String(f.phone || '').replace(/\D/g, '').replace(/^84/, '').replace(/^0/, '');
+        if (d.length !== 9) { toast('Số điện thoại cần 10 số, ví dụ 0909 123 456.', 'alert'); return; }
+        f.phone = '0' + d;
+      }
+      if (String(f.password || '').length < 6) { toast('Mật khẩu cần ít nhất 6 ký tự.', 'alert'); return; }
+      const done = busy(e.submitter, mode === 'register' ? 'Đang tạo tài khoản…' : 'Đang đăng nhập…');
+      try {
+        const r = await api(mode === 'register' ? '/auth/register' : '/auth/login', { method: 'POST', body: { ...f, role } });
+        store.set('user', r.user);
+        await syncMe();
+        toast(mode === 'register' ? 'Tạo tài khoản thành công.' : 'Đăng nhập thành công.');
+        go(back || (r.user.role === 'employer' ? '/nha-tuyen-dung' : '/ung-vien'));
+      } catch (err) { done(); toast(err.message, 'alert'); }
     });
-    const boxes = $$('.otp input', root);
-    boxes.forEach((b, i) => {
-      b.addEventListener('input', () => { b.value = b.value.replace(/\D/g, ''); if (b.value && boxes[i + 1]) boxes[i + 1].focus(); if (boxes.every((x) => x.value)) steps[1].requestSubmit(); });
-      b.addEventListener('keydown', (e) => { if (e.key === 'Backspace' && !b.value && boxes[i - 1]) boxes[i - 1].focus(); });
-      b.addEventListener('paste', (e) => { const t = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6); if (t.length === 6) { e.preventDefault(); t.split('').forEach((c, k) => (boxes[k].value = c)); steps[1].requestSubmit(); } });
-    });
-    steps[1].addEventListener('submit', (e) => { e.preventDefault(); if (boxes.every((x) => x.value)) show(2); else toast('Nhập đủ 6 số.', 'alert'); });
-    $('[data-back]', root).addEventListener('click', () => show(0));
-    $('#resend', root).addEventListener('click', () => toast('Đã gửi lại mã.'));
-    steps[2].addEventListener('submit', (e) => { e.preventDefault(); finish(e.target.role.value, e.target.name.value.trim()); });
-    $$('[data-social]', root).forEach((b) => b.addEventListener('click', () => { phone = ''; toast(`Đăng nhập ${b.dataset.social} cần cấu hình ở bản chính thức. Đang dùng tài khoản mẫu.`, 'lock'); show(2); }));
-    document.addEventListener('vlbv:leave', () => clearInterval(timer), { once: true });
+    draw();
   }
 
   return { nav: '', html, mount, title: 'Đăng nhập', noindex: true, tabbar: false };
 }
+

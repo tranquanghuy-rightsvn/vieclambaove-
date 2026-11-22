@@ -134,7 +134,7 @@ export default function ({ params: [ps, ds], query }) {
         <section class="lbox">
           <h2>${icon('shield')}Cảnh giác lừa đảo</h2>
           <ul class="lb-warn"><li>Không đóng phí đồng phục, phí giữ chỗ.</li><li>Không nộp bản gốc CCCD, bằng cấp.</li><li>Lương quá cao so với mặt bằng cần hỏi kỹ.</li></ul>
-          <a class="more" href="/cam-nang/dau-hieu-cong-ty-bao-ve-lua-dao">Đọc thêm ${icon('arrow', 'ico-s')}</a>
+          <a class="more" href="/tin-tuc/dau-hieu-cong-ty-bao-ve-lua-dao">Đọc thêm ${icon('arrow', 'ico-s')}</a>
         </section>
       </aside>
     </div>
@@ -181,7 +181,7 @@ export default function ({ params: [ps, ds], query }) {
 }
 
 function seoIntro(p, d, jobs) {
-  if (!jobs.length) return `<p>Hiện chưa có tin tuyển dụng ở khu vực này. Bật thông báo trong <a href="/ung-vien/thong-bao">tài khoản ứng viên</a> để được báo khi có việc mới.</p>`;
+  if (!jobs.length) return `<p>Hiện chưa có tin tuyển dụng ở khu vực này. <button class="linkbtn" type="button" data-quick>Tạo hồ sơ 1 chạm</button> để công ty bảo vệ gần bạn liên hệ khi có việc mới.</p>`;
   const avgMin = (jobs.reduce((a, j) => a + j.salaryMin, 0) / jobs.length).toFixed(1).replace('.', ',');
   const avgMax = (jobs.reduce((a, j) => a + j.salaryMax, 0) / jobs.length).toFixed(1).replace('.', ',');
   const byShift = V.shifts.map((x) => [x.name.toLowerCase(), jobs.filter((j) => j.shift === x.id).length]).filter((x) => x[1]).sort((a, b) => b[1] - a[1]);

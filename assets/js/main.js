@@ -1,23 +1,24 @@
 // Điểm vào: khai báo tuyến, vẽ khung trang, xử lý sự kiện chung
-import { $, icon, esc, user, store, toggleSave, applyJob, reportJob, quickProfile, toast, SITE } from './core.js';
+import { $, icon, esc, user, store, toggleSave, applyJob, reportJob, quickProfile, toast, SITE, api, syncMe } from './core.js';
 import { route, onRender, match, clean, go } from './router.js';
 
 route(/^\/$/, () => import('./pages/home.js'));
 route(/^\/viec-lam(?:\/([a-z0-9-]+))?(?:\/([a-z0-9-]+))?$/, () => import('./pages/jobs.js'));
 route(/^\/tin\/(?:[a-z0-9-]*-)?(\d+)$/, () => import('./pages/job.js'));
 route(/^\/cong-ty\/([a-z0-9-]+)$/, () => import('./pages/company.js'));
-route(/^\/cam-nang$/, () => import('./pages/blog.js'));
-route(/^\/cam-nang\/([a-z0-9-]+)$/, () => import('./pages/post.js'));
+route(/^\/tin-tuc$/, () => import('./pages/blog.js'));
+route(/^\/tin-tuc\/([a-z0-9-]+)$/, () => import('./pages/post.js'));
+route(/^\/video(?:\/([a-z0-9-]+))?$/, () => import('./pages/video.js'));
 route(/^\/bang-gia$/, () => import('./pages/pricing.js'));
 route(/^\/dang-nhap$/, () => import('./pages/auth.js'));
 route(/^\/ung-vien(?:\/([a-z-]+))?$/, () => import('./pages/candidate.js'));
 route(/^\/nha-tuyen-dung(?:\/([a-z-]+))?$/, () => import('./pages/employer.js'));
-route(/^\/quan-tri(?:\/([a-z-]+))?$/, () => import('./pages/admin.js'));
 route(/^\/chinh-sach(?:\/([a-z-]+))?$/, () => import('./pages/policy.js'));
 
 const NAV = [
   ['jobs', '/viec-lam', 'Việc làm'],
-  ['blog', '/cam-nang', 'Cẩm nang'],
+  ['blog', '/tin-tuc', 'Tin tức'],
+  ['video', '/video', 'Video'],
   ['pricing', '/bang-gia', 'Bảng giá'],
   ['employer', '/nha-tuyen-dung', 'Nhà tuyển dụng']
 ];
@@ -26,6 +27,12 @@ function acctLink(u) {
   if (!u) return { href: '/dang-nhap', label: 'Đăng nhập' };
   return { href: u.role === 'employer' ? '/nha-tuyen-dung' : '/ung-vien', label: u.role === 'employer' ? 'Quản lý tuyển dụng' : esc(u.name?.split(' ').pop() || 'Tài khoản') };
 }
+
+// Logo theo mẫu "Cổng thông tin tuyển dụng bảo vệ": ô vàng gradient + khiên, chữ vieclam·baove·.vn
+const brand = () => `<a class="brand logo" href="/" aria-label="vieclambaove.vn – Trang chủ">
+      <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.2 4.2 5.3v5.9c0 4.9 3.3 9.2 7.8 10.6 4.5-1.4 7.8-5.7 7.8-10.6V5.3z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M12 2.2v19.6c-4.5-1.4-7.8-5.7-7.8-10.6V5.3z" fill="currentColor"/></svg></span>
+      <span class="logo-text"><span class="logo-name">vieclam<b>baove</b>.vn</span><small>AI Recruitment &amp; Auto-SEO</small></span>
+    </a>`;
 
 function header(navKey) {
   const u = user();
@@ -36,15 +43,12 @@ function header(navKey) {
     : `<a class="btn btn-line btn-s" href="/dang-nhap?dang-ky=1">Đăng ký</a><a class="btn btn-primary btn-s" href="/dang-nhap">Đăng nhập</a>`;
   $('#header').innerHTML = `
   <header class="mast"><div class="wrap">
-    <a class="brand" href="/" aria-label="Việc Làm Bảo Vệ – Trang chủ">
-      <img src="/assets/img/logo-shield.webp" alt="" width="40" height="41">
-      <span class="brand-word"><small>VIỆC LÀM</small><span>BẢO VỆ</span></span>
-    </a>
+    ${brand()}
     <nav class="nav" aria-label="Chính">${NAV.map(([k, h, t]) => `<a href="${h}" class="${k === navKey ? 'on' : ''}">${t}</a>`).join('')}</nav>
     <div class="mast-act">
       <button class="btn btn-quick btn-s mast-quick" type="button" data-quick>${icon('bolt')}<span>Tạo hồ sơ 1 chạm</span></button>
       ${right}
-      <a class="emp-link" href="${postHref}"><small>Dành cho nhà tuyển dụng</small>Đăng tuyển, tìm ứng viên</a>
+      ${u?.role === 'employer' ? '' : `<a class="emp-link" href="${postHref}"><small>Dành cho nhà tuyển dụng</small>Đăng tuyển, tìm ứng viên</a>`}
       <button class="burger" type="button" data-drawer aria-label="Mở menu" aria-expanded="false">${icon('menu')}</button>
     </div>
   </div></header>
@@ -72,7 +76,10 @@ function tabbar(path) {
     ['/ung-vien/da-luu', 'Đã lưu', 'bookmark', path === '/ung-vien/da-luu'],
     [u ? acctLink(u).href : '/dang-nhap', 'Tài khoản', 'user', (path.startsWith('/ung-vien') && path !== '/ung-vien/da-luu') || path.startsWith('/dang-nhap') || path.startsWith('/nha-tuyen-dung')]
   ];
-  return `<nav class="tabbar" aria-label="Điều hướng nhanh">${items.map(([h, t, ic, on]) => `<a href="${h}" class="${on ? 'on' : ''}">${icon(ic)}${t}</a>`).join('')}</nav>`;
+  const link = ([h, t, ic, on]) => `<a href="${h}" class="${on ? 'on' : ''}">${icon(ic)}${t}</a>`;
+  // Nút "Tạo hồ sơ 1 chạm" nằm giữa thanh dưới, luôn thấy rõ trên mobile ở mọi trang
+  const quick = `<button class="tb-quick" type="button" data-quick><span class="tb-quick-ic">${icon('bolt')}</span>Hồ sơ 1 chạm</button>`;
+  return `<nav class="tabbar" aria-label="Điều hướng nhanh">${items.slice(0, 2).map(link).join('')}${quick}${items.slice(2).map(link).join('')}</nav>`;
 }
 
 function footer(path) {
@@ -80,7 +87,7 @@ function footer(path) {
   $('#footer').innerHTML = `<footer class="foot"><div class="wrap">
     <div class="foot-top">
       <div class="foot-co">
-        <a class="brand" href="/"><img src="/assets/img/logo-shield.webp" alt="" width="40" height="41"><span class="brand-word"><small>VIỆC LÀM</small><span>BẢO VỆ</span></span></a>
+        ${brand()}
         <p class="foot-note">Chuyên trang tuyển dụng ngành bảo vệ, vệ sĩ. Tin được kiểm duyệt trước khi hiển thị, công ty được xác thực giấy phép.</p>
         <ul class="foot-contact">
           <li>${icon('phone', 'ico-s')}Hotline: <a href="tel:19006868">1900 6868</a> (8:00 – 21:00)</li>
@@ -93,20 +100,18 @@ function footer(path) {
         <li><a href="/chinh-sach/dieu-khoan">Điều khoản sử dụng</a></li>
         <li><a href="/chinh-sach/bao-mat">Chính sách bảo mật</a></li>
         <li><a href="/chinh-sach/quy-che">Quy chế hoạt động</a></li>
-        <li><a href="/quan-tri">Trang quản trị</a></li>
       </ul></div>
       <div><h4>Dành cho ứng viên</h4><ul>
         <li><a href="/viec-lam">Việc làm bảo vệ mới nhất</a></li>
         <li><a href="/viec-lam?gap=1">Việc làm tuyển gấp</a></li>
         <li><a href="/ung-vien">Hồ sơ của tôi</a></li>
-        <li><a href="/cam-nang">Cẩm nang nghề bảo vệ</a></li>
-        <li><a href="/cam-nang/dau-hieu-cong-ty-bao-ve-lua-dao">Cảnh báo lừa đảo</a></li>
+        <li><a href="/tin-tuc">Tin tức nghề bảo vệ</a></li>
+        <li><a href="/video">Video nghề bảo vệ</a></li>
+        <li><a href="/tin-tuc/dau-hieu-cong-ty-bao-ve-lua-dao">Cảnh báo lừa đảo</a></li>
       </ul></div>
       <div><h4>Dành cho nhà tuyển dụng</h4><ul>
         <li><a href="/nha-tuyen-dung/dang-tin">Đăng tin tuyển dụng</a></li>
-        <li><a href="/nha-tuyen-dung/tim-ung-vien">Tìm hồ sơ ứng viên</a></li>
         <li><a href="/bang-gia">Bảng giá dịch vụ</a></li>
-        <li><a href="/bang-gia#quang-cao">Quảng cáo banner</a></li>
         <li><a href="/nha-tuyen-dung/xac-thuc">Xác thực công ty</a></li>
       </ul></div>
       <div><h4>Việc làm theo tỉnh</h4><ul>${V.provinces.map((p) => `<li><a href="/viec-lam/${p.slug}">Bảo vệ ${p.short}</a></li>`).join('')}</ul></div>
@@ -201,8 +206,25 @@ document.addEventListener('click', (e) => {
   if (t.closest('[data-undrawer]') || t.closest('#drawer a')) { $('#drawer')?.classList.remove('open'); }
   const tt = t.closest('[data-toast]');
   if (tt) toast(tt.dataset.toast);
-  if (t.closest('[data-logout]')) { e.preventDefault(); store.del('user'); toast('Đã đăng xuất.'); go('/'); }
+  const tr = t.closest('[data-track]');
+  if (tr) api('/track', { method: 'POST', body: { jobId: Number(tr.dataset.job), type: tr.dataset.track } }).catch(() => {});
+  if (t.closest('[data-logout]')) {
+    e.preventDefault();
+    api('/auth/logout', { method: 'POST' }).catch(() => {}).finally(() => {
+      ['user', 'profile', 'applied'].forEach(store.del);
+      toast('Đã đăng xuất.');
+      go('/');
+    });
+  }
 });
 document.addEventListener('vlbv:esc', () => $('#drawer')?.classList.remove('open'));
 
-render();
+// Phiên đăng nhập nằm trong cookie HttpOnly: hỏi máy chủ trước khi vẽ trang cần tài khoản,
+// trang công khai vẽ ngay rồi cập nhật đầu trang khi có kết quả
+const PRIVATE = /^\/(ung-vien|nha-tuyen-dung|dang-nhap)/;
+if (PRIVATE.test(location.pathname)) syncMe().then(() => render());
+else {
+  render();
+  const before = JSON.stringify(user());
+  syncMe().then((u) => { if (JSON.stringify(u) !== before) render({ keepScroll: true }); });
+}

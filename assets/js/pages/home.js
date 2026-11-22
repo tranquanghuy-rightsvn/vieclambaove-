@@ -1,4 +1,4 @@
-import { V, $, $$, esc, icon, url, mono, jobCard, activeJobs, SITE } from '../core.js';
+import { V, $, $$, esc, icon, url, mono, jobCard, activeJobs, company, province, SITE } from '../core.js';
 import { go } from '../router.js';
 
 const PER = 6;
@@ -18,7 +18,10 @@ export default function () {
 
 
   const tops = V.companies.map((c) => ({ c, n: count((j) => j.company === c.id) })).sort((a, b) => b.c.verified - a.c.verified || b.n - a.n);
-  const sponsor = V.companies.find((c) => c.id === 'phuong-nam');
+  // Banner: tin nổi bật có thật (VIP, rồi tin gấp, lương cao); không có thì ẩn
+  const hot = [...jobs].sort((a, b) => (b.tier === 'vip') - (a.tier === 'vip') || b.urgent - a.urgent || b.salaryMax - a.salaryMax)[0];
+  const hotCo = hot && company(hot.company);
+  const pr = (n) => String(n).replace('.', ',');
 
   const tiles = [...V.targets.map((t) => [t.name, '/viec-lam?muc-tieu=' + t.id, t.icon, count((j) => j.target === t.id)]),
     ['Bảo vệ ca đêm', '/viec-lam?ca=dem', 'moon', count((j) => j.shift === 'dem')],
@@ -46,15 +49,15 @@ export default function () {
       <div class="tiles">${tiles.map(([t, h, ic, n]) => `<a class="tile" href="${h}"><span class="tile-ic">${icon(ic)}</span><b>${esc(t)}</b><small>${n} việc làm</small></a>`).join('')}</div>
     </section>
 
-    <a class="hbanner" href="/viec-lam/binh-duong?muc-tieu=kcn">
-      <span class="hb-ad">Tài trợ</span>
+    ${hot && hotCo ? `<a class="hbanner" href="${url.job(hot)}">
+      <span class="hb-ad">Nổi bật</span>
       <div class="hb-text">
-        <span class="hb-co">${mono(sponsor)}${esc(sponsor.name)}</span>
-        <strong>Tuyển 25 bảo vệ nhà máy KCN VSIP 1 – Bình Dương</strong>
-        <ul><li>Lương 8,5 – 10 triệu/tháng</li><li>Bao ăn 3 bữa, ký túc xá miễn phí</li><li>Đóng BHXH đầy đủ từ tháng đầu</li></ul>
+        <span class="hb-co">${mono(hotCo)}${esc(hotCo.name)}</span>
+        <strong>${esc(hot.title)}</strong>
+        <ul><li>Lương ${pr(hot.salaryMin)}${hot.salaryMax !== hot.salaryMin ? ' – ' + pr(hot.salaryMax) : ''} triệu/tháng</li><li>${esc(hot.district)}, ${esc(province(hot.province)?.short || '')}</li>${hot.housing || hot.meals ? `<li>${[hot.housing && 'Có chỗ ở', hot.meals && 'Hỗ trợ bữa ăn'].filter(Boolean).join(', ')}</li>` : ''}</ul>
       </div>
-      <div class="hb-cta"><b>8,5–10</b><span>triệu/tháng</span><span class="btn btn-gold">Ứng tuyển ngay</span></div>
-    </a>
+      <div class="hb-cta"><b>${pr(hot.salaryMin)}${hot.salaryMax !== hot.salaryMin ? '–' + pr(hot.salaryMax) : ''}</b><span>triệu/tháng</span><span class="btn btn-gold">Ứng tuyển ngay</span></div>
+    </a>` : ''}
 
     <section class="panel-box" aria-labelledby="hotH">
       <div class="pb-head">
@@ -106,7 +109,7 @@ export default function () {
     </div>
 
     <section class="panel-box" aria-labelledby="blogH">
-      <div class="pb-head"><h2 id="blogH">Cẩm nang nghề bảo vệ</h2><a class="more" href="/cam-nang">Xem tất cả ${icon('arrow', 'ico-s')}</a></div>
+      <div class="pb-head"><h2 id="blogH">Tin tức nghề bảo vệ</h2><a class="more" href="/tin-tuc">Xem tất cả ${icon('arrow', 'ico-s')}</a></div>
       <div class="bgrid">${posts.map((p, i) => `<article class="bcard">
         <a class="bc-thumb" href="${url.post(p)}" tabindex="-1" aria-hidden="true"><img src="${p.img}" alt="" loading="lazy" width="800" height="500"><span>${esc(p.cat)}</span></a>
         <h3><a href="${url.post(p)}">${esc(p.title)}</a></h3>

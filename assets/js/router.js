@@ -14,14 +14,16 @@ export function match(path) {
 }
 
 // Chuẩn hóa URL: bỏ .html, bỏ index, bỏ dấu / cuối
-const LEGACY = { 'chi-tiet': '/viec-lam', 'bai-viet': '/cam-nang' };
+const LEGACY = { 'chi-tiet': '/viec-lam', 'bai-viet': '/tin-tuc' };
 export function clean(href) {
   const u = new URL(href, location.origin);
   let p = u.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
   if (p.length > 1) p = p.replace(/\/+$/, '');
+  // "Cẩm nang" đã đổi thành "Tin tức": link cũ /cam-nang chuyển sang /tin-tuc
+  if (/^\/cam-nang(\/|$)/.test(p)) p = p.replace(/^\/cam-nang/, '/tin-tuc');
   const id = u.searchParams.get('id');
   const seg = p.slice(1);
-  if (LEGACY[seg] && id) { u.searchParams.delete('id'); p = seg === 'chi-tiet' ? `/tin/tin-${id}` : `/cam-nang/${id}`; }
+  if (LEGACY[seg] && id) { u.searchParams.delete('id'); p = seg === 'chi-tiet' ? `/tin/tin-${id}` : `/tin-tuc/${id}`; }
   else if (seg === 'cong-ty' && id) { u.searchParams.delete('id'); p = `/cong-ty/${id}`; }
   return p + (u.search === '?' ? '' : u.search) + u.hash;
 }

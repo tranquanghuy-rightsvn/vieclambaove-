@@ -30,13 +30,13 @@ const generic = (p) => `<p>${esc(p.excerpt)}</p>
 
 export default function ({ params: [id] }) {
   const p = V.posts.find((x) => x.id === id);
-  if (!p) return { redirect: '/cam-nang' };
+  if (!p) return { redirect: '/tin-tuc' };
   const related = V.posts.filter((x) => x.id !== p.id).slice(0, 3);
   const urgent = activeJobs().filter((j) => j.urgent).slice(0, 4);
   const html = `
   <div class="wrap article">
     <article>
-      ${crumbs([['Trang chủ', '/'], ['Cẩm nang', '/cam-nang'], [p.cat, null]])}
+      ${crumbs([['Trang chủ', '/'], ['Tin tức', '/tin-tuc'], [p.cat, null]])}
       <span class="cat">${esc(p.cat)}</span>
       <h1 class="d-title" style="margin-top:8px;max-width:32ch">${esc(p.title)}</h1>
       <div class="byline"><span>Ban biên tập Việc Làm Bảo Vệ</span><span>${p.date}</span><span>${p.read} phút đọc</span><span>${num(p.views)} lượt đọc</span></div>
