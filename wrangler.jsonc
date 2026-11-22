@@ -13,7 +13,7 @@
     "run_worker_first": ["/api/*", "/data/*", "/robots.txt", "/sitemap.xml", "/", "/viec-lam", "/viec-lam/*", "/tin/*", "/cong-ty/*", "/video", "/video/*"]
   },
   "d1_databases": [
-    { "binding": "DB", "database_name": "vieclambaove", "database_id": "local-dev-placeholder", "migrations_dir": "migrations" }
+    { "binding": "DB", "database_name": "vieclambaove", "database_id": "cda8c87a-8005-4c6d-b325-a2fa70009782", "migrations_dir": "migrations" }
   ],
   "r2_buckets": [
     // Giấy tờ xác thực công ty (không công khai)
