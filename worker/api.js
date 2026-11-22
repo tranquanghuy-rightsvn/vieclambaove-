@@ -4,7 +4,7 @@ import {
   hashPassword, verifyPassword, checkPassword, createSession, destroySession, currentUser, publicUser,
   riskCheck, rateLimit, ipHash, getCookie, cookie
 } from './lib.js';
-import { buildSnapshot, getKv, categories, LIVE_SQL } from './snapshot.js';
+import { markDirty, getKv, categories, LIVE_SQL } from './publish.js';
 import { adminApi } from './admin.js';
 
 const WEEK = 7 * DAY;
@@ -294,7 +294,7 @@ async function report(env, req) {
   if (n >= 3) {
     const risks = [...JSON.parse(j.risks || '[]').filter((x) => !x.startsWith('Bị báo cáo')), `Bị báo cáo ${n} lần`];
     await env.DB.prepare('UPDATE jobs SET status = \'pending\', risks = ?, updated_at = ? WHERE id = ?').bind(JSON.stringify(risks), now(), j.id).run();
-    await buildSnapshot(env);
+    await markDirty(env);
   }
   return json({ ok: true });
 }
@@ -332,7 +332,7 @@ async function employer(req, env, url, p) {
     const b = await body(req);
     await env.DB.prepare('UPDATE companies SET phone = ?, about = ?, size = ?, founded = ? WHERE id = ?')
       .bind(str(b.phone, 20), str(b.about, 2000), str(b.size, 40), Number(b.founded) || null, co.id).run();
-    await buildSnapshot(env);
+    await markDirty(env);
     return json({ ok: true });
   }
 
@@ -358,7 +358,7 @@ async function employer(req, env, url, p) {
       if (!b.hidden && j.status !== 'hidden') fail(400, 'Tin không ở trạng thái ẩn.');
       if (!b.hidden && j.expires_at <= now()) fail(400, 'Tin đã hết hạn, hãy gia hạn.');
       await env.DB.prepare('UPDATE jobs SET status = ?, updated_at = ? WHERE id = ?').bind(b.hidden ? 'hidden' : 'live', now(), j.id).run();
-      await buildSnapshot(env);
+      await markDirty(env);
       return json({ ok: true });
     }
     if (act === 'renew' && m === 'POST') {
@@ -370,7 +370,7 @@ async function employer(req, env, url, p) {
       const from = j.status !== 'expired' && j.expires_at > t ? j.expires_at : t;
       await env.DB.prepare('UPDATE jobs SET status = CASE WHEN status = \'expired\' THEN \'live\' ELSE status END, expires_at = ?, weeks = ?, updated_at = ? WHERE id = ?')
         .bind(from + weeks * WEEK, weeks, t, j.id).run();
-      await buildSnapshot(env);
+      await markDirty(env);
       return json({ ok: true });
     }
   }
@@ -468,7 +468,7 @@ async function saveJob(env, req, co, old) {
     id = (await env.DB.prepare(`INSERT INTO jobs (company_id, ${cols.join(', ')}, status, risks, posted_at, expires_at, created_at, updated_at) VALUES (?, ${cols.map(() => '?').join(', ')}, ?, ?, ?, ?, ?, ?) RETURNING id`)
       .bind(co.id, ...cols.map((c) => f[c]), status, JSON.stringify(risks), posted, expires, t, t).first()).id;
   }
-  if (status === 'live' || (old && ['live', 'hidden'].includes(old.status))) await buildSnapshot(env);
+  if (status === 'live' || (old && ['live', 'hidden'].includes(old.status))) await markDirty(env);
   return json({ ok: true, id, status, risks });
 }
 

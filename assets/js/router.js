@@ -1,17 +1,7 @@
 // Bộ định tuyến History API: URL sạch, không đuôi .html
-const routes = [];
 let render = null;
 
-export const route = (pattern, load) => routes.push({ pattern, load });
 export const onRender = (fn) => { render = fn; };
-
-export function match(path) {
-  for (const r of routes) {
-    const m = path.match(r.pattern);
-    if (m) return { load: r.load, params: m.slice(1).map((x) => (x ? decodeURIComponent(x) : x)) };
-  }
-  return null;
-}
 
 // Chuẩn hóa URL: bỏ .html, bỏ index, bỏ dấu / cuối
 const LEGACY = { 'chi-tiet': '/viec-lam', 'bai-viet': '/tin-tuc' };

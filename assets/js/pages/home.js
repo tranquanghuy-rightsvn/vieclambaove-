@@ -100,7 +100,7 @@ export default function () {
         <img class="eb-img" src="/assets/img/photos/doi-bao-ve-toa-nha.webp" alt="Đội bảo vệ mặc đồng phục chào trước sảnh tòa nhà" loading="lazy" width="1100" height="825">
         <span class="kicker">Dành cho công ty bảo vệ</span>
         <h2>Tuyển đủ quân số trong 24 giờ</h2>
-        <p>Đăng tin miễn phí, AI soạn tin giúp bạn, nhận cuộc gọi từ ứng viên đã xuất ngũ, có chứng chỉ nghiệp vụ.</p>
+        <p>Đăng tin miễn phí 1 – 4 tuần, nhận cuộc gọi từ ứng viên đã xuất ngũ, có chứng chỉ nghiệp vụ.</p>
         <div class="eb-act">
           <a class="btn btn-gold" href="/nha-tuyen-dung/dang-tin">Đăng tin miễn phí</a>
           <a class="btn btn-ghost" href="/bang-gia">Xem bảng giá</a>

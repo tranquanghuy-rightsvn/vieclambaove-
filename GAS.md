@@ -76,13 +76,14 @@ banner/AdSense, danh sách đen, email báo việc mới.
 - Chuyển tab chỉ ẩn/hiện; dữ liệu tab tải khi mở tab, hiện ngay bản đã lưu trong localStorage.
 - Boot 1 lượt; lần sau hiện từ cache rồi làm mới ngầm (stale-while-revalidate).
 - Key localStorage (trừ token) mang hậu tố `CLIENT_BUILD` do server băm từ app.html + js.html.
-- Website cập nhật NGAY sau mỗi thao tác (Worker dựng lại file dữ liệu tĩnh), không chờ CI.
+- Website KHÔNG đổi ngay: Worker đánh dấu cần xuất bản → cron 2 phút/lần commit data/site.json lên GitHub → CI build HTML tĩnh → deploy. Thông báo kết quả ghi rõ "Website sẽ được cập nhật sau khoảng 2–5 phút".
 
 ## VIII. Lưu trữ
 
 - Google Sheet `vieclambaove Admin` (tự tạo lần đầu), sheet `Users`: cột `email`, `role`
   (`admin` | `moderator`).
 - Mọi dữ liệu nghiệp vụ: Cloudflare D1 qua Worker. GAS không lưu bản sao.
+- Dữ liệu công khai được Worker commit vào repo tại `data/site.json` (file trigger CI); `scripts/build.mjs` sinh HTML tĩnh từ file này.
 - Script Properties `token_<uuid>`: phiên đăng nhập admin, tự dọn khi hết hạn.
 
 ## IX. Bug đã gặp ở dự án này

@@ -4,20 +4,25 @@ Chuyên trang việc làm ngành bảo vệ. Phase 1: ứng viên (SĐT + mật 
 đăng tin miễn phí 1–4 tuần, ứng tuyển nhanh, báo cáo lừa đảo, xác thực công ty, mục Video YouTube,
 trang SEO + sitemap. Trang quản trị chạy trên Google Apps Script.
 
-## Kiến trúc
+## Kiến trúc (site tĩnh theo playbook free-cms-static-site-pipeline)
 
 ```
-Trình duyệt ──► Cloudflare Worker (worker/) ──► D1 (dữ liệu) + R2 (giấy tờ xác thực)
-                 │  /api/*          API website + API quản trị (/api/admin/*, khoá ADMIN_API_KEY)
-                 │  /data/site.js   dữ liệu công khai dạng file tĩnh, dựng lại mỗi khi có thay đổi;
-                 │                  trình duyệt tìm kiếm/lọc ngay trên file này
-                 │  /, /viec-lam, /tin/*, /cong-ty/*, /video*   chèn sẵn tiêu đề, mô tả, JSON-LD cho Google
-                 │  /sitemap.xml, /robots.txt
-                 └─ còn lại: file tĩnh trong dist/ (HTML/CSS/JS thuần, router phía client)
-Trang quản trị /quan-tri ──(iframe)──► Google Apps Script (gas/, không nằm trong git) ──► /api/admin/*
+Người dùng / NTD ──► Worker /api/* ──► D1 (dữ liệu), R2 (giấy tờ xác thực)
+Quản trị (/quan-tri → GAS) ──► Worker /api/admin/*
+            │ mọi thay đổi nội dung công khai: đánh dấu "cần xuất bản"
+            ▼
+Cron Worker (2 phút/lần) ──commit──► GitHub: data/site.json
+                                        │ push kích hoạt GitHub Actions
+                                        ▼
+                         scripts/build.mjs sinh HTML tĩnh từng trang ──► wrangler deploy ──► dist/
 ```
 
-Cron mỗi giờ: tin hết hạn bị xoá khỏi website (`status = expired`), dọn phiên đăng nhập cũ.
+- Trang công khai (trang chủ, khu vực, tin, công ty, tin tức, video, chính sách) là **file HTML đầy đủ**,
+  render bằng chính các hàm trong `assets/js/pages/*.js`; JS trên trình duyệt vẽ lại y hệt và thêm phần động.
+- Trang tài khoản (`/dang-nhap`, `/ung-vien/*`, `/nha-tuyen-dung/*`) chỉ là khung, JS vẽ sau khi đăng nhập.
+- Tìm kiếm/lọc chạy trên `/data/site.js` (build sinh từ cùng `data/site.json`).
+- Độ trễ từ lúc thay đổi tới lúc lên web: khoảng 2–5 phút. Tin hết hạn: cron đổi trạng thái → lần build sau trang bị xoá (404).
+- Actions còn build lại mỗi ngày 00:05 giờ VN để số "còn N ngày" trong HTML luôn đúng.
 
 ## Chạy ở máy
 
@@ -26,33 +31,35 @@ npm install
 npm run db:migrate:local
 npx wrangler d1 execute vieclambaove --local --file seed/demo.sql   # dữ liệu mẫu (tuỳ chọn)
 echo "ADMIN_API_KEY=dev-admin-key" > .dev.vars
-npm run dev            # http://localhost:8787
+npm run dev                 # build + wrangler dev → http://localhost:8787
+npm run data:pull           # kéo dữ liệu từ D1 local về data/site.json, rồi npm run build để xem trang tĩnh mới
 ```
-
-`node scripts/seed.mjs` sinh lại `migrations/0002_categories.sql` và `seed/demo.sql` từ dữ liệu mẫu cũ.
 
 ## Triển khai
 
+Một lần:
 ```bash
 npm run db:migrate:remote
-npx wrangler secret put ADMIN_API_KEY          # trùng Script Property ADMIN_API_KEY của GAS
-npx wrangler secret put GOOGLE_CLIENT_ID       # đăng nhập Gmail cho nhà tuyển dụng (tuỳ chọn)
+npx wrangler secret put ADMIN_API_KEY      # trùng Script Property ADMIN_API_KEY của GAS
+npx wrangler secret put GITHUB_TOKEN       # fine-grained PAT, repo này, Contents: Read and write (Worker commit data/site.json)
+npx wrangler secret put GOOGLE_CLIENT_ID   # đăng nhập Gmail cho NTD (tuỳ chọn)
 npx wrangler secret put GOOGLE_CLIENT_SECRET
-npm run deploy
 ```
+GitHub repo → Settings → Secrets and variables → Actions: `CLOUDFLARE_API_TOKEN` (mẫu "Edit Cloudflare Workers"),
+`CLOUDFLARE_ACCOUNT_ID`; biến `SITE_URL` khi gắn tên miền thật. Sau đó mọi push lên `main` tự build + deploy
+(`.github/workflows/deploy.yml`). Migration D1 mới vẫn chạy tay: `npm run db:migrate:remote`.
 
-Google OAuth: Authorized redirect URI = `<tên miền>/api/auth/google/callback`.
-Chưa đặt 2 secret Google thì nút "Đăng nhập với Google" hiện thông báo chưa cấu hình.
-
-Trang quản trị GAS: xem `GAS.md` (quyết định nghiệp vụ, phân quyền, Script Properties).
+Google OAuth redirect URI: `<tên miền>/api/auth/google/callback`. Trang quản trị GAS: xem `GAS.md`.
 
 ## Cấu trúc
 
 ```
 index.html, quan-tri/     khung trang, trang nhúng admin GAS
 assets/                   CSS, JS (core, router, pages/), ảnh; data.js = nội dung tĩnh (bài tin tức, bảng giá)
-worker/                   index.js (định tuyến), api.js, admin.js, snapshot.js, seo.js, lib.js
+worker/                   index.js (định tuyến + cron), api.js, admin.js, publish.js (xuất bản lên GitHub), lib.js
 migrations/               schema D1
 seed/demo.sql             dữ liệu mẫu
-scripts/build.sh          gom file web vào dist/
+scripts/build.mjs         sinh site tĩnh vào dist/ từ data/site.json
+scripts/pull-data.mjs     kéo dữ liệu công khai từ Worker về data/site.json
+data/site.json            dữ liệu công khai (Worker tự commit, không sửa tay)
 ```

@@ -67,7 +67,7 @@ export default async function ({ params: [tab = ''], query }) {
       const f = src || { qty: 1, weeks: 4, phone: c.phone };
       const live = src && ['live', 'hidden'].includes(src.status);
       return `
-      <div class="desk-title"><div><h1>${src ? 'Sửa tin' : 'Đăng tin tuyển'}</h1><p>Đăng tin miễn phí. ${approveMode === 'manual' ? 'Tin được kiểm duyệt trước khi hiển thị, thường trong 2 giờ.' : 'Tin không có dấu hiệu rủi ro được hiển thị ngay.'}</p></div></div>
+      <div class="desk-title"><div><h1>${src ? 'Sửa tin' : 'Đăng tin tuyển'}</h1><p>Đăng tin miễn phí. ${approveMode === 'manual' ? 'Tin được kiểm duyệt trước khi hiển thị, thường trong 2 giờ.' : 'Tin không có dấu hiệu rủi ro được duyệt ngay và lên website sau khoảng 2–5 phút.'}</p></div></div>
       ${src?.status === 'rejected' ? `<div class="notice notice-warn" style="margin-bottom:16px">${icon('alert')}<p><b>Tin bị từ chối:</b> ${esc(src.rejectReason)}. Sửa lại rồi gửi duyệt.</p></div>` : ''}
       <form class="formcard" id="jf">
         <label class="field" style="margin-bottom:16px"><span>Tiêu đề</span><input class="input" name="title" required minlength="10" maxlength="150" value="${esc(f.title || '')}" placeholder="Tuyển 5 bảo vệ tòa nhà Quận 1, ca 12 tiếng, bao ở"></label>
@@ -190,7 +190,7 @@ export default async function ({ params: [tab = ''], query }) {
         const stop = busy(btn, 'Đang lưu…');
         try {
           const r = await api(editing ? `/employer/jobs/${editing}` : '/employer/jobs', { method: editing ? 'PUT' : 'POST', body: payload });
-          toast(r.status === 'live' || r.status === 'hidden' ? 'Đã lưu. Tin đang hiển thị trên website.' : r.status === 'pending' ? 'Tin đang chờ kiểm duyệt, thường xong trong 2 giờ.' : 'Đã lưu nháp.');
+          toast(r.status === 'live' || r.status === 'hidden' ? 'Đã lưu. Website cập nhật sau khoảng 2–5 phút.' : r.status === 'pending' ? 'Tin đang chờ kiểm duyệt, thường xong trong 2 giờ.' : 'Đã lưu nháp.');
           go('/nha-tuyen-dung/tin-dang');
         } catch (err) { stop(); toast(err.message, 'alert'); }
       };
@@ -205,7 +205,7 @@ export default async function ({ params: [tab = ''], query }) {
       const rn = e.target.closest('[data-renew]');
       if (hd) {
         const stop = busy(hd, '…');
-        try { await api(`/employer/jobs/${hd.dataset.hide}/hide`, { method: 'POST', body: { hidden: !!hd.dataset.on } }); toast(hd.dataset.on ? 'Đã tạm ẩn tin.' : 'Tin đã hiển thị lại.'); reload(); } catch (err) { stop(); toast(err.message, 'alert'); }
+        try { await api(`/employer/jobs/${hd.dataset.hide}/hide`, { method: 'POST', body: { hidden: !!hd.dataset.on } }); toast(hd.dataset.on ? 'Đã tạm ẩn tin. Website cập nhật sau vài phút.' : 'Tin sẽ hiển thị lại sau vài phút.'); reload(); } catch (err) { stop(); toast(err.message, 'alert'); }
       }
       if (rn) {
         const j = jobs.find((x) => String(x.id) === rn.dataset.renew);

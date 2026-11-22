@@ -3,9 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "sh scripts/build.sh",
-    "dev": "sh scripts/build.sh && wrangler dev",
-    "deploy": "sh scripts/build.sh && wrangler deploy",
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs && wrangler dev",
+    "deploy": "node scripts/build.mjs && wrangler deploy",
+    "data:pull": "node scripts/pull-data.mjs",
     "db:migrate:local": "wrangler d1 migrations apply vieclambaove --local",
     "db:migrate:remote": "wrangler d1 migrations apply vieclambaove --remote"
   },

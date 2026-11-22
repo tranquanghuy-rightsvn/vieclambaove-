@@ -6,11 +6,11 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    // URL sạch không phải file → index.html cho router JS xử lý
-    "not_found_handling": "single-page-application",
+    // Trang không có file tĩnh → 404.html (vẫn là khung app, router JS hiển thị đúng trang nếu có)
+    "not_found_handling": "404-page",
     "html_handling": "drop-trailing-slash",
-    // Các đường dẫn Worker xử lý trước (API, dữ liệu, SEO); còn lại phục vụ file tĩnh trực tiếp
-    "run_worker_first": ["/api/*", "/data/*", "/robots.txt", "/sitemap.xml", "/", "/viec-lam", "/viec-lam/*", "/tin/*", "/cong-ty/*", "/video", "/video/*"]
+    // Worker chỉ xử lý API + robots.txt; mọi trang còn lại là file tĩnh do scripts/build.mjs sinh ra
+    "run_worker_first": ["/api/*", "/robots.txt"]
   },
   "d1_databases": [
     { "binding": "DB", "database_name": "vieclambaove", "database_id": "cda8c87a-8005-4c6d-b325-a2fa70009782", "migrations_dir": "migrations" }
@@ -19,7 +19,8 @@
     // Giấy tờ xác thực công ty (không công khai)
     { "binding": "FILES", "bucket_name": "vieclambaove-files" }
   ],
-  "triggers": { "crons": ["0 * * * *"] },
+  "vars": { "GITHUB_REPO": "tranquanghuy-rightsvn/vieclambaove-", "GITHUB_BRANCH": "main" },
+  "triggers": { "crons": ["*/2 * * * *"] },
   "observability": { "enabled": true }
-  // Secret (đặt bằng `wrangler secret put`): ADMIN_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+  // Secret (đặt bằng `wrangler secret put`): ADMIN_API_KEY, GITHUB_TOKEN, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 }

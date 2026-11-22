@@ -1,7 +1,7 @@
 // API quản trị: chỉ trang admin GAS gọi, xác thực bằng khoá bí mật ADMIN_API_KEY
 // (header Authorization: Bearer <key>). Không dùng cookie, không mở cho trình duyệt.
 import { fail, json, now, DAY, body, str, sha256, slugify } from './lib.js';
-import { buildSnapshot, getKv, setKv, categories } from './snapshot.js';
+import { markDirty, getKv, setKv, categories, publish, publishStatus, buildData } from './publish.js';
 
 const enc = new TextEncoder();
 async function hmac(key, msg) {
@@ -47,7 +47,7 @@ export async function adminApi(req, env, url, p) {
       one('SELECT COUNT(DISTINCT job_id) n FROM reports WHERE status = \'open\''),
       env.DB.prepare('SELECT province, COUNT(*) n FROM jobs WHERE status = \'live\' AND expires_at > ? GROUP BY province ORDER BY n DESC').bind(t).all()
     ]);
-    return json({ live, pending, candidates: cand, employers: emp, companies: cos, verified, waitVerify, applications30d: apps, openReports: reports, byProvince: byProvince.results, approveMode: await getKv(env, 'approve_mode', 'auto') });
+    return json({ live, pending, candidates: cand, employers: emp, companies: cos, verified, waitVerify, applications30d: apps, openReports: reports, byProvince: byProvince.results, approveMode: await getKv(env, 'approve_mode', 'auto'), publish: await publishStatus(env) });
   }
 
   /* ---------- Duyệt tin ---------- */
@@ -81,7 +81,7 @@ export async function adminApi(req, env, url, p) {
         env.DB.prepare('UPDATE reports SET status = \'removed\' WHERE job_id = ? AND status = \'open\'').bind(j.id)
       ]);
     }
-    await buildSnapshot(env);
+    await markDirty(env);
     return json({ ok: true });
   }
 
@@ -109,7 +109,7 @@ export async function adminApi(req, env, url, p) {
         env.DB.prepare(`UPDATE jobs SET status = 'live', risks = '[]', updated_at = ? WHERE id = ? AND status = 'pending' AND risks LIKE '%Bị báo cáo%' AND expires_at > ?`).bind(t, id, t)
       ]);
     } else fail(400, 'Thao tác không hợp lệ.');
-    await buildSnapshot(env);
+    await markDirty(env);
     return json({ ok: true });
   }
 
@@ -139,7 +139,7 @@ export async function adminApi(req, env, url, p) {
         ...(b.locked ? [env.DB.prepare('DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE company_id = ?)').bind(c.id)] : [])
       ]);
     }
-    await buildSnapshot(env);
+    await markDirty(env);
     return json({ ok: true });
   }
 
@@ -176,7 +176,7 @@ export async function adminApi(req, env, url, p) {
     if (b.provinces !== undefined) await setKv(env, 'provinces', cleanProvinces(b.provinces));
     if (b.targets !== undefined) await setKv(env, 'targets', cleanList(b.targets, true));
     if (b.shifts !== undefined) await setKv(env, 'shifts', cleanList(b.shifts, false));
-    await buildSnapshot(env);
+    await markDirty(env);
     return json({ ok: true, ...(await categories(env)), approveMode: await getKv(env, 'approve_mode', 'auto') });
   }
 
@@ -199,23 +199,27 @@ export async function adminApi(req, env, url, p) {
       let slug = base;
       for (let i = 2; await env.DB.prepare('SELECT 1 FROM videos WHERE slug = ?').bind(slug).first(); i++) slug = `${base}-${i}`;
       const v = await env.DB.prepare('INSERT INTO videos (slug, youtube_id, title, descr, published, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *').bind(slug, yt, title, descr, published, t, t).first();
-      await buildSnapshot(env);
+      await markDirty(env);
       return json({ ok: true, item: v });
     }
     if (m === 'PUT' && vm[1]) {
       const r = await env.DB.prepare('UPDATE videos SET youtube_id = ?, title = ?, descr = ?, published = ?, updated_at = ? WHERE id = ?').bind(yt, title, descr, published, t, Number(vm[1])).run();
       if (!r.meta.changes) fail(404, 'Không tìm thấy video.');
-      await buildSnapshot(env);
+      await markDirty(env);
       return json({ ok: true });
     }
   }
   if (vm && vm[1] && m === 'DELETE') {
     await env.DB.prepare('DELETE FROM videos WHERE id = ?').bind(Number(vm[1])).run();
-    await buildSnapshot(env);
+    await markDirty(env);
     return json({ ok: true });
   }
 
-  if (p === '/rebuild' && m === 'POST') { await buildSnapshot(env); return json({ ok: true }); }
+  /* ---------- Xuất bản lên website tĩnh ---------- */
+  if (p === '/publish' && m === 'GET') return json(await publishStatus(env));
+  if (p === '/publish' && m === 'POST') { await markDirty(env); return json(await publish(env)); }
+  // Dữ liệu công khai (để build site tĩnh ở máy: npm run data:pull)
+  if (p === '/export' && m === 'GET') return json(await buildData(env));
 
   fail(404, 'Không tìm thấy.');
 }
