@@ -6,11 +6,11 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    // Trang không có file tĩnh → 404.html (vẫn là khung app, router JS hiển thị đúng trang nếu có)
-    "not_found_handling": "404-page",
+    // Không có file tĩnh → chuyển cho Worker: nội dung vừa duyệt (chưa kịp build) trả khung 200, còn lại 404
+    "not_found_handling": "none",
     "html_handling": "drop-trailing-slash",
-    // Worker chỉ xử lý API + robots.txt; mọi trang còn lại là file tĩnh do scripts/build.mjs sinh ra
-    "run_worker_first": ["/api/*", "/robots.txt"]
+    // Worker xử lý trước: API, robots.txt, dữ liệu trực tiếp /data/site.js; còn lại ưu tiên file tĩnh do scripts/build.mjs sinh ra
+    "run_worker_first": ["/api/*", "/robots.txt", "/data/site.js"]
   },
   "d1_databases": [
     { "binding": "DB", "database_name": "vieclambaove", "database_id": "cda8c87a-8005-4c6d-b325-a2fa70009782", "migrations_dir": "migrations" }

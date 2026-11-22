@@ -134,6 +134,8 @@ const loading = '<div class="wrap" style="padding:80px 0;text-align:center"><p c
 for (const [path, title] of Object.entries(PRIVATE)) {
   write(path, htmlPage(path, { title, noindex: true, html: loading, nav: path.startsWith('/nha-tuyen-dung') ? 'employer' : '', tabbar: path !== '/dang-nhap' }));
 }
+// Khung trống: Worker trả cho nội dung vừa duyệt chưa kịp build (JS vẽ từ dữ liệu trực tiếp)
+write('/_shell.html', htmlPage('/', { title: '', html: loading }).replace('<link rel="canonical" href="' + SITE + '/">', '<link rel="canonical" href="/">'));
 // 404: vẫn là khung app — đường dẫn hợp lệ nhưng chưa có trang tĩnh (vd quận chưa có tin) JS sẽ vẽ đúng trang
 write('/404.html', htmlPage('/404', layout.notFoundPage()));
 

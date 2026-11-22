@@ -76,7 +76,7 @@ banner/AdSense, danh sách đen, email báo việc mới.
 - Chuyển tab chỉ ẩn/hiện; dữ liệu tab tải khi mở tab, hiện ngay bản đã lưu trong localStorage.
 - Boot 1 lượt; lần sau hiện từ cache rồi làm mới ngầm (stale-while-revalidate).
 - Key localStorage (trừ token) mang hậu tố `CLIENT_BUILD` do server băm từ app.html + js.html.
-- Website KHÔNG đổi ngay: Worker đánh dấu cần xuất bản → cron 2 phút/lần commit data/site.json lên GitHub → CI build HTML tĩnh → deploy. Thông báo kết quả ghi rõ "Website sẽ được cập nhật sau khoảng 2–5 phút".
+- Website cập nhật NGAY: Worker dựng lại `/data/site.js` trực tiếp từ D1 và trả khung trang cho nội dung chưa có file tĩnh; đồng thời commit data/site.json lên GitHub → Actions build HTML tĩnh đầy đủ (cho Google) sau vài phút. Thông báo kết quả: "Website đã cập nhật ngay."
 
 ## VIII. Lưu trữ
 

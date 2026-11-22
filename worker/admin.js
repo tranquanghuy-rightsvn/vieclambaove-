@@ -16,7 +16,16 @@ async function sameSecret(a, b) {
   return d === 0;
 }
 
+// Thao tác quản trị đổi nội dung (duyệt, gỡ, video, danh mục…) → xuất bản lên GitHub NGAY, không chờ cron
 export async function adminApi(req, env, url, p) {
+  const res = await adminRoute(req, env, url, p);
+  if (req.method !== 'GET' && p !== '/publish' && res.ok && (await getKv(env, 'publish_dirty', 0)) > ((await getKv(env, 'publish_last', { at: 0 })).at || 0)) {
+    await publish(env).catch((e) => console.error('Xuất bản ngay thất bại, cron sẽ thử lại:', e.message));
+  }
+  return res;
+}
+
+async function adminRoute(req, env, url, p) {
   const m = req.method;
 
   // Link xem giấy tờ xác thực: ký HMAC, hết hạn sau 15 phút (mở được trong trình duyệt của quản trị)

@@ -50,8 +50,40 @@ export async function buildData(env) {
   return { ...cats, companies: cos.results.map(publicCompany), jobs: jobs.results.map(publicJob), videos: videos.results.map(publicVideo) };
 }
 
-/** Gọi sau MỌI thay đổi ảnh hưởng tới nội dung công khai. Rẻ: chỉ ghi 1 dòng. */
-export const markDirty = (env) => setKv(env, 'publish_dirty', now());
+/**
+ * Gọi sau MỌI thay đổi ảnh hưởng tới nội dung công khai:
+ *  1. dựng lại ngay /data/site.js (dữ liệu trực tiếp cho tìm kiếm + trang chưa kịp build) → người dùng thấy ngay;
+ *  2. đánh dấu cần xuất bản → cron / thao tác quản trị commit data/site.json → CI build lại HTML tĩnh.
+ */
+export async function markDirty(env) {
+  await setKv(env, 'publish_dirty', now());
+  await buildLive(env);
+}
+
+/* ---------- /data/site.js trực tiếp từ D1 ---------- */
+export async function buildLive(env) {
+  const data = await buildData(env);
+  const body = `/* Dữ liệu trực tiếp lúc ${new Date().toISOString()} – không sửa tay */
+(function (V, d) {
+  var t = Date.now(), D = 864e5;
+  d.jobs = d.jobs.map(function (j) {
+    j.posted = Math.max(0, Math.floor((t - j.postedAt) / D));
+    j.daysLeft = Math.floor((j.expiresAt - t) / D);
+    return j;
+  }).filter(function (j) { return j.expiresAt > t; });
+  for (var k in d) V[k] = d[k];
+})(window.VLBV = window.VLBV || {}, ${JSON.stringify(data).replace(/</g, '\\u003c')});
+`;
+  const snap = { body, etag: '"' + (await sha256(body)).slice(0, 16) + '"' };
+  await setKv(env, 'live_site_js', snap);
+  return snap;
+}
+
+export async function serveLive(env, req) {
+  const snap = (await getKv(env, 'live_site_js')) || (await buildLive(env));
+  if (req.headers.get('if-none-match') === snap.etag) return new Response(null, { status: 304, headers: { etag: snap.etag } });
+  return new Response(snap.body, { headers: { 'content-type': 'text/javascript; charset=utf-8', etag: snap.etag, 'cache-control': 'no-cache' } });
+}
 
 /* ---------- GitHub Contents API ---------- */
 const DATA_PATH = 'data/site.json';

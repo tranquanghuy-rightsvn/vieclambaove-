@@ -20,8 +20,9 @@ Cron Worker (2 phút/lần) ──commit──► GitHub: data/site.json
 - Trang công khai (trang chủ, khu vực, tin, công ty, tin tức, video, chính sách) là **file HTML đầy đủ**,
   render bằng chính các hàm trong `assets/js/pages/*.js`; JS trên trình duyệt vẽ lại y hệt và thêm phần động.
 - Trang tài khoản (`/dang-nhap`, `/ung-vien/*`, `/nha-tuyen-dung/*`) chỉ là khung, JS vẽ sau khi đăng nhập.
-- Tìm kiếm/lọc chạy trên `/data/site.js` (build sinh từ cùng `data/site.json`).
-- Độ trễ từ lúc thay đổi tới lúc lên web: khoảng 2–5 phút. Tin hết hạn: cron đổi trạng thái → lần build sau trang bị xoá (404).
+- Tìm kiếm/lọc chạy trên `/data/site.js` do Worker phục vụ TRỰC TIẾP từ D1 (dựng lại ngay khi có thay đổi).
+- Duyệt/đăng xong là lên web NGAY: trang chưa có file tĩnh (vừa duyệt) được Worker trả khung 200, JS vẽ từ dữ liệu trực tiếp;
+  HTML tĩnh đầy đủ cho Google có sau khoảng 2–5 phút (thao tác quản trị xuất bản ngay, thao tác NTD qua cron 2 phút). Tin hết hạn: cron đổi trạng thái → lần build sau trang bị xoá (404).
 - Actions còn build lại mỗi ngày 00:05 giờ VN để số "còn N ngày" trong HTML luôn đúng.
 
 ## Chạy ở máy
