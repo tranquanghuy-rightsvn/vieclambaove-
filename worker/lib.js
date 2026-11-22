@@ -101,6 +101,14 @@ export const publicUser = (u, company) => u && ({
   hasPassword: !!u.password_hash, google: !!u.google_sub
 });
 
+/* ---------- Không cho người dùng đưa link vào nội dung công khai ---------- */
+// Chặn: http(s)://, www., tên miền (abc.com, abc.vn/...), rút gọn (bit.ly, zalo.me...). Email và SĐT vẫn được.
+const LINK_RE = /(https?:\/\/|www\.|\b[a-z0-9][a-z0-9-]{0,62}\.(com|vn|net|org|info|biz|me|io|co|xyz|top|online|site|store|shop|link|ly|app|page|asia|club|live|pro|tv|cc|ws|to|gl|gg)\b(\.vn)?(\/|\b))/i;
+export const hasLink = (text) => LINK_RE.test(String(text ?? '').replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, ' '));
+export function noLinks(fields) {
+  for (const [label, value] of Object.entries(fields)) if (hasLink(value)) fail(400, `${label} không được chứa đường link (website, Zalo, Facebook…). Vui lòng xoá link rồi lưu lại.`);
+}
+
 /* ---------- Kiểm tra rủi ro tin đăng (theo quy tắc, không dùng AI) ---------- */
 export function riskCheck(f) {
   const text = `${f.title || ''} ${f.descr || ''}`.toLowerCase();

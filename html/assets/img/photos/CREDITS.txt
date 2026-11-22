@@ -1,0 +1,17 @@
+Ảnh từ Pexels (Pexels License, dùng miễn phí):
+hero-bao-ve.jpg     https://www.pexels.com/photo/38475625/
+doi-bao-ve.jpg      https://www.pexels.com/photo/39270895/
+blog-luong.jpg      https://www.pexels.com/photo/18348226/
+blog-lua-dao.jpg    https://www.pexels.com/photo/13051291/
+blog-tuan-tra.jpg   https://www.pexels.com/photo/29997903/
+blog-ca-12.jpg      https://www.pexels.com/photo/29799289/
+blog-chung-chi.jpg  https://www.pexels.com/photo/35562107/
+Ảnh từ Unsplash:
+blog-phong-van.jpg  https://unsplash.com/photos/ (photo-1763741208672-94012967e60e)
+
+Logo công ty (assets/img/logos/) lấy từ website chính thức của từng công ty, CHỈ dùng cho bản demo:
+long-hai.png   longhaisecurity.vn
+an-phat.png    anquocsecurity.com
+phuong-nam.png baovephuongnam.com
+thang-long.webp baovethanglong.vn
+hai-au.png     soscorp.vn

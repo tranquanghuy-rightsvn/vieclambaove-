@@ -9,7 +9,13 @@ dụng). GAS chỉ là giao diện quản trị, gọi API quản trị của Wo
 ```
 Trình duyệt quản trị ──google.script.run──► GAS (Code.js) ──UrlFetchApp + Bearer ADMIN_API_KEY──► Worker /api/admin/* ──► D1 / R2
                                               │
-                                              └── Google Sheet "vieclambaove Admin": CHỈ danh sách quản trị viên (Users)
+                                              ├── Google Sheet "vieclambaove Admin": CHỈ danh sách quản trị viên (Users)
+                                              └── Trigger hằng ngày 0h: dailyExpire() → Worker /api/admin/expire
+
+Xuất bản (chốt 22/11/2026, "Triển khai thực tế"): mọi thay đổi nội dung công khai → Worker xuất bản NGAY
+(không cron Cloudflare): 1 commit Git Data API gồm data/site.json + ảnh mới vào html/images/ (+ xoá ảnh
+không còn dùng) → GitHub Actions (token sẵn của GitHub, KHÔNG secret Cloudflare) chạy scripts/build.mjs,
+commit html/ → Cloudflare Workers Builds nối thẳng repo, deploy html/ + Worker.
 ```
 
 ## 0. Phạm vi (Phase 1, không làm rộng hơn)
@@ -26,7 +32,7 @@ banner/AdSense, danh sách đen, email báo việc mới.
 4. Phân quyền 3 cấp `root > admin > moderator` (chốt 22/11/2026):
    | Chức năng | moderator (Kiểm duyệt) | admin | root |
    |---|---|---|---|
-   | Tổng quan, Duyệt tin, Báo cáo vi phạm, Video | ✔ | ✔ | ✔ |
+   | Tổng quan (kèm trạng thái xuất bản, nút Xuất bản ngay), Duyệt tin, Báo cáo vi phạm, Video | ✔ | ✔ | ✔ |
    | Công ty (xác thực, khoá), Người dùng website (khoá/mở) | | ✔ | ✔ |
    | Danh mục + chế độ duyệt tin | | ✔ | ✔ |
    | Quản trị viên: thêm/xoá moderator | | ✔ | ✔ |
@@ -42,7 +48,15 @@ banner/AdSense, danh sách đen, email báo việc mới.
 - Hiển thị cờ rủi ro (quy tắc, không AI) và số báo cáo đang mở.
 - Thao tác: Duyệt (`pending` → `live`, hạn tính từ lúc duyệt theo số tuần NTD chọn), Từ chối
   (bắt nhập lý do, NTD thấy lý do), Gỡ (tin đang hiển thị → `removed`).
-- Chế độ duyệt (`approve_mode`): `auto` = tin không có cờ lên ngay; `manual` = mọi tin chờ duyệt.
+- Chế độ duyệt (`approve_mode`): `auto` (mặc định ban đầu) = tin không có cờ lên ngay; `manual` = mọi tin chờ duyệt.
+- KHÔNG cho người dùng đưa link: tiêu đề, mô tả, địa chỉ, yêu cầu của tin, tên/giới thiệu công ty chứa
+  đường link (http, www, tên miền, zalo.me, bit.ly…) bị từ chối ngay khi lưu (email và số điện thoại vẫn được).
+- Ảnh: mỗi tin tối đa 3 ảnh đại diện; công ty có 1 logo. NTD tải lên (nén phía trình duyệt, cạnh dài ≤1200px,
+  JPEG), lưu tạm R2 `img/…`; khi tin lên website ảnh được chép sang `html/images/jobs|companies/…` trên GitHub.
+  Ảnh riêng 1-1 theo tin/công ty (tên `jobs/<id>-<băm>.jpg`, `companies/<id>-<băm>.jpg`) nên xoá kèm an toàn
+  khi tin hết hạn/bị gỡ. Giấy tờ xác thực KHÔNG BAO GIỜ lên GitHub (chỉ ở R2 `verify/…`).
+- Tin hết hạn: GAS trigger hằng ngày lúc 0h gọi Worker chuyển `expired` → xuất bản → trang + ảnh bị xoá.
+  Trong ngày, trình duyệt tự ẩn tin quá hạn khỏi danh sách (dữ liệu trực tiếp).
 
 ## III. Báo cáo vi phạm
 
@@ -83,7 +97,8 @@ banner/AdSense, danh sách đen, email báo việc mới.
 - Google Sheet `vieclambaove Admin` (tự tạo lần đầu), sheet `Users`: cột `email`, `role`
   (`admin` | `moderator`).
 - Mọi dữ liệu nghiệp vụ: Cloudflare D1 qua Worker. GAS không lưu bản sao.
-- Dữ liệu công khai được Worker commit vào repo tại `data/site.json` (file trigger CI); `scripts/build.mjs` sinh HTML tĩnh từ file này.
+- Dữ liệu công khai được Worker commit vào repo tại `data/site.json` (file trigger CI); `scripts/build.mjs` sinh HTML tĩnh vào `html/` (thư mục site trên GitHub, Cloudflare deploy thư mục này).
+- Ảnh công khai: `html/images/jobs/`, `html/images/companies/` (Worker commit). Danh sách ảnh đã xuất bản lưu ở D1 kv `published_images`.
 - Script Properties `token_<uuid>`: phiên đăng nhập admin, tự dọn khi hết hạn.
 
 ## IX. Bug đã gặp ở dự án này
@@ -95,3 +110,4 @@ banner/AdSense, danh sách đen, email báo việc mới.
 - `WORKER_URL` — gốc website, vd `https://vieclambaove.web100-vn.workers.dev` (không có `/` cuối).
 - `ADMIN_API_KEY` — trùng secret `ADMIN_API_KEY` của Worker (`wrangler secret put ADMIN_API_KEY`).
 - `SPREADSHEET_ID` — KHÔNG cần điền, tự tạo lần đầu.
+- Trigger: chạy tay `installTriggers()` 1 lần để cài trigger `dailyExpire` 0h–1h mỗi ngày (giờ VN).

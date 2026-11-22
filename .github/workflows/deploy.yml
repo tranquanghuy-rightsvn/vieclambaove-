@@ -1,22 +1,26 @@
-# Build site tĩnh từ data/site.json rồi deploy lên Cloudflare Worker "vieclambaove".
-# Chạy khi: push lên main (gồm commit dữ liệu do Worker tự đẩy lên), mỗi ngày 00:05 giờ VN
-# (làm mới "còn N ngày" trong HTML), hoặc bấm tay trong tab Actions.
-# Cần 2 secret của repo: CLOUDFLARE_API_TOKEN (quyền Edit Cloudflare Workers), CLOUDFLARE_ACCOUNT_ID.
-name: Build & deploy
+# Sinh site tĩnh vào html/ rồi commit lại repo. KHÔNG deploy, KHÔNG cần secret Cloudflare:
+# Cloudflare Workers Builds nối thẳng repo này, thấy html/ đổi thì tự deploy.
+# Chạy khi: Worker commit data/site.json (tin lên/gỡ, video, công ty…), sửa giao diện/script build,
+# mỗi ngày 00:10 giờ VN (làm mới "còn N ngày"), hoặc bấm tay ở tab Actions.
+name: Build html
 
 on:
   push:
     branches: [main]
+    paths: ['data/**', 'assets/**', 'scripts/**', 'index.html', 'quan-tri/**', 'package.json', 'package-lock.json', '.github/workflows/deploy.yml']
   schedule:
-    - cron: '5 17 * * *'
+    - cron: '10 17 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
-  group: deploy
-  cancel-in-progress: false
+  group: build-html
+  cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -24,14 +28,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
-      - name: Sinh trang tĩnh
+      - name: Sinh trang tĩnh (scripts/build.mjs không cần cài thư viện)
         run: node scripts/build.mjs
         env:
           SITE_URL: ${{ vars.SITE_URL || 'https://vieclambaove.web100-vn.workers.dev' }}
-      - name: Deploy
-        run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Commit html/
+        run: |
+          git config user.name "vieclambaove-ci"
+          git config user.email "ci@vieclambaove.invalid"
+          git add -A html
+          if git diff --cached --quiet; then echo "html/ không đổi"; exit 0; fi
+          git commit -m "CI: build html"
+          # Worker có thể vừa commit dữ liệu mới trong lúc build → rebase rồi đẩy lại
+          for i in 1 2 3; do git pull --rebase origin main && git push origin HEAD:main && exit 0; sleep 5; done
+          exit 1

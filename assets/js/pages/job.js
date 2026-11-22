@@ -76,7 +76,8 @@ export default function ({ params: [id] }) {
         <div><a href="${url.company(c)}">${esc(c.name)}</a><br>
         ${c.verified ? `<span class="verified">${icon('check')}Đã xác thực giấy phép</span>` : '<span class="mute">Chưa xác thực</span>'}</div>
       </div>
-      <dl class="facts">${facts.map(([k, v, cls]) => `<div class="${cls || ''}"><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+      ${(j.images || []).length ? `<div class="d-gallery n${j.images.length}">${j.images.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="${esc(j.title)} – ảnh ${i + 1}" loading="${i ? 'lazy' : 'eager'}"></a>`).join('')}</div>` : ''}
+      <dl class="facts">${facts.filter(([, v]) => v).map(([k, v, cls]) => `<div class="${cls || ''}"><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
 
       ${j.desc
         ? `<section class="d-sec"><h2>Mô tả công việc</h2><p class="d-desc">${esc(j.desc)}</p></section>`
@@ -130,7 +131,7 @@ export default function ({ params: [id] }) {
     canonical, noindex: off,
     ld: off ? [] : {
       '@context': 'https://schema.org', '@type': 'JobPosting',
-      title: j.title, description: j.desc || desc.join(' '), datePosted: posted.toISOString().slice(0, 10), validThrough: until.toISOString().slice(0, 10),
+      title: j.title, description: j.desc || desc.join(' '), ...(j.images?.length ? { image: j.images.map((u) => SITE + u) } : {}), datePosted: posted.toISOString().slice(0, 10), validThrough: until.toISOString().slice(0, 10),
       employmentType: 'FULL_TIME', industry: 'Dịch vụ bảo vệ', totalJobOpenings: j.qty,
       hiringOrganization: { '@type': 'Organization', name: c.name, sameAs: SITE + url.company(c) },
       jobLocation: { '@type': 'Place', address: { '@type': 'PostalAddress', streetAddress: j.address, addressLocality: j.district, addressRegion: p.name, addressCountry: 'VN' } },

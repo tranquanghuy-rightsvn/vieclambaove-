@@ -1,4 +1,4 @@
-import { V, $, $$, esc, icon, user, toast, deskNav, url, num, modal, closeModal, api, busy, syncMe } from '../core.js';
+import { V, $, $$, esc, icon, user, toast, deskNav, url, num, modal, closeModal, api, busy, syncMe, mono, uploadImage, hasLink } from '../core.js';
 import { go } from '../router.js';
 
 const DAY = 864e5;
@@ -95,6 +95,8 @@ export default async function ({ params: [tab = ''], query }) {
         ${live ? '' : `<div class="field" style="margin-top:16px"><span>Thời gian hiển thị</span>
           <div class="pills">${WEEKS.map((w) => `<label class="pill"><input type="radio" name="weeks" value="${w}" ${Number(f.weeks || 4) === w ? 'checked' : ''}><span>${w} tuần</span></label>`).join('')}</div>
           <small>Hết thời gian, tin tự động bị gỡ khỏi website. Có thể gia hạn trong mục Tin đã đăng.</small></div>`}
+        <div class="field" style="margin-top:16px"><span>Ảnh đại diện của tin (tối đa 3 ảnh, hiện ở danh sách và trang tin)</span>
+          <div class="imgs" id="imgs"></div></div>
         <div id="risk" style="margin-top:16px"></div>
         <div class="form-foot">${live ? '' : '<button class="btn btn-quiet" type="button" id="draft">Lưu nháp</button>'}<button class="btn btn-primary" type="submit">${live ? 'Lưu thay đổi' : 'Đăng tin'}</button></div>
       </form>`;
@@ -159,6 +161,10 @@ export default async function ({ params: [tab = ''], query }) {
     'cong-ty': () => `
       <div class="desk-title"><div><h1>Thông tin công ty</h1><p>Hiển thị trên trang công ty <a href="/cong-ty/${esc(c.id)}">/cong-ty/${esc(c.id)}</a>.</p></div></div>
       <form class="formcard" id="cf">
+        <div class="logo-edit"><span id="logoBox">${mono(c, 'mono-l')}</span>
+          <div><b>Logo công ty</b><p class="mute" style="margin:2px 0 8px;font-size:14px">Hiện ở trang công ty và các tin chưa có ảnh. Ảnh vuông, nền trắng là đẹp nhất.</p>
+          <label class="btn btn-quiet btn-s upload" style="position:relative">${icon('file')}Chọn logo<input type="file" id="logoIn" accept="image/jpeg,image/png,image/webp"></label>
+          ${c.logo ? '<button class="linkbtn" type="button" id="logoDel" style="margin-left:10px">Xoá logo</button>' : ''}</div></div>
         <div class="grid3">
           <label class="field"><span>Số điện thoại</span><input class="input" name="phone" value="${esc(c.phone)}" inputmode="tel"></label>
           <label class="field"><span>Quy mô</span><input class="input" name="size" value="${esc(c.size)}" placeholder="200+ nhân viên"></label>
@@ -178,8 +184,33 @@ export default async function ({ params: [tab = ''], query }) {
     const jf = $('#jf', root);
     if (jf) {
       const editing = query.get('sua');
+      // Ảnh: tin đã có thì hiện ảnh cũ (xoá được ngay); ảnh mới chọn sẽ tải lên sau khi lưu tin
+      const src = editing ? jobs.find((x) => String(x.id) === editing) : null;
+      let saved = src ? [...(src.images || [])] : [];
+      const pending = [];
+      const drawImgs = () => {
+        const n = saved.length + pending.length;
+        $('#imgs', root).innerHTML = saved.map((u, i) => `<figure><img src="${esc(u)}" alt=""><button type="button" data-delimg="${i}" aria-label="Xoá ảnh">×</button></figure>`).join('')
+          + pending.map((p, i) => `<figure class="pending"><img src="${p.url}" alt=""><button type="button" data-delpend="${i}" aria-label="Bỏ ảnh">×</button></figure>`).join('')
+          + (n < 3 ? `<label class="imgs-add">${icon('plus')}Thêm ảnh<input type="file" accept="image/jpeg,image/png,image/webp" multiple></label>` : '');
+        $('#imgs input', root)?.addEventListener('change', (e) => {
+          [...e.target.files].slice(0, 3 - n).forEach((file) => pending.push({ file, url: URL.createObjectURL(file) }));
+          drawImgs();
+        });
+      };
+      $('#imgs', root).addEventListener('click', async (e) => {
+        const d = e.target.closest('[data-delimg]');
+        const dp = e.target.closest('[data-delpend]');
+        if (dp) { pending.splice(Number(dp.dataset.delpend), 1); drawImgs(); }
+        if (d) {
+          try { saved = (await api(`/employer/jobs/${editing}/images/${d.dataset.delimg}`, { method: 'DELETE' })).images; drawImgs(); toast('Đã xoá ảnh.'); } catch (err) { toast(err.message, 'alert'); }
+        }
+      });
+      drawImgs();
+      const linkIn = () => ['title', 'desc', 'address', 'age', 'height'].find((k) => hasLink(jf[k]?.value));
       const showRisk = () => {
         const r = riskCheck(Object.fromEntries(new FormData(jf)));
+        if (linkIn()) { $('#risk', root).innerHTML = `<div class="risk hi"><h4>${icon('alert')}Không được chèn đường link</h4><ul><li>Xoá link website, Zalo, Facebook… khỏi nội dung. Số điện thoại và email vẫn được.</li></ul></div>`; return; }
         $('#risk', root).innerHTML = r.length ? `<div class="risk hi"><h4>${icon('alert')}Tin sẽ được kiểm duyệt thủ công</h4><ul>${r.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : jf.title.value ? `<div class="risk lo"><h4>${icon('shield')}Không thấy dấu hiệu rủi ro</h4></div>` : '';
       };
       jf.province.addEventListener('change', () => (jf.district.innerHTML = districtOpts(jf.province.value)));
@@ -187,9 +218,14 @@ export default async function ({ params: [tab = ''], query }) {
       const save = async (action, btn) => {
         const f = Object.fromEntries(new FormData(jf));
         const payload = { ...f, housing: !!f.housing, meals: !!f.meals, urgent: !!f.urgent, action };
+        if (linkIn()) { toast('Nội dung không được chứa đường link. Vui lòng xoá link rồi lưu lại.', 'alert'); return; }
         const stop = busy(btn, 'Đang lưu…');
         try {
           const r = await api(editing ? `/employer/jobs/${editing}` : '/employer/jobs', { method: editing ? 'PUT' : 'POST', body: payload });
+          for (let i = 0; i < pending.length; i++) {
+            btn.innerHTML = `Đang tải ảnh ${i + 1}/${pending.length}…`;
+            await uploadImage(`/employer/jobs/${r.id}/images`, pending[i].file).catch((err) => toast('Ảnh ' + (i + 1) + ': ' + err.message, 'alert'));
+          }
           toast(r.status === 'live' || r.status === 'hidden' ? 'Đã lưu. Tin đang hiển thị trên website.' : r.status === 'pending' ? 'Tin đang chờ kiểm duyệt, thường xong trong 2 giờ.' : 'Đã lưu nháp.');
           go('/nha-tuyen-dung/tin-dang');
         } catch (err) { stop(); toast(err.message, 'alert'); }
@@ -253,8 +289,18 @@ export default async function ({ params: [tab = ''], query }) {
     }
 
     /* Thông tin công ty */
+    $('#logoIn', root)?.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      toast('Đang tải logo…', 'download');
+      try { await uploadImage('/employer/company/logo', file); toast('Đã cập nhật logo.'); reload(); } catch (err) { toast(err.message, 'alert'); }
+    });
+    $('#logoDel', root)?.addEventListener('click', async () => {
+      try { await api('/employer/company/logo', { method: 'DELETE' }); toast('Đã xoá logo.'); reload(); } catch (err) { toast(err.message, 'alert'); }
+    });
     $('#cf', root)?.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (hasLink(e.target.about.value) || hasLink(e.target.size.value)) { toast('Giới thiệu công ty không được chứa đường link.', 'alert'); return; }
       const stop = busy(e.submitter, 'Đang lưu…');
       try { await api('/employer/company', { method: 'PUT', body: Object.fromEntries(new FormData(e.target)) }); toast('Đã lưu thông tin công ty.'); } catch (err) { toast(err.message, 'alert'); }
       stop();

@@ -4,7 +4,7 @@
   "main": "worker/index.js",
   "compatibility_date": "2026-11-01",
   "assets": {
-    "directory": "./dist",
+    "directory": "./html",
     "binding": "ASSETS",
     // Không có file tĩnh → chuyển cho Worker: nội dung vừa duyệt (chưa kịp build) trả khung 200, còn lại 404
     "not_found_handling": "none",
@@ -19,8 +19,9 @@
     // Giấy tờ xác thực công ty (không công khai)
     { "binding": "FILES", "bucket_name": "vieclambaove-files" }
   ],
+  // Không dùng cron Cloudflare: xuất bản ngay khi có thay đổi, hết hạn do GAS gọi lúc 0h (GAS.md)
+  "triggers": { "crons": [] },
   "vars": { "GITHUB_REPO": "tranquanghuy-rightsvn/vieclambaove-", "GITHUB_BRANCH": "main" },
-  "triggers": { "crons": ["*/2 * * * *"] },
   "observability": { "enabled": true }
   // Secret (đặt bằng `wrangler secret put`): ADMIN_API_KEY, GITHUB_TOKEN, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 }

@@ -30,6 +30,7 @@ export const publicJob = (j) => ({
   target: j.target, shift: j.shift, qty: j.qty, salaryMin: j.salary_min, salaryMax: j.salary_max,
   housing: !!j.housing, meals: !!j.meals, urgent: !!j.urgent, tier: j.tier, age: j.age, height: j.height,
   desc: j.descr || '', phone: j.contact_phone || '', views: j.views, calls: j.calls,
+  images: JSON.parse(j.images || '[]').map((x) => '/images/' + x),
   postedAt: j.posted_at, expiresAt: j.expires_at, updatedAt: j.updated_at
 });
 
@@ -85,51 +86,94 @@ export async function serveLive(env, req) {
   return new Response(snap.body, { headers: { 'content-type': 'text/javascript; charset=utf-8', etag: snap.etag, 'cache-control': 'no-cache' } });
 }
 
-/* ---------- GitHub Contents API ---------- */
+/* ---------- GitHub Git Data API: 1 commit / lần xuất bản ---------- */
 const DATA_PATH = 'data/site.json';
-function b64utf8(str) {
-  const bytes = new TextEncoder().encode(str);
+const IMG_DIR = 'html/images/';
+
+function b64(bytes) {
   let bin = '';
   for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   return btoa(bin);
 }
 async function gh(env, method, path, body) {
-  const res = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/contents/${path}`, {
+  const res = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/${path}`, {
     method,
     headers: { authorization: `Bearer ${env.GITHUB_TOKEN}`, accept: 'application/vnd.github+json', 'user-agent': 'vieclambaove-worker', 'x-github-api-version': '2022-11-28', ...(body ? { 'content-type': 'application/json' } : {}) },
     body: body ? JSON.stringify(body) : undefined
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok && !(method === 'GET' && res.status === 404)) throw new Error(`GitHub ${method} ${path}: ${res.status} ${data.message || ''}`);
-  return res.ok ? data : null;
+  if (!res.ok) { const e = new Error(`GitHub ${method} ${path}: ${res.status} ${data.message || ''}`); e.status = res.status; throw e; }
+  return data;
+}
+
+// Ảnh công khai đang được dùng: ảnh của tin đang hiển thị + logo công ty (chỉ ảnh do người dùng tải, nằm ở /images/)
+function wantedImages(data) {
+  const set = new Set();
+  data.jobs.forEach((j) => (j.images || []).forEach((u) => set.add(u.slice(8))));
+  data.companies.forEach((c) => c.logo?.startsWith('/images/') && set.add(c.logo.slice(8)));
+  return set;
+}
+
+async function commitOnce(env, data, json) {
+  const branch = env.GITHUB_BRANCH || 'main';
+  const published = new Set(await getKv(env, 'published_images', []));
+  const wanted = wantedImages(data);
+  const add = [...wanted].filter((x) => !published.has(x));
+  const del = [...published].filter((x) => !wanted.has(x));
+
+  const ref = await gh(env, 'GET', `git/ref/heads/${encodeURIComponent(branch)}`);
+  const head = await gh(env, 'GET', `git/commits/${ref.object.sha}`);
+  const tree = [{ path: DATA_PATH, mode: '100644', type: 'blob', content: json }];
+  for (const name of add) {
+    const obj = await env.FILES.get('img/' + name);
+    if (!obj) continue; // ảnh đã bị xoá khỏi R2 (NTD vừa xoá) - bỏ qua
+    const blob = await gh(env, 'POST', 'git/blobs', { content: b64(new Uint8Array(await obj.arrayBuffer())), encoding: 'base64' });
+    tree.push({ path: IMG_DIR + name, mode: '100644', type: 'blob', sha: blob.sha });
+  }
+  // Xoá ảnh không còn dùng (tin hết hạn/bị gỡ, logo cũ). Chỉ xoá file thật sự đang có trong repo.
+  if (del.length) {
+    const existing = new Set();
+    for (const dir of new Set(del.map((n) => n.split('/')[0]))) {
+      try { (await gh(env, 'GET', `contents/${IMG_DIR}${dir}?ref=${encodeURIComponent(branch)}`)).forEach((f) => existing.add(f.path)); } catch (e) { if (e.status !== 404) throw e; }
+    }
+    del.filter((n) => existing.has(IMG_DIR + n)).forEach((n) => tree.push({ path: IMG_DIR + n, mode: '100644', type: 'blob', sha: null }));
+  }
+  const newTree = await gh(env, 'POST', 'git/trees', { base_tree: head.tree.sha, tree });
+  if (newTree.sha === head.tree.sha) return { commit: '', images: wanted };
+  const commit = await gh(env, 'POST', 'git/commits', {
+    message: `data: cập nhật website (${data.jobs.length} tin, ${data.videos.length} video${add.length ? `, +${add.length} ảnh` : ''}${del.length ? `, -${del.length} ảnh` : ''})`,
+    tree: newTree.sha, parents: [head.sha],
+    author: { name: 'vieclambaove-bot', email: 'bot@vieclambaove.invalid' }
+  });
+  await gh(env, 'PATCH', `git/refs/heads/${encodeURIComponent(branch)}`, { sha: commit.sha });
+  return { commit: commit.sha, images: wanted };
 }
 
 /**
- * Xuất bản nếu có thay đổi (hoặc force). Trả về trạng thái để quản trị/cron biết.
- * Nội dung không đổi so với lần trước (so băm) thì không commit, tránh build thừa.
+ * Xuất bản nếu có thay đổi (hoặc force): data/site.json + ảnh trong 1 commit.
+ * Gọi ngay sau mỗi thay đổi (không dùng cron). Hai lần xuất bản chồng nhau → thử lại.
  */
 export async function publish(env, { force = false } = {}) {
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) return { ok: false, skipped: 'Chưa cấu hình GITHUB_TOKEN / GITHUB_REPO' };
   const dirty = await getKv(env, 'publish_dirty', 0);
   const last = await getKv(env, 'publish_last', { at: 0, hash: '' });
   if (!force && !(dirty > last.at)) return { ok: true, skipped: 'Không có thay đổi' };
-  const startedAt = now();
-  const data = await buildData(env);
-  const json = JSON.stringify(data, null, 1) + '\n';
-  const hash = await sha256(json);
-  if (hash === last.hash && !force) {
-    await setKv(env, 'publish_last', { at: startedAt, hash, commit: last.commit });
-    return { ok: true, skipped: 'Nội dung không đổi' };
+  for (let attempt = 1; ; attempt++) {
+    const startedAt = now();
+    const data = await buildData(env);
+    const json = JSON.stringify(data, null, 1) + '\n';
+    try {
+      const r = await commitOnce(env, data, json);
+      await setKv(env, 'published_images', [...r.images]);
+      await setKv(env, 'publish_last', { at: startedAt, hash: await sha256(json), commit: r.commit || last.commit || '', error: '' });
+      return { ok: true, commit: r.commit, jobs: data.jobs.length };
+    } catch (e) {
+      // 422 = nhánh vừa có commit khác (lần xuất bản song song) → đọc lại và thử lại
+      if (attempt < 3 && (e.status === 422 || e.status === 409)) continue;
+      await setKv(env, 'publish_last', { ...last, error: e.message.slice(0, 300), errorAt: now() });
+      throw e;
+    }
   }
-  const branch = env.GITHUB_BRANCH || 'main';
-  const cur = await gh(env, 'GET', `${DATA_PATH}?ref=${encodeURIComponent(branch)}`);
-  const r = await gh(env, 'PUT', DATA_PATH, {
-    message: `data: cập nhật dữ liệu website (${data.jobs.length} tin, ${data.videos.length} video)`,
-    content: b64utf8(json), branch, ...(cur?.sha ? { sha: cur.sha } : {}),
-    committer: { name: 'vieclambaove-bot', email: 'bot@vieclambaove.invalid' }
-  });
-  await setKv(env, 'publish_last', { at: startedAt, hash, commit: r.commit?.sha || '' });
-  return { ok: true, commit: r.commit?.sha || '', jobs: data.jobs.length };
 }
 
 export const publishStatus = async (env) => ({

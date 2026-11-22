@@ -1,16 +1,16 @@
-// Sinh site tĩnh vào dist/ từ data/site.json (dữ liệu Worker xuất bản lên GitHub) + assets/js/data.js.
+// Sinh site tĩnh vào html/ (thư mục site trên GitHub, Cloudflare deploy thư mục này) từ data/site.json (dữ liệu Worker xuất bản lên GitHub) + assets/js/data.js.
 // Mỗi trang công khai (trang chủ, khu vực, tin, công ty, tin tức, video, chính sách) thành 1 file HTML
 // đầy đủ nội dung, render bằng CHÍNH các hàm vẽ trang của website (assets/js/pages/*.js) nên HTML
 // tĩnh và giao diện khi JS chạy là một. Trang cần tài khoản chỉ là khung, JS tự vẽ.
 //
 // Chạy: node scripts/build.mjs        (SITE_URL=https://ten-mien node scripts/build.mjs khi có tên miền)
-import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync, existsSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import vm from 'node:vm';
 
 const root = new URL('..', import.meta.url).pathname;
-const out = join(root, 'dist');
+const out = join(root, 'html');
 const SITE = (process.env.SITE_URL || 'https://vieclambaove.web100-vn.workers.dev').replace(/\/+$/, '');
 const BUILT = Date.now();
 
@@ -81,8 +81,9 @@ async function render(path) {
 }
 
 /* ---------- Sinh trang ---------- */
-rmSync(out, { recursive: true, force: true });
+// Dọn html/ nhưng GIỮ html/images/ (ảnh tin + logo do Worker commit, build không tạo lại được)
 mkdirSync(out, { recursive: true });
+for (const f of readdirSync(out)) if (f !== 'images') rmSync(join(out, f), { recursive: true, force: true });
 cpSync(join(root, 'assets'), join(out, 'assets'), { recursive: true, filter: (s) => !s.endsWith('.DS_Store') });
 cpSync(join(root, 'quan-tri'), join(out, 'quan-tri'), { recursive: true });
 
@@ -142,4 +143,4 @@ write('/404.html', htmlPage('/404', layout.notFoundPage()));
 const day = (ms) => new Date(ms).toISOString().slice(0, 10);
 write('/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pub.map(([u, d]) => `  <url><loc>${escAttr(SITE + u)}</loc><lastmod>${day(d)}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 
-console.log(`build: ${n} trang công khai, ${Object.keys(PRIVATE).length} khung trang tài khoản, ${V.jobs.length} tin, ${(V.videos || []).length} video → dist/ (SITE_URL=${SITE})`);
+console.log(`build: ${n} trang công khai, ${Object.keys(PRIVATE).length} khung trang tài khoản, ${V.jobs.length} tin, ${(V.videos || []).length} video → html/ (SITE_URL=${SITE})`);

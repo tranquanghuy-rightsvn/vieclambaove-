@@ -16,14 +16,7 @@ async function sameSecret(a, b) {
   return d === 0;
 }
 
-// Thao tác quản trị đổi nội dung (duyệt, gỡ, video, danh mục…) → xuất bản lên GitHub NGAY, không chờ cron
-export async function adminApi(req, env, url, p) {
-  const res = await adminRoute(req, env, url, p);
-  if (req.method !== 'GET' && p !== '/publish' && res.ok && (await getKv(env, 'publish_dirty', 0)) > ((await getKv(env, 'publish_last', { at: 0 })).at || 0)) {
-    await publish(env).catch((e) => console.error('Xuất bản ngay thất bại, cron sẽ thử lại:', e.message));
-  }
-  return res;
-}
+export const adminApi = (req, env, url, p) => adminRoute(req, env, url, p);
 
 async function adminRoute(req, env, url, p) {
   const m = req.method;
@@ -222,6 +215,15 @@ async function adminRoute(req, env, url, p) {
     await env.DB.prepare('DELETE FROM videos WHERE id = ?').bind(Number(vm[1])).run();
     await markDirty(env);
     return json({ ok: true });
+  }
+
+  /* ---------- Hết hạn: GAS gọi mỗi ngày lúc 0h ---------- */
+  if (p === '/expire' && m === 'POST') {
+    const r = await env.DB.prepare('UPDATE jobs SET status = \'expired\', updated_at = ? WHERE status IN (\'live\', \'hidden\') AND expires_at <= ?').bind(t, t).run();
+    await env.DB.prepare('DELETE FROM sessions WHERE expires_at <= ?').bind(t).run();
+    await markDirty(env); // dựng lại dữ liệu trực tiếp + xuất bản (gỡ trang, ảnh của tin hết hạn)
+    const pub = await publish(env, { force: true }).catch((e) => ({ ok: false, error: e.message }));
+    return json({ ok: true, expired: r.meta.changes, publish: pub });
   }
 
   /* ---------- Xuất bản lên website tĩnh ---------- */

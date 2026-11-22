@@ -1,7 +1,7 @@
-// Điểm vào Worker. Trang công khai là file HTML tĩnh do scripts/build.mjs sinh ra (dist/);
-// Worker chỉ lo API (/api/*), robots.txt theo tên miền, và cron xuất bản dữ liệu.
+// Điểm vào Worker. Trang công khai là file HTML tĩnh trong html/ (scripts/build.mjs sinh ra, GitHub lưu);
+// Worker lo API (/api/*), robots.txt, dữ liệu trực tiếp, nội dung vừa duyệt chưa kịp build, và xuất bản lên GitHub.
 import { api } from './api.js';
-import { markDirty, publish, serveLive, LIVE_SQL, categories } from './publish.js';
+import { publish, serveLive, LIVE_SQL, categories, getKv } from './publish.js';
 import { slugify } from './lib.js';
 import { now } from './lib.js';
 
@@ -32,28 +32,46 @@ async function existsLive(env, path) {
   return false;
 }
 
+// Ảnh công khai chưa kịp lên GitHub (vừa tải/vừa duyệt): phục vụ tạm từ R2, chỉ ảnh đang được dùng công khai
+async function liveImage(env, name) {
+  if (!/^(jobs|companies)\/[a-z0-9-]+\.(jpg|png|webp)$/.test(name)) return null;
+  const used = name.startsWith('jobs/')
+    ? await env.DB.prepare(LIVE_SQL + ' AND j.images LIKE ?2').bind(now(), '%"' + name + '"%').first()
+    : await env.DB.prepare('SELECT 1 FROM companies WHERE locked = 0 AND logo = ?').bind('/images/' + name).first();
+  if (!used) return null;
+  const obj = await env.FILES.get('img/' + name);
+  return obj && new Response(obj.body, { headers: { 'content-type': obj.httpMetadata?.contentType || 'image/jpeg', 'cache-control': 'public, max-age=300' } });
+}
+
 export default {
-  async fetch(req, env) {
+  async fetch(req, env, ctx) {
     const url = new URL(req.url);
-    if (url.pathname.startsWith('/api/')) return api(req, env, url);
+    if (url.pathname.startsWith('/api/')) {
+      const res = await api(req, env, url);
+      // Không dùng cron: thao tác nào làm đổi nội dung công khai thì xuất bản lên GitHub ngay (chạy nền)
+      if (req.method !== 'GET' && res.ok) ctx.waitUntil(publishIfDirty(env));
+      return res;
+    }
     if (url.pathname === '/robots.txt') return robots(url);
     if (url.pathname === '/data/site.js') return serveLive(env, req);
     // Tới đây nghĩa là KHÔNG có file tĩnh cho đường dẫn này (file tĩnh được phục vụ trước khi vào Worker).
-    // Nội dung vừa duyệt chưa kịp build: trả khung trang (200) để JS vẽ ngay từ dữ liệu trực tiếp.
-    if (req.method === 'GET' && (await existsLive(env, url.pathname))) {
+    if (url.pathname.startsWith('/images/')) {
+      const img = await liveImage(env, decodeURIComponent(url.pathname.slice(8)));
+      if (img) return img;
+    } else if (req.method === 'GET' && (await existsLive(env, url.pathname))) {
+      // Nội dung vừa duyệt chưa kịp build: trả khung trang (200) để JS vẽ ngay từ dữ liệu trực tiếp
       const shell = await env.ASSETS.fetch(new Request(url.origin + '/_shell.html'));
       return new Response(shell.body, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-cache' } });
     }
     const nf = await env.ASSETS.fetch(new Request(url.origin + '/404.html'));
     return new Response(nf.body, { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
-  },
-
-  // 2 phút/lần: tin hết hạn rời website; có thay đổi thì xuất bản dữ liệu lên GitHub (CI build lại)
-  async scheduled(event, env, ctx) {
-    const t = now();
-    const r = await env.DB.prepare('UPDATE jobs SET status = \'expired\', updated_at = ? WHERE status IN (\'live\', \'hidden\') AND expires_at <= ?').bind(t, t).run();
-    if (r.meta.changes) await markDirty(env);
-    if (new Date(t).getUTCMinutes() < 2) await env.DB.prepare('DELETE FROM sessions WHERE expires_at <= ?').bind(t).run();
-    ctx.waitUntil(publish(env).then((x) => x.commit && console.log('Đã xuất bản', x)).catch((e) => console.error('Xuất bản thất bại:', e.message)));
   }
 };
+
+async function publishIfDirty(env) {
+  try {
+    const dirty = await getKv(env, 'publish_dirty', 0);
+    const last = await getKv(env, 'publish_last', { at: 0 });
+    if (dirty > (last.at || 0)) { const r = await publish(env); if (r.commit) console.log('Đã xuất bản', r.commit); }
+  } catch (e) { console.error('Xuất bản thất bại (lần thay đổi sau hoặc GAS 0h sẽ thử lại):', e.message); }
+}

@@ -7,7 +7,6 @@ node_modules/
 .env*
 .dev.vars
 .wrangler/
-dist/
 # Mã trang quản trị GAS: không đưa lên git, deploy bằng clasp (xem GAS.md)
 gas/
 # Tài liệu nội bộ của khách, giữ ở máy

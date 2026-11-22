@@ -155,6 +155,41 @@ export const mono = (c, cls = '') => c.logo
   ? `<span class="mono mono-img ${cls}" aria-hidden="true"><img src="${c.logo}" alt="" loading="lazy"></span>`
   : `<span class="mono ${cls}" style="background:${c.color}" aria-hidden="true">${c.initials}</span>`;
 
+// Ảnh đại diện của tin: ảnh đầu tiên NTD tải lên, không có thì logo công ty
+const jobThumb = (j, c) => (j.images && j.images[0]
+  ? `<span class="mono mono-img mono-photo" aria-hidden="true"><img src="${esc(j.images[0])}" alt="" loading="lazy"></span>`
+  : mono(c));
+
+/* ---------- Ảnh: nén phía trình duyệt trước khi tải lên (cạnh dài ≤ max, JPEG) ---------- */
+export function resizeImage(file, max = 1200, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { reject(new Error('Chỉ nhận ảnh JPG, PNG hoặc WEBP.')); return; }
+    const img = new Image();
+    const src = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+      const cv = document.createElement('canvas');
+      cv.width = Math.round(img.naturalWidth * k); cv.height = Math.round(img.naturalHeight * k);
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); // nền trắng cho logo PNG trong suốt
+      ctx.drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(src);
+      cv.toBlob((b) => (b ? resolve(b) : reject(new Error('Không xử lý được ảnh.'))), 'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(src); reject(new Error('Không đọc được ảnh.')); };
+    img.src = src;
+  });
+}
+export async function uploadImage(path, file) {
+  const fd = new FormData();
+  fd.append('file', await resizeImage(file), 'anh.jpg');
+  return api(path, { method: 'POST', body: fd });
+}
+
+// Giống quy tắc máy chủ: không cho chèn link vào nội dung công khai (email, SĐT vẫn được)
+const LINK_RE = /(https?:\/\/|www\.|\b[a-z0-9][a-z0-9-]{0,62}\.(com|vn|net|org|info|biz|me|io|co|xyz|top|online|site|store|shop|link|ly|app|page|asia|club|live|pro|tv|cc|ws|to|gl|gg)\b(\.vn)?(\/|\b))/i;
+export const hasLink = (t) => LINK_RE.test(String(t ?? '').replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, ' '));
+
 /* ---------- Dòng tin tuyển dụng ---------- */
 export const isSaved = (id) => store.get('saved', []).includes(Number(id));
 export function toggleSave(id) {
@@ -183,7 +218,7 @@ function jobBits(j) {
 export function jobCard(j) {
   const { c, p, off, tags, tick, save } = jobBits(j);
   return `<article class="jcard${j.tier === "vip" && !off ? " is-vip" : ""}">
-    <a class="jc-logo" href="${url.company(c)}" tabindex="-1" aria-hidden="true">${mono(c)}</a>
+    <a class="jc-logo" href="${url.job(j)}" tabindex="-1" aria-hidden="true">${jobThumb(j, c)}</a>
     <div class="jc-body">
       ${tags ? `<p class="jc-tags">${tags}</p>` : ""}
       <h3><a href="${url.job(j)}" title="${esc(j.title)}">${esc(j.title)}</a></h3>
@@ -202,7 +237,7 @@ export function jobCard(j) {
 export function jobRow(j) {
   const { c, p, off, tags, tick, save, left } = jobBits(j);
   return `<article class="jrow${j.tier === "vip" && !off ? " is-vip" : ""}${off ? " is-off" : ""}">
-    <a class="jr-logo" href="${url.company(c)}" tabindex="-1" aria-hidden="true">${mono(c)}</a>
+    <a class="jr-logo" href="${url.job(j)}" tabindex="-1" aria-hidden="true">${jobThumb(j, c)}</a>
     <div class="jr-body">
       ${tags ? `<p class="jr-tags">${tags}</p>` : ""}
       <h3><a href="${url.job(j)}">${esc(j.title)}</a></h3>

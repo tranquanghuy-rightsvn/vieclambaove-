@@ -2,7 +2,7 @@
 import {
   HttpError, fail, json, now, DAY, body, str, normPhone, normEmail, slugify, sha256, randomToken,
   hashPassword, verifyPassword, checkPassword, createSession, destroySession, currentUser, publicUser,
-  riskCheck, rateLimit, ipHash, getCookie, cookie
+  riskCheck, rateLimit, ipHash, getCookie, cookie, noLinks
 } from './lib.js';
 import { markDirty, getKv, categories, LIVE_SQL } from './publish.js';
 import { adminApi } from './admin.js';
@@ -92,6 +92,7 @@ async function register(env, req) {
     if (!email) fail(400, 'Email không hợp lệ.');
     const coName = str(b.companyName, 120);
     if (!coName) fail(400, 'Vui lòng nhập tên công ty.');
+    noLinks({ 'Tên công ty': coName });
     if (await env.DB.prepare('SELECT 1 FROM users WHERE email = ?').bind(email).first()) fail(409, 'Email này đã có tài khoản. Hãy đăng nhập.');
     const co = await createCompany(env, coName, str(b.companyPhone, 20));
     user = await env.DB.prepare('INSERT INTO users (role, email, password_hash, name, company_id, created_at) VALUES (\'employer\', ?, ?, ?, ?, ?) RETURNING *')
@@ -321,6 +322,7 @@ async function employer(req, env, url, p) {
     const b = await body(req);
     const name = str(b.name, 120);
     if (!name) fail(400, 'Vui lòng nhập tên công ty.');
+    noLinks({ 'Tên công ty': name });
     const c = await createCompany(env, name, str(b.phone, 20));
     await env.DB.prepare('UPDATE users SET company_id = ? WHERE id = ?').bind(c.id, u.id).run();
     return json({ ok: true, company: c });
@@ -330,6 +332,7 @@ async function employer(req, env, url, p) {
 
   if (p === '/company' && m === 'PUT') {
     const b = await body(req);
+    noLinks({ 'Giới thiệu công ty': b.about, 'Quy mô': b.size });
     await env.DB.prepare('UPDATE companies SET phone = ?, about = ?, size = ?, founded = ? WHERE id = ?')
       .bind(str(b.phone, 20), str(b.about, 2000), str(b.size, 40), Number(b.founded) || null, co.id).run();
     await markDirty(env);
@@ -342,6 +345,42 @@ async function employer(req, env, url, p) {
       env.DB.prepare('SELECT a.*, j.title FROM applications a JOIN jobs j ON j.id = a.job_id WHERE j.company_id = ? ORDER BY a.created_at DESC LIMIT 300').bind(co.id).all()
     ]);
     return json({ company: companyForOwner(co), jobs: jobs.results.map(ownJob), applications: apps.results, approveMode: await getKv(env, 'approve_mode', 'auto') });
+  }
+
+  /* Logo công ty */
+  if (p === '/company/logo' && m === 'POST') {
+    const name = await putImage(env, req, `companies/${co.id}`);
+    const old = co.logo?.startsWith('/images/') ? co.logo.slice(8) : null;
+    await env.DB.prepare('UPDATE companies SET logo = ? WHERE id = ?').bind('/images/' + name, co.id).run();
+    if (old) await env.FILES.delete('img/' + old);
+    await markDirty(env);
+    return json({ ok: true, logo: '/images/' + name });
+  }
+  if (p === '/company/logo' && m === 'DELETE') {
+    if (co.logo?.startsWith('/images/')) await env.FILES.delete('img/' + co.logo.slice(8));
+    await env.DB.prepare('UPDATE companies SET logo = NULL WHERE id = ?').bind(co.id).run();
+    await markDirty(env);
+    return json({ ok: true });
+  }
+
+  /* Ảnh đại diện của tin (tối đa 3) */
+  const im = p.match(/^\/jobs\/(\d+)\/images(?:\/(\d+))?$/);
+  if (im) {
+    const j = await env.DB.prepare('SELECT * FROM jobs WHERE id = ? AND company_id = ?').bind(Number(im[1]), co.id).first();
+    if (!j) fail(404, 'Không tìm thấy tin.');
+    if (j.status === 'removed') fail(400, 'Tin đã bị gỡ.');
+    const imgs = JSON.parse(j.images || '[]');
+    if (m === 'POST' && !im[2]) {
+      if (imgs.length >= 3) fail(400, 'Mỗi tin tối đa 3 ảnh. Xoá bớt ảnh cũ trước.');
+      imgs.push(await putImage(env, req, `jobs/${j.id}`));
+    } else if (m === 'DELETE' && im[2] !== undefined) {
+      const [gone] = imgs.splice(Number(im[2]), 1);
+      if (!gone) fail(404, 'Không tìm thấy ảnh.');
+      await env.FILES.delete('img/' + gone);
+    } else fail(405, 'Không hỗ trợ.');
+    await env.DB.prepare('UPDATE jobs SET images = ?, updated_at = ? WHERE id = ?').bind(JSON.stringify(imgs), now(), j.id).run();
+    if (['live', 'hidden'].includes(j.status)) await markDirty(env);
+    return json({ ok: true, images: imgs.map((x) => '/images/' + x) });
   }
 
   const jm = p.match(/^\/jobs(?:\/(\d+))?(?:\/(hide|renew))?$/);
@@ -387,6 +426,7 @@ async function employer(req, env, url, p) {
   if (p === '/verify' && m === 'POST') {
     const b = await body(req);
     const name = str(b.name, 120), mst = str(b.mst, 20), license = str(b.license, 200), rep = str(b.rep, 80);
+    noLinks({ 'Tên công ty': name });
     if (!name || !mst || !license || !rep) fail(400, 'Vui lòng điền đủ tên công ty, mã số thuế, giấy phép và người đại diện.');
     if (!JSON.parse(co.docs || '[]').length) fail(400, 'Vui lòng tải lên ít nhất 1 giấy tờ.');
     await env.DB.prepare('UPDATE companies SET name = ?, mst = ?, license = ?, rep_name = ?, verify_status = \'pending\', verify_note = NULL WHERE id = ?')
@@ -408,7 +448,7 @@ async function employer(req, env, url, p) {
 }
 
 const companyForOwner = (c) => ({
-  id: c.id, name: c.name, short: c.short, phone: c.phone || '', about: c.about || '', size: c.size || '', founded: c.founded || '',
+  id: c.id, name: c.name, short: c.short, initials: c.initials, color: c.color, logo: c.logo || '', phone: c.phone || '', about: c.about || '', size: c.size || '', founded: c.founded || '',
   mst: c.mst || '', license: c.license || '', rep: c.rep_name || '', verified: !!c.verified, verifyStatus: c.verify_status, verifyNote: c.verify_note || '',
   docs: JSON.parse(c.docs || '[]').map(({ name, type, size }) => ({ name, type, size }))
 });
@@ -417,6 +457,7 @@ const ownJob = (j) => ({
   id: j.id, title: j.title, province: j.province, district: j.district, address: j.address, target: j.target, shift: j.shift,
   qty: j.qty, salaryMin: j.salary_min, salaryMax: j.salary_max, housing: !!j.housing, meals: !!j.meals, urgent: !!j.urgent,
   age: j.age, height: j.height, desc: j.descr, phone: j.contact_phone, status: j.status, risks: JSON.parse(j.risks || '[]'),
+  images: JSON.parse(j.images || '[]').map((x) => '/images/' + x),
   rejectReason: j.reject_reason || '', weeks: j.weeks, views: j.views, calls: j.calls, zalos: j.zalos,
   postedAt: j.posted_at, expiresAt: j.expires_at, updatedAt: j.updated_at
 });
@@ -435,6 +476,7 @@ async function saveJob(env, req, co, old) {
   };
   const draft = b.action === 'draft';
   if (!f.title || f.title.length < 10) fail(400, 'Tiêu đề cần ít nhất 10 ký tự.');
+  noLinks({ 'Tiêu đề': f.title, 'Mô tả': f.descr, 'Địa chỉ': f.address, 'Độ tuổi': f.age, 'Chiều cao': f.height });
   if (!draft) {
     const pv = cats.provinces.find((x) => x.slug === f.province);
     if (!pv) fail(400, 'Chọn tỉnh/thành.');
@@ -470,6 +512,21 @@ async function saveJob(env, req, co, old) {
   }
   if (status === 'live' || (old && ['live', 'hidden'].includes(old.status))) await markDirty(env);
   return json({ ok: true, id, status, risks });
+}
+
+// Ảnh công khai (đã được trình duyệt nén ≤1200px): lưu R2 "img/<base>-<băm>.<đuôi>", trả tên file
+const IMG_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+async function putImage(env, req, base) {
+  await rateLimit(req, 'img', 60, 3600);
+  const form = await req.formData().catch(() => fail(400, 'Không đọc được ảnh.'));
+  const file = form.get('file');
+  if (!file || typeof file === 'string') fail(400, 'Chưa chọn ảnh.');
+  if (!IMG_TYPES[file.type]) fail(400, 'Chỉ nhận ảnh JPG, PNG hoặc WEBP.');
+  if (file.size > 2 * 1024 * 1024) fail(400, 'Ảnh tối đa 2MB.');
+  const buf = await file.arrayBuffer();
+  const name = `${base}-${(await sha256(String.fromCharCode(...new Uint8Array(buf.slice(0, 4096))) + buf.byteLength + Date.now())).slice(0, 8)}.${IMG_TYPES[file.type]}`;
+  await env.FILES.put('img/' + name, buf, { httpMetadata: { contentType: file.type, cacheControl: 'public, max-age=31536000, immutable' } });
+  return name;
 }
 
 const DOC_TYPES = { 'application/pdf': 'pdf', 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
