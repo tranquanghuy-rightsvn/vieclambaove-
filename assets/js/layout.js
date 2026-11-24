@@ -18,6 +18,7 @@ export const ROUTES = [
   [/^\/tin\/(?:[a-z0-9-]*-)?(\d+)$/, () => import('./pages/job.js')],
   [/^\/cong-ty-tuyen-dung$/, () => import('./pages/companies.js')],
   [/^\/viec-da-luu$/, () => import('./pages/saved.js')],
+  [/^\/tim-kiem$/, () => import('./pages/search.js')],
   [/^\/cong-ty\/([a-z0-9-]+)$/, () => import('./pages/company.js')],
   [/^\/tin-tuc$/, () => import('./pages/blog.js')],
   [/^\/tin-tuc\/([a-z0-9-]+)$/, () => import('./pages/post.js')],

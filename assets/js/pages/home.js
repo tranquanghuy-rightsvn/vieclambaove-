@@ -40,7 +40,7 @@ export default function () {
       <label class="hs-sel">${icon('clock')}<span class="sr">Ca làm</span><select name="ca"><option value="">Ca làm</option>${V.shifts.map((x) => `<option value="${x.id}">${x.name}</option>`).join('')}</select></label>
       <button class="btn btn-gold" type="submit">Tìm việc</button>
     </form>
-    <p class="hero-cta"><button class="btn btn-quick" type="button" data-quick>${icon('bolt')}Tạo hồ sơ xin việc nhanh</button><span>Để lại tên và số điện thoại, công ty bảo vệ gần bạn sẽ gọi lại.</span></p>
+    <p class="hero-cta hero-search"><a class="btn btn-quick" href="/tim-kiem">${icon('filter')}Tìm kiếm chi tiết</a><span>Tìm kiếm theo quận huyện, mức lương mong muốn, công việc cụ thể và nhiều hơn thế.</span></p>
     <p class="hquick"><span>Tìm nhiều:</span>${quick.map(([t, h]) => `<a href="${h}">${t}</a>`).join('')}</p>
   </div></section>
 

@@ -1791,3 +1791,20 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
   .laside { position: sticky; top: 84px; max-height: calc(100vh - 100px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-bottom: 4px; }
   .laside::-webkit-scrollbar { width: 6px; } .laside::-webkit-scrollbar-thumb { background: #cfd6e4; border-radius: 3px; }
 }
+
+/* Trang chủ: nút Tìm kiếm chi tiết luôn hiện (kể cả nhà tuyển dụng) */
+.is-employer .hero-search { display: flex !important; }
+
+/* Tìm kiếm chi tiết */
+.search-x { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 20px; align-items: start; }
+.sx-form { position: sticky; top: 84px; max-height: calc(100vh - 100px); overflow-y: auto; scrollbar-width: thin; display: flex; flex-direction: column; gap: 14px; }
+.sx-form .field { margin: 0; }
+.sx-form .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.sx-form .pill span { min-height: 34px; font-size: 13.5px; padding: 0 10px; }
+.sx-pay { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+.sx-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip-btn { border: 1px solid var(--line-2, #d0d5dd) !important; background: #fff; border-radius: 16px; padding: 5px 11px; font: 600 13px var(--f-body); color: var(--txt-2); cursor: pointer; }
+.chip-btn.on, .chip-btn:hover { border-color: var(--brand) !important; color: var(--brand); background: var(--brand-wash, #eef0f8); }
+.sx-head { margin: 4px 0 12px; font-size: 16px; }
+@media (max-width: 960px) { .search-x { grid-template-columns: 1fr; } .sx-form { position: static; max-height: none; } }
+.sx-form .grid3 { grid-template-columns: 1fr 1fr; gap: 12px; }
