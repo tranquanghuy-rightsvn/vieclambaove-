@@ -256,6 +256,8 @@ async function saveProfile(env, req) {
   PROFILE_KEYS.forEach((k) => { if (b[k] !== undefined) data[k] = str(b[k], 80); });
   if (Array.isArray(b.exp)) data.exp = b.exp.slice(0, 12).map((x) => str(x, 40));
   if (b.stay !== undefined) data.stay = !!b.stay;
+  // Đồng ý cho công ty bảo vệ đã xác thực xem hồ sơ và liên hệ (Nghị định 13/2023): lưu cả thời điểm đồng ý
+  if (b.share !== undefined) { data.share = !!b.share; data.shareAt = b.share ? now() : null; }
   await env.DB.prepare('INSERT INTO profiles (phone, user_id, data, updated_at) VALUES (?, ?, ?, ?) ON CONFLICT(phone) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at, user_id = COALESCE(profiles.user_id, excluded.user_id)')
     .bind(phone, owner || null, JSON.stringify(data), now()).run();
   if (u?.role === 'candidate' && data.name && data.name !== u.name) await env.DB.prepare('UPDATE users SET name = ? WHERE id = ?').bind(data.name, u.id).run();
@@ -337,6 +339,19 @@ async function employer(req, env, url, p) {
       .bind(str(b.phone, 20), str(b.about, 2000), str(b.size, 40), Number(b.founded) || null, co.id).run();
     await markDirty(env);
     return json({ ok: true });
+  }
+
+  /* Tìm ứng viên: hồ sơ nhanh của ứng viên đã đồng ý cho nhà tuyển dụng liên hệ. Mọi NTD đã đăng ký (công ty bị khoá thì không). */
+  if (p === '/candidates' && m === 'GET') {
+    await rateLimit(req, 'cand-search', 120, 3600);
+    const area = str(url.searchParams.get('tinh'), 40);
+    const r = await env.DB.prepare(`SELECT phone, data, updated_at FROM profiles
+      WHERE json_extract(data, '$.share') = 1 AND (?1 = '' OR json_extract(data, '$.area') = ?1)
+      ORDER BY updated_at DESC LIMIT 500`).bind(area).all();
+    return json({ items: r.results.map((x) => {
+      const d = JSON.parse(x.data);
+      return { phone: x.phone, name: d.name || '', year: d.year || '', height: d.height || '', weight: d.weight || '', area: d.area || '', shift: d.shift || '', stay: !!d.stay, exp: d.exp || [], updatedAt: x.updated_at };
+    }) });
   }
 
   if (p === '/overview' && m === 'GET') {

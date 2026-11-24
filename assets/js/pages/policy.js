@@ -10,7 +10,7 @@ const PAGES = {
   'bao-mat': ['Chính sách bảo mật', `
     <p>Chính sách tuân theo Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân.</p>
     <h2>Dữ liệu chúng tôi thu thập</h2><ul><li>Số điện thoại, họ tên, năm sinh, chiều cao, cân nặng, kinh nghiệm bạn tự khai.</li><li>Khu vực muốn làm việc. Vị trí GPS chỉ dùng khi bạn bấm "Gần tôi" và không được lưu.</li></ul>
-    <h2>Ai được thấy</h2><p>Số điện thoại của ứng viên chỉ hiện với công ty khi ứng viên ứng tuyển, hoặc khi ứng viên bật "cho công ty tìm thấy" và công ty dùng điểm để mở.</p>
+    <h2>Ai được thấy</h2><p>Số điện thoại của ứng viên chỉ hiện với công ty khi ứng viên ứng tuyển, hoặc khi ứng viên đồng ý cho nhà tuyển dụng đã đăng ký trên website tìm thấy hồ sơ. Ứng viên có thể tắt đồng ý này bất cứ lúc nào trong trang hồ sơ.</p>
     <h2>Quyền của bạn</h2><ul><li>Xem, sửa, tải về toàn bộ dữ liệu trong mục Cài đặt.</li><li>Rút lại đồng ý và xóa tài khoản bất kỳ lúc nào. Dữ liệu bị xóa trong 30 ngày.</li></ul>
     <h2>Lưu trữ</h2><p>Dữ liệu được mã hóa khi truyền và khi lưu trữ, chỉ nhân sự được phân quyền mới truy cập được.</p>`],
   'quy-che': ['Quy chế đăng tin', `

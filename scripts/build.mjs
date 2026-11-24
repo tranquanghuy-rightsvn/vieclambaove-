@@ -128,7 +128,7 @@ write('/chinh-sach', htmlPage('/chinh-sach', await render('/chinh-sach/dieu-khoa
 const PRIVATE = {
   '/dang-nhap': 'Đăng nhập',
   '/ung-vien': 'Hồ sơ của tôi', '/ung-vien/da-ung-tuyen': 'Đã ứng tuyển', '/ung-vien/da-luu': 'Việc đã lưu', '/ung-vien/cai-dat': 'Cài đặt',
-  '/nha-tuyen-dung': 'Nhà tuyển dụng', '/nha-tuyen-dung/dang-tin': 'Đăng tin', '/nha-tuyen-dung/tin-dang': 'Tin đã đăng', '/nha-tuyen-dung/ung-vien': 'Ứng viên',
+  '/nha-tuyen-dung': 'Nhà tuyển dụng', '/nha-tuyen-dung/dang-tin': 'Đăng tin', '/nha-tuyen-dung/tin-dang': 'Tin đã đăng', '/nha-tuyen-dung/ung-vien': 'Ứng viên', '/nha-tuyen-dung/tim-ung-vien': 'Tìm ứng viên',
   '/nha-tuyen-dung/xac-thuc': 'Xác thực công ty', '/nha-tuyen-dung/cong-ty': 'Thông tin công ty'
 };
 const loading = '<div class="wrap" style="padding:80px 0;text-align:center"><p class="mute">Đang tải…</p></div>';

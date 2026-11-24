@@ -35,8 +35,7 @@ export const NAV = [
   ['jobs', '/viec-lam', 'Việc làm'],
   ['blog', '/tin-tuc', 'Tin tức'],
   ['video', '/video', 'Video'],
-  ['pricing', '/bang-gia', 'Bảng giá'],
-  ['employer', '/nha-tuyen-dung', 'Nhà tuyển dụng']
+  ['pricing', '/bang-gia', 'Bảng giá']
 ];
 
 function acctLink(u) {
