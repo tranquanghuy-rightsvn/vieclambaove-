@@ -1765,3 +1765,23 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 .jrow.is-vip:hover, .jcard.is-vip:hover { border-color: #d4a017 !important; }
 .jlist { gap: 12px; }
 .detail .jrow, .article .jrow { background: #fff; }
+
+/* ---------- Chân trang: phong cách cổng thông tin (nền xanh đen, nhấn vàng cam) ---------- */
+.foot { background: #020617; color: #94a3b8; border-top: 1px solid #1e293b; margin-top: 48px; font-size: 14px; }
+.foot a { color: #cbd5e1; text-decoration: none; transition: color .15s; }
+.foot a:hover { color: #fbbf24; }
+.foot-top { grid-template-columns: 1.7fr repeat(4, 1fr); gap: 32px; padding: 48px 0 36px; }
+.foot h4 { color: #fff; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px; }
+.foot li { margin-bottom: 9px; }
+.foot .logo-name { color: #fff; } .foot .logo-name b { color: #fbbf24; }
+.foot .logo-text small { color: #64748b; }
+.foot-note { color: #94a3b8; line-height: 1.65; max-width: 40ch; margin: 14px 0 16px; }
+.foot-contact li { display: flex; align-items: center; gap: 8px; color: #94a3b8; }
+.foot-contact .ico { color: #fbbf24; flex: none; }
+.foot-base { border-top: 1px solid #0f172a; padding: 18px 0 22px; text-align: center; font-size: 12.5px; color: #64748b; }
+.foot-base p { margin: 4px 0; }
+.foot-base b { color: #94a3b8; }
+.foot-copy { color: #94a3b8; }
+@media (max-width: 1080px) { .foot-top { grid-template-columns: repeat(2, 1fr); } .foot-top > div:first-child { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .foot-top { grid-template-columns: 1fr 1fr; gap: 24px 16px; padding: 36px 0 24px; } }
+.foot .foot-base { background: #01030f; border-top: 1px solid #1e293b !important; }

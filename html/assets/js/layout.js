@@ -131,13 +131,14 @@ export function footerHtml(path) {
       </ul></div>
       <div><h4>Dành cho nhà tuyển dụng</h4><ul>
         <li><a href="/trang-quan-ly-tuyen-dung/dang-tin">Đăng tin tuyển dụng</a></li>
+        <li><a href="/trang-quan-ly-tuyen-dung/tim-ung-vien">Tìm ứng viên</a></li>
         <li><a href="/trang-quan-ly-tuyen-dung/xac-thuc">Xác thực công ty</a></li>
       </ul></div>
       <div><h4>Việc làm theo tỉnh</h4><ul>${V.provinces.map((p) => `<li><a href="/viec-lam/${p.slug}">Bảo vệ ${p.short}</a></li>`).join('')}</ul></div>
     </div>
     <div class="foot-base">
       <p><b>Công ty Cổ phần Việc Làm Bảo Vệ</b> (dữ liệu mẫu) · Giấy chứng nhận ĐKKD số 03xxxxxxxx do Sở KH&amp;ĐT TP.HCM cấp · Người chịu trách nhiệm nội dung: Ban biên tập.</p>
-      <p>© 2026 ViecLamBaoVe.vn. Bản giao diện mẫu, số liệu minh họa.</p>
+      <p class="foot-copy">© 2026 vieclambaove.vn - Chuyên trang tuyển dụng bảo vệ, vệ sĩ. Bảo lưu mọi quyền.</p>
     </div>
   </div></footer>${tabbar(path)}`;
 }
