@@ -1,4 +1,4 @@
-import { V, $, $$, esc, icon, url, mono, jobCard, activeJobs, company, province, SITE } from '../core.js';
+import { V, $, $$, esc, icon, url, mono, jobRow, activeJobs, company, province, SITE } from '../core.js';
 import { companyList, coBox } from './companies.js';
 import { go } from '../router.js';
 
@@ -69,7 +69,7 @@ export default function () {
         <button class="on" role="tab" aria-selected="true" data-p="">Tất cả</button>
         ${V.provinces.map((p) => `<button role="tab" aria-selected="false" data-p="${p.slug}">${p.short}</button>`).join('')}
       </div>
-      <div class="jgrid" id="hotList"></div>
+      <div class="jlist" id="hotList">${jobs.slice(0, PER).map(jobRow).join('')}</div>
       <div class="pg" id="hotPg"></div>
     </section>
 
@@ -125,7 +125,7 @@ export default function () {
       const pages = Math.max(1, Math.ceil(rows.length / PER));
       page = Math.min(page, pages);
       list.innerHTML = rows.length
-        ? rows.slice((page - 1) * PER, page * PER).map(jobCard).join('')
+        ? rows.slice((page - 1) * PER, page * PER).map(jobRow).join('')
         : `<div class="empty"><h3>Chưa có tin ở khu vực này</h3><p class="mute"><a href="/viec-lam">Xem việc ở khu vực khác</a></p></div>`;
       pg.innerHTML = `<button type="button" data-d="-1" aria-label="Trang trước" ${page === 1 ? 'disabled' : ''}>${icon('arrow', 'ico-s flip')}</button>
         <span><b>${page}</b> / ${pages} trang</span>
