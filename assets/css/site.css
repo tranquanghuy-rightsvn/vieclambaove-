@@ -1606,7 +1606,7 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
   .emp-link small { display: none; }
 }
 @media (max-width: 1240px) { .logo-text small { display: none; } }
-@media (max-width: 1280px) { .emp-link { display: none; } }
+@media (max-width: 1440px) { .emp-link { display: none; } }
 
 /* ---------- Đăng nhập: công tắc Người tìm việc / Nhà tuyển dụng ---------- */
 .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: var(--fill, #f2f4f7); border-radius: 10px; margin-bottom: 22px; }
@@ -1675,3 +1675,6 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 .logo-edit { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
 .logo-edit .mono { width: 72px; height: 72px; }
 .mono-photo { padding: 0; overflow: hidden; }
+/* Nút "Tạo hồ sơ xin việc nhanh" ở đầu trang: màn hình hẹp hiện chữ ngắn để không tràn */
+.mast-quick .q-short { display: none; }
+@media (max-width: 1280px) { .mast-quick .q-full { display: none; } .mast-quick .q-short { display: inline; } }

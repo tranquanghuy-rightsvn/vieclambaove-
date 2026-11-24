@@ -362,14 +362,14 @@ export function deskNav(base, items, active, who) {
 
 export const crumbs = (items) => `<ol class="crumbs">${items.map(([t, h]) => `<li>${h ? `<a href="${h}">${esc(t)}</a>` : `<span aria-current="page">${esc(t)}</span>`}</li>`).join('')}</ol>`;
 
-/* ---------- Tạo hồ sơ 1 chạm: ít gõ, chọn là xong ---------- */
+/* ---------- Tạo hồ sơ xin việc nhanh: ít gõ, chọn là xong ---------- */
 const QUICK_EXP = ['Xuất ngũ', 'Công an nghĩa vụ', 'Chứng chỉ PCCC', 'Võ thuật', 'Chưa có kinh nghiệm'];
 export function quickProfile() {
   const u = user();
   if (u?.role === 'employer') { toast('Bạn đang đăng nhập tài khoản nhà tuyển dụng.', 'alert'); return; }
   const me = u?.role === 'candidate';
   const p = store.get('profile', {});
-  const box = modal(`<h2>Tạo hồ sơ 1 chạm</h2>
+  const box = modal(`<h2>Tạo hồ sơ xin việc nhanh</h2>
     <p>Chỉ cần tên và số điện thoại. Công ty bảo vệ đã xác thực gần bạn sẽ gọi hoặc nhắn Zalo.</p>
     <form class="stack" id="quickForm">
       <label class="field"><span>Họ và tên</span><input class="input" name="name" required autocomplete="name" value="${esc(p.name || u?.name || '')}"></label>

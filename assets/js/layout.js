@@ -62,9 +62,9 @@ export function headerHtml(navKey) {
     ${brand()}
     <nav class="nav" aria-label="Chính">${NAV.map(([k, h, t]) => `<a href="${h}" class="${k === navKey ? 'on' : ''}">${t}</a>`).join('')}</nav>
     <div class="mast-act">
-      <button class="btn btn-quick btn-s mast-quick" type="button" data-quick>${icon('bolt')}<span>Tạo hồ sơ 1 chạm</span></button>
-      ${right}
+      <button class="btn btn-quick btn-s mast-quick" type="button" data-quick>${icon('bolt')}<span class="q-full">Tạo hồ sơ xin việc nhanh</span><span class="q-short">Hồ sơ xin việc</span></button>
       ${u?.role === 'employer' ? '' : `<a class="emp-link" href="${postHref}"><small>Dành cho nhà tuyển dụng</small>Đăng tuyển, tìm ứng viên</a>`}
+      ${right}
       <button class="burger" type="button" data-drawer aria-label="Mở menu" aria-expanded="false">${icon('menu')}</button>
     </div>
   </div></header>
@@ -93,8 +93,8 @@ function tabbar(path) {
     [u ? acctLink(u).href : '/dang-nhap', 'Tài khoản', 'user', (path.startsWith('/ung-vien') && path !== '/ung-vien/da-luu') || path.startsWith('/dang-nhap') || path.startsWith('/nha-tuyen-dung')]
   ];
   const link = ([h, t, ic, on]) => `<a href="${h}" class="${on ? 'on' : ''}">${icon(ic)}${t}</a>`;
-  // Nút "Tạo hồ sơ 1 chạm" nằm giữa thanh dưới, luôn thấy rõ trên mobile ở mọi trang
-  const quick = `<button class="tb-quick" type="button" data-quick><span class="tb-quick-ic">${icon('bolt')}</span>Hồ sơ 1 chạm</button>`;
+  // Nút "Tạo hồ sơ xin việc nhanh" nằm giữa thanh dưới, luôn thấy rõ trên mobile ở mọi trang
+  const quick = `<button class="tb-quick" type="button" data-quick><span class="tb-quick-ic">${icon('bolt')}</span>Hồ sơ nhanh</button>`;
   return `<nav class="tabbar" aria-label="Điều hướng nhanh">${items.slice(0, 2).map(link).join('')}${quick}${items.slice(2).map(link).join('')}</nav>`;
 }
 
