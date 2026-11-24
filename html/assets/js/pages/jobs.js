@@ -1,4 +1,4 @@
-import { V, $, $$, esc, icon, url, jobRow, activeJobs, province, shift, target, districtBySlug, crumbs, SITE, company } from '../core.js';
+import { V, $, $$, esc, icon, url, jobRow, activeJobs, province, shift, target, districtBySlug, splitArea, crumbs, SITE, company } from '../core.js';
 import { go } from '../router.js';
 
 const PAY = [['', 'Mọi mức lương'], ['duoi-8', 'Dưới 8 triệu'], ['8-10', '8 - 10 triệu'], ['10-15', '10 - 15 triệu'], ['tren-15', 'Trên 15 triệu']];
@@ -43,10 +43,16 @@ function buildHref(s, page = 1) {
 export default function ({ params: [ps, ds], query }) {
   let near = false;
   if (query.get('gan-toi') && !ps) { ps = 'tp-hcm'; near = true; }
+  const qs = query.toString() ? '?' + query.toString() : '';
+  // Dạng cũ 2 cấp /viec-lam/<tỉnh>/<quận>/ → dạng mới /viec-lam/<quận>-<tỉnh>/
+  if (ds) { const pv = province(ps); const dd = districtBySlug(pv, ds); return { redirect: (dd ? url.area(ps, dd) : pv ? url.area(ps) : '/viec-lam/') + qs }; }
+  let d = null;
+  if (ps && !province(ps)) {
+    const sp = splitArea(ps);
+    if (!sp) return { redirect: '/viec-lam/' };
+    [ps, d] = sp;
+  }
   const p = ps ? province(ps) : null;
-  if (ps && !p) return { redirect: '/viec-lam' };
-  const d = ds ? districtBySlug(p, ds) : null;
-  if (ds && !d) return { redirect: url.area(ps) };
 
   const s = { tinh: p?.slug || '', quan: d || '', q: query.get('q') || '', luong: query.get('luong') || '', ca: list(query, 'ca'), mt: list(query, 'muc-tieu'), cd: list(query, 'che-do'), gap: query.get('gap') === '1', sx: query.get('sap-xep') || 'moi' };
   const all = activeJobs();

@@ -22,7 +22,7 @@ const PAGES = {
 
 export default function ({ params: [slug = 'dieu-khoan'] }) {
   const tabs = [...Object.entries(PAGES).map(([k, [t]]) => [k, t]), ['lien-he', 'Liên hệ']];
-  if (!tabs.some(([k]) => k === slug)) return { redirect: '/chinh-sach' };
+  if (!tabs.some(([k]) => k === slug)) return { redirect: '/chinh-sach/dieu-khoan/' };
   const title = tabs.find(([k]) => k === slug)[1];
   const body = slug === 'lien-he' ? `
     <p>Phản hồi trong giờ hành chính, thường trong 4 giờ.</p>
@@ -47,5 +47,5 @@ export default function ({ params: [slug = 'dieu-khoan'] }) {
   function mount(root) {
     $('#ct', root)?.addEventListener('submit', (e) => { e.preventDefault(); e.target.reset(); toast('Đã gửi. Chúng tôi sẽ gọi lại sớm.'); });
   }
-  return { nav: '', html, mount, title, desc: `${title} của Việc Làm Bảo Vệ.`, canonical: slug === 'dieu-khoan' ? '/chinh-sach' : undefined };
+  return { nav: '', html, mount, title, desc: `${title} của Việc Làm Bảo Vệ.`, canonical: '/chinh-sach/' + slug + '/' };
 }

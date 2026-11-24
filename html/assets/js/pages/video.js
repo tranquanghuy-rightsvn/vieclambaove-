@@ -1,7 +1,7 @@
 import { V, esc, icon, crumbs, SITE } from '../core.js';
 
 const thumb = (v) => `https://i.ytimg.com/vi/${v.yt}/hqdefault.jpg`;
-const card = (v) => `<a class="vcard" href="/video/${v.slug}">
+const card = (v) => `<a class="vcard" href="/video/${v.slug}/">
   <span class="vthumb"><img src="${thumb(v)}" alt="" loading="lazy" width="480" height="360"><span class="vplay">${icon('play')}</span></span>
   <b>${esc(v.title)}</b><small>${new Date(v.date).toLocaleDateString('vi-VN')}</small></a>`;
 
@@ -22,7 +22,7 @@ export default function ({ params: [slug] }) {
   if (!v) return { redirect: '/video' };
   const more = all.filter((x) => x.slug !== slug).slice(0, 6);
   return {
-    nav: 'video', title: v.title, desc: (v.desc || v.title).slice(0, 160), canonical: '/video/' + v.slug,
+    nav: 'video', title: v.title, desc: (v.desc || v.title).slice(0, 160), canonical: '/video/' + v.slug + '/',
     html: `<div class="wrap" style="padding-top:20px">
       ${crumbs([['Trang chủ', '/'], ['Video', '/video'], [v.title, null]])}
       <article class="vdetail">
@@ -33,6 +33,6 @@ export default function ({ params: [slug] }) {
       </article>
       ${more.length ? `<section class="sec"><div class="sec-head"><h2>Video khác</h2><a class="more" href="/video">Xem tất cả ${icon('arrow', 'ico-s')}</a></div><div class="vgrid">${more.map(card).join('')}</div></section>` : ''}
     </div>`,
-    ld: { '@context': 'https://schema.org', '@type': 'VideoObject', name: v.title, description: v.desc || v.title, thumbnailUrl: thumb(v), uploadDate: new Date(v.date).toISOString(), embedUrl: `https://www.youtube.com/embed/${v.yt}`, url: SITE + '/video/' + v.slug }
+    ld: { '@context': 'https://schema.org', '@type': 'VideoObject', name: v.title, description: v.desc || v.title, thumbnailUrl: thumb(v), uploadDate: new Date(v.date).toISOString(), embedUrl: `https://www.youtube.com/embed/${v.yt}`, url: SITE + '/video/' + v.slug + '/' }
   };
 }

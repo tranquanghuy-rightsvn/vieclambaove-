@@ -5,6 +5,11 @@ import { icon, esc, user } from './core.js';
 export const SITE_NAME = 'Việc Làm Bảo Vệ';
 export const DEFAULT_TITLE = 'Việc Làm Bảo Vệ - Tuyển dụng bảo vệ, vệ sĩ toàn quốc';
 export const DEFAULT_DESC = 'Chuyên trang việc làm ngành bảo vệ: lương, ca làm, chỗ ở ghi rõ trong từng tin.';
+// Mọi link tới trang trong HTML đều dạng /slug/ (bỏ qua file có đuôi, /api/, /assets/, /images/, /data/)
+const LINK_RE = /href="(\/(?!api\/|assets\/|images\/|data\/)[^"?#]*[^/"?#])((?:[?#][^"]*)?)"/g;
+export const slashLinks = (html) => String(html || '').replace(LINK_RE, (m, p, q) => (/\.[a-z0-9]{2,5}$/i.test(p) ? m : `href="${p}/${q}"`));
+export const withSlash = (p) => (p === '/' || p.endsWith('/') || /\.[a-z0-9]{2,5}$/i.test(p) ? p : p + '/');
+
 export const docTitle = (page) => (page.title ? `${page.title} | ${SITE_NAME}` : DEFAULT_TITLE);
 
 export const ROUTES = [
@@ -24,6 +29,7 @@ export const ROUTES = [
 ];
 
 export function match(path) {
+  if (path.length > 1) path = path.replace(/\/+$/, '');
   for (const [pattern, load] of ROUTES) {
     const m = path.match(pattern);
     if (m) return { load, params: m.slice(1).map((x) => (x ? decodeURIComponent(x) : x)) };

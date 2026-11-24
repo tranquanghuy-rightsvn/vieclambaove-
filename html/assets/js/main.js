@@ -1,7 +1,7 @@
 // Điểm vào: khai báo tuyến, vẽ khung trang, xử lý sự kiện chung
 import { $, icon, esc, user, store, toggleSave, applyJob, reportJob, quickProfile, toast, SITE, api, syncMe } from './core.js';
 import { onRender, clean, go } from './router.js';
-import { match, headerHtml, footerHtml, notFoundPage, docTitle, DEFAULT_DESC } from './layout.js';
+import { match, headerHtml, footerHtml, notFoundPage, docTitle, DEFAULT_DESC, slashLinks, withSlash } from './layout.js';
 
 function setMeta(name, content, attr = 'name') {
   let m = document.head.querySelector(`meta[${attr}="${name}"]`);
@@ -17,7 +17,8 @@ let first = true;
 async function render({ keepScroll = false } = {}) {
   const want = clean(location.href);
   if (want !== location.pathname + location.search + location.hash) history.replaceState({}, '', want);
-  const path = location.pathname;
+  // Trang nhận đường dẫn KHÔNG có / cuối (so sánh nội bộ); URL trên thanh địa chỉ luôn có / cuối
+  const path = location.pathname.length > 1 ? location.pathname.replace(/\/+$/, '') : '/';
   const m = match(path) || { load: notFound, params: [] };
   let page;
   try {
@@ -30,12 +31,12 @@ async function render({ keepScroll = false } = {}) {
   if (page.redirect) return go(page.redirect, { replace: true });
 
   document.dispatchEvent(new Event('vlbv:leave'));
-  main.innerHTML = page.html;
+  main.innerHTML = slashLinks(page.html);
   document.title = docTitle(page);
   setMeta('description', page.desc || DEFAULT_DESC);
   setMeta('robots', page.noindex ? 'noindex, follow' : '');
   setMeta('og:title', document.title, 'property');
-  document.head.querySelector('link[rel=canonical]').href = SITE + (page.canonical || path);
+  document.head.querySelector('link[rel=canonical]').href = SITE + withSlash(page.canonical || path);
   document.head.querySelectorAll('script[data-ld]').forEach((s) => s.remove());
   [].concat(page.ld || []).forEach((obj) => {
     const s = document.createElement('script');
@@ -45,8 +46,8 @@ async function render({ keepScroll = false } = {}) {
   document.body.classList.toggle('has-mbar', !!page.mbar);
   document.body.classList.toggle('has-tabbar', page.tabbar !== false);
 
-  $('#header').innerHTML = headerHtml(page.nav);
-  $('#footer').innerHTML = footerHtml(path);
+  $('#header').innerHTML = slashLinks(headerHtml(page.nav));
+  $('#footer').innerHTML = slashLinks(footerHtml(path));
   page.mount?.(main);
 
   if (!keepScroll) {

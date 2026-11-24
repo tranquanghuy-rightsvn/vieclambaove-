@@ -1,9 +1,9 @@
-// Bộ định tuyến History API: URL sạch, không đuôi .html
+// Bộ định tuyến History API: URL sạch dạng /slug/ (có dấu / cuối), không đuôi .html
 let render = null;
 
 export const onRender = (fn) => { render = fn; };
 
-// Chuẩn hóa URL: bỏ .html, bỏ index, bỏ dấu / cuối
+// Chuẩn hóa URL: bỏ .html, bỏ index, LUÔN có dấu / cuối (trừ file có đuôi như .xml)
 const LEGACY = { 'chi-tiet': '/viec-lam', 'bai-viet': '/tin-tuc' };
 export function clean(href) {
   const u = new URL(href, location.origin);
@@ -15,6 +15,7 @@ export function clean(href) {
   const seg = p.slice(1);
   if (LEGACY[seg] && id) { u.searchParams.delete('id'); p = seg === 'chi-tiet' ? `/tin/tin-${id}` : `/tin-tuc/${id}`; }
   else if (seg === 'cong-ty' && id) { u.searchParams.delete('id'); p = `/cong-ty/${id}`; }
+  if (p !== '/' && !/\.[a-z0-9]{2,5}$/i.test(p)) p += '/';
   return p + (u.search === '?' ? '' : u.search) + u.hash;
 }
 
@@ -32,7 +33,7 @@ document.addEventListener('click', (e) => {
   if (a.target && a.target !== '_self') return;
   if (a.hasAttribute('download')) return;
   const href = a.getAttribute('href');
-  if (!href.startsWith('/') || href.startsWith('//') || href.startsWith('/assets/')) return;
+  if (!href.startsWith('/') || href.startsWith('//') || /^\/(assets|api|images|data)\//.test(href)) return;
   const u = new URL(href, location.origin);
   // Chỉ đổi #hash trong cùng trang
   if (u.pathname === location.pathname && u.search === location.search && u.hash) return;
