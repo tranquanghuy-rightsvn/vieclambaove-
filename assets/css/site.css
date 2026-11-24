@@ -1734,3 +1734,4 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 .facts.facts-row .big .ico { color: var(--pay-c, #d9480f); }
 .facts.facts-row .big dd { font: 800 17px/1.2 var(--f-head); color: var(--pay-c, #d9480f); }
 @media (max-width: 720px) { .facts.facts-row { grid-template-columns: 1fr; } }
+.cand-about { white-space: pre-line; font-size: 14.5px; color: var(--txt-2); margin: 4px 0 2px; max-width: 70ch; }

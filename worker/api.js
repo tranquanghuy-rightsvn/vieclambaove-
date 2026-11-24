@@ -254,6 +254,8 @@ async function saveProfile(env, req) {
   if ((owner && owner !== u?.id) || (old?.user_id && old.user_id !== u?.id)) fail(403, 'Số điện thoại này đã có tài khoản. Hãy đăng nhập để sửa hồ sơ.');
   const data = { ...(old ? JSON.parse(old.data) : {}), phone };
   PROFILE_KEYS.forEach((k) => { if (b[k] !== undefined) data[k] = str(b[k], 80); });
+  // Giới thiệu bản thân (không bắt buộc): nhà tuyển dụng xem được nên không cho chèn link
+  if (b.about !== undefined) { noLinks({ 'Giới thiệu bản thân': b.about }); data.about = str(b.about, 1000); }
   if (Array.isArray(b.exp)) data.exp = b.exp.slice(0, 12).map((x) => str(x, 40));
   if (b.stay !== undefined) data.stay = !!b.stay;
   // Đồng ý cho công ty bảo vệ đã xác thực xem hồ sơ và liên hệ (Nghị định 13/2023): lưu cả thời điểm đồng ý
@@ -350,7 +352,7 @@ async function employer(req, env, url, p) {
       ORDER BY updated_at DESC LIMIT 500`).bind(area).all();
     return json({ items: r.results.map((x) => {
       const d = JSON.parse(x.data);
-      return { phone: x.phone, name: d.name || '', year: d.year || '', height: d.height || '', weight: d.weight || '', area: d.area || '', shift: d.shift || '', stay: !!d.stay, exp: d.exp || [], updatedAt: x.updated_at };
+      return { phone: x.phone, name: d.name || '', about: d.about || '', year: d.year || '', height: d.height || '', weight: d.weight || '', area: d.area || '', shift: d.shift || '', stay: !!d.stay, exp: d.exp || [], updatedAt: x.updated_at };
     }) });
   }
 
