@@ -13,6 +13,15 @@ export const province = (s) => V.provinces.find((p) => p.slug === s);
 export const shift = (id) => V.shifts.find((s) => s.id === id);
 export const target = (id) => V.targets.find((t) => t.id === id);
 export const districtBySlug = (p, ds) => p?.districts.find((d) => slug(d) === ds);
+// Tách "<quận>-<tỉnh>" (vd "hai-chau-da-nang") thành [mã tỉnh, tên quận]; không khớp trả null
+export function splitArea(seg) {
+  for (const p of V.provinces || []) {
+    if (!seg.endsWith('-' + p.slug)) continue;
+    const d = districtBySlug(p, seg.slice(0, -(p.slug.length + 1)));
+    if (d) return [p.slug, d];
+  }
+  return null;
+}
 
 /* ---------- Gọi API của Worker ---------- */
 export async function api(path, { method = 'GET', body } = {}) {
@@ -90,10 +99,11 @@ export const dateIn = (days) => { const t = new Date(); t.setDate(t.getDate() + 
 
 /* ---------- URL sạch ---------- */
 export const url = {
-  job: (j) => `/tin/${slug(j.title)}-${j.id}`,
-  area: (p, d) => '/viec-lam' + (p ? '/' + p : '') + (d ? '/' + slug(d) : ''),
-  company: (c) => `/cong-ty/${c.id}`,
-  post: (p) => `/tin-tuc/${p.id}`
+  job: (j) => `/tin/${slug(j.title)}-${j.id}/`,
+  // Khu vực 1 cấp: /viec-lam/<tỉnh>/ và /viec-lam/<quận>-<tỉnh>/ (vd /viec-lam/hai-chau-da-nang/)
+  area: (p, d) => '/viec-lam/' + (p ? (d ? slug(d) + '-' : '') + p + '/' : ''),
+  company: (c) => `/cong-ty/${c.id}/`,
+  post: (p) => `/tin-tuc/${p.id}/`
 };
 
 /* ---------- Icon (nét mảnh, tự vẽ) ---------- */

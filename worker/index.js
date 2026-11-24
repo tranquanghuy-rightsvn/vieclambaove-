@@ -26,8 +26,10 @@ async function existsLive(env, path) {
   if (m) return !!(await env.DB.prepare('SELECT 1 FROM videos WHERE slug = ? AND published = 1').bind(m[1]).first());
   m = path.match(/^\/viec-lam\/([a-z0-9-]+)(?:\/([a-z0-9-]+))?$/);
   if (m) {
-    const p = (await categories(env)).provinces.find((x) => x.slug === m[1]);
-    return !!p && (!m[2] || p.districts.some((d) => slugify(d) === m[2]));
+    const provinces = (await categories(env)).provinces;
+    if (m[2]) { const p = provinces.find((x) => x.slug === m[1]); return !!p && p.districts.some((d) => slugify(d) === m[2]); } // dạng cũ, JS chuyển hướng
+    if (provinces.some((x) => x.slug === m[1])) return true;
+    return provinces.some((p) => m[1].endsWith('-' + p.slug) && p.districts.some((d) => slugify(d) === m[1].slice(0, -(p.slug.length + 1))));
   }
   return false;
 }
@@ -60,10 +62,10 @@ export default {
       if (img) return img;
     } else if (req.method === 'GET' && (await existsLive(env, url.pathname))) {
       // Nội dung vừa duyệt chưa kịp build: trả khung trang (200) để JS vẽ ngay từ dữ liệu trực tiếp
-      const shell = await env.ASSETS.fetch(new Request(url.origin + '/_shell.html'));
+      const shell = await env.ASSETS.fetch(new Request(url.origin + '/_shell/'));
       return new Response(shell.body, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-cache' } });
     }
-    const nf = await env.ASSETS.fetch(new Request(url.origin + '/404.html'));
+    const nf = await env.ASSETS.fetch(new Request(url.origin + '/_404/'));
     return new Response(nf.body, { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 };

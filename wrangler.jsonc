@@ -8,7 +8,7 @@
     "binding": "ASSETS",
     // Không có file tĩnh → chuyển cho Worker: nội dung vừa duyệt (chưa kịp build) trả khung 200, còn lại 404
     "not_found_handling": "none",
-    "html_handling": "drop-trailing-slash",
+    "html_handling": "force-trailing-slash",
     // Worker xử lý trước: API, robots.txt, dữ liệu trực tiếp /data/site.js; còn lại ưu tiên file tĩnh do scripts/build.mjs sinh ra
     "run_worker_first": ["/api/*", "/robots.txt", "/data/site.js"]
   },
