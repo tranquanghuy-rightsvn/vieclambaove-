@@ -67,7 +67,7 @@ export function headerHtml(navKey) {
     <nav class="nav" aria-label="Chính">${NAV.map(([k, h, t]) => `<a href="${h}" class="${k === navKey ? 'on' : ''}">${t}</a>`).join('')}</nav>
     <div class="mast-act">
       <button class="btn btn-quick btn-s mast-quick" type="button" data-quick>${icon('bolt')}<span class="q-full">Tạo hồ sơ xin việc nhanh</span><span class="q-short">Hồ sơ xin việc</span></button>
-      ${u?.role === 'employer' ? '' : `<a class="emp-link" href="${postHref}"><small>Dành cho nhà tuyển dụng</small>Đăng tin tuyển dụng</a>`}
+      ${u ? '' : `<a class="emp-link" href="${postHref}"><small>Dành cho nhà tuyển dụng</small>Đăng tin tuyển dụng</a>`}
       ${right}
       <button class="burger" type="button" data-drawer aria-label="Mở menu" aria-expanded="false">${icon('menu')}</button>
     </div>
@@ -79,7 +79,7 @@ export function headerHtml(navKey) {
       <a href="/chinh-sach/lien-he">Liên hệ</a>
       <a href="${a.href}">${u ? 'Tài khoản của tôi' : 'Đăng nhập / Đăng ký'}</a>
       ${u ? '<a href="#" data-logout>Đăng xuất</a>' : ''}
-      <a class="btn btn-primary btn-l" href="${postHref}">Đăng tin tuyển dụng</a>
+      ${u?.role === 'candidate' ? '' : `<a class="btn btn-primary btn-l" href="${postHref}">Đăng tin tuyển dụng</a>`}
     </div>
   </div>
   <div class="floaty" aria-label="Hỗ trợ nhanh">
