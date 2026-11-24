@@ -14,3 +14,5 @@ requirement.md
 de-xuat-website-viec-lam-bao-ve.html
 *.local-backup.pdf
 Cổng_*.html
+crawl-out/
+.admin-key
