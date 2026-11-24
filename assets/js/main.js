@@ -96,7 +96,7 @@ document.addEventListener('vlbv:esc', () => $('#drawer')?.classList.remove('open
 
 // Phiên đăng nhập nằm trong cookie HttpOnly: hỏi máy chủ trước khi vẽ trang cần tài khoản,
 // trang công khai vẽ ngay rồi cập nhật đầu trang khi có kết quả
-const PRIVATE = /^\/(ung-vien|nha-tuyen-dung|dang-nhap)/;
+const PRIVATE = /^\/(ung-vien|trang-quan-ly-tuyen-dung|dang-nhap)/;
 if (PRIVATE.test(location.pathname)) syncMe().then(() => render());
 else {
   render();

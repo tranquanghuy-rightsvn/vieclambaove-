@@ -24,7 +24,7 @@ function riskCheck(f) {
 
 export default async function ({ params: [tab = ''], query }) {
   const u = user();
-  if (!u) return { redirect: '/dang-nhap?vai-tro=nha-tuyen-dung&tiep=/nha-tuyen-dung' };
+  if (!u) return { redirect: '/dang-nhap?vai-tro=nha-tuyen-dung&tiep=/trang-quan-ly-tuyen-dung' };
   if (u.role !== 'employer') return { redirect: '/ung-vien' };
 
   // Đăng nhập Google lần đầu: chưa có công ty
@@ -38,7 +38,7 @@ export default async function ({ params: [tab = ''], query }) {
   const { company: c, jobs, applications: apps, approveMode } = data;
   const newApps = apps.filter((a) => a.status === 'new').length;
   const tabs = [['', 'Tổng quan', 'chart'], ['dang-tin', 'Đăng tin', 'plus'], ['tin-dang', 'Tin đã đăng', 'list', jobs.length || ''], ['ung-vien', 'Ứng viên', 'users', newApps || ''], ['tim-ung-vien', 'Tìm ứng viên', 'search'], ['xac-thuc', 'Xác thực công ty', 'shield'], ['cong-ty', 'Thông tin công ty', 'building']];
-  if (!tabs.some((t) => t[0] === tab)) return { redirect: '/nha-tuyen-dung' };
+  if (!tabs.some((t) => t[0] === tab)) return { redirect: '/trang-quan-ly-tuyen-dung' };
   // Tìm ứng viên: tải khi mở tab; lọc tỉnh ở máy chủ, các điều kiện khác lọc ngay trên trình duyệt
   let cands = [];
   if (tab === 'tim-ung-vien') {
@@ -50,8 +50,8 @@ export default async function ({ params: [tab = ''], query }) {
 
   const views = {
     '': () => `
-      <div class="desk-title"><div><h1>Chào ${esc(u.name || c.short)}</h1><p>${esc(c.name)} · ${verifyTag}</p></div><a class="btn btn-primary" href="/nha-tuyen-dung/dang-tin">${icon('plus')}Đăng tin mới</a></div>
-      ${!c.verified && c.verifyStatus !== 'pending' ? `<div class="notice notice-warn" style="margin-bottom:16px">${icon('shield')}<p><b>Xác thực công ty</b> để tin được gắn dấu "Đã xác thực giấy phép" và ứng viên tin tưởng hơn. <a href="/nha-tuyen-dung/xac-thuc">Gửi giấy tờ</a></p></div>` : ''}
+      <div class="desk-title"><div><h1>Chào ${esc(u.name || c.short)}</h1><p>${esc(c.name)} · ${verifyTag}</p></div><a class="btn btn-primary" href="/trang-quan-ly-tuyen-dung/dang-tin">${icon('plus')}Đăng tin mới</a></div>
+      ${!c.verified && c.verifyStatus !== 'pending' ? `<div class="notice notice-warn" style="margin-bottom:16px">${icon('shield')}<p><b>Xác thực công ty</b> để tin được gắn dấu "Đã xác thực giấy phép" và ứng viên tin tưởng hơn. <a href="/trang-quan-ly-tuyen-dung/xac-thuc">Gửi giấy tờ</a></p></div>` : ''}
       <div class="kpis">
         <div><span>Tin đang hiển thị</span><b>${count('live') + count('soon')}</b><small>${count('soon')} tin sắp hết hạn</small></div>
         <div><span>Lượt xem tin</span><b>${num(jobs.reduce((a, j) => a + (j.views || 0), 0))}</b><small>tất cả tin</small></div>
@@ -61,14 +61,14 @@ export default async function ({ params: [tab = ''], query }) {
       <section class="panel"><div class="panel-h"><h2>Vòng đời tin</h2><span class="mute">${approveMode === 'manual' ? 'Mọi tin được kiểm duyệt trước khi hiển thị' : 'Tin không có dấu hiệu rủi ro lên ngay'}</span></div>
         <div class="life">${['draft', 'pending', 'live', 'soon', 'expired'].map((s) => `<div class="${s === 'soon' ? 'warn' : ''}"><b>${count(s)}</b><span>${STATUS[s][1]}</span></div>`).join('')}</div>
       </section>
-      <section class="panel"><div class="panel-h"><h2>Ứng viên mới nhất</h2><a class="more" href="/nha-tuyen-dung/ung-vien">Xem tất cả ${icon('arrow', 'ico-s')}</a></div>
+      <section class="panel"><div class="panel-h"><h2>Ứng viên mới nhất</h2><a class="more" href="/trang-quan-ly-tuyen-dung/ung-vien">Xem tất cả ${icon('arrow', 'ico-s')}</a></div>
         ${apps.length ? `<ul class="notes">${apps.slice(0, 5).map((a) => `<li><div><b>${esc(a.name)}</b> · <a href="tel:${esc(a.phone)}">${esc(a.phone)}</a><p>${esc(a.title)}</p></div><time class="mute">${ago(a.created_at)}</time></li>`).join('')}</ul>` : '<p class="mute">Chưa có ứng viên nào.</p>'}
       </section>`,
 
     'dang-tin': () => {
       const src = query.get('sua') ? jobs.find((j) => String(j.id) === query.get('sua')) : null;
-      if (query.get('sua') && !src) return '<div class="empty"><h3>Không tìm thấy tin</h3><a class="btn btn-primary" href="/nha-tuyen-dung/tin-dang">Về danh sách tin</a></div>';
-      if (src?.status === 'removed') return '<div class="empty"><h3>Tin đã bị quản trị gỡ, không sửa được</h3><a class="btn btn-primary" href="/nha-tuyen-dung/tin-dang">Về danh sách tin</a></div>';
+      if (query.get('sua') && !src) return '<div class="empty"><h3>Không tìm thấy tin</h3><a class="btn btn-primary" href="/trang-quan-ly-tuyen-dung/tin-dang">Về danh sách tin</a></div>';
+      if (src?.status === 'removed') return '<div class="empty"><h3>Tin đã bị quản trị gỡ, không sửa được</h3><a class="btn btn-primary" href="/trang-quan-ly-tuyen-dung/tin-dang">Về danh sách tin</a></div>';
       const f = src || { qty: 1, weeks: 4, phone: c.phone };
       const live = src && ['live', 'hidden'].includes(src.status);
       return `
@@ -108,7 +108,7 @@ export default async function ({ params: [tab = ''], query }) {
     },
 
     'tin-dang': () => `
-      <div class="desk-title"><div><h1>Tin đã đăng</h1><p>${count('live') + count('soon')} tin đang hiển thị · ${count('soon')} tin sắp hết hạn</p></div><a class="btn btn-primary" href="/nha-tuyen-dung/dang-tin">${icon('plus')}Đăng tin</a></div>
+      <div class="desk-title"><div><h1>Tin đã đăng</h1><p>${count('live') + count('soon')} tin đang hiển thị · ${count('soon')} tin sắp hết hạn</p></div><a class="btn btn-primary" href="/trang-quan-ly-tuyen-dung/dang-tin">${icon('plus')}Đăng tin</a></div>
       ${jobs.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tin</th><th>Trạng thái</th><th class="num">Xem</th><th class="num">Gọi/Zalo</th><th class="num">Còn</th><th class="num">Thao tác</th></tr></thead><tbody>
       ${jobs.map((j) => {
         const d = daysLeft(j);
@@ -117,13 +117,13 @@ export default async function ({ params: [tab = ''], query }) {
         <td>${statusCell(j)}</td><td class="num">${num(j.views || 0)}</td><td class="num">${num((j.calls || 0) + (j.zalos || 0))}</td>
         <td class="num">${['live', 'hidden'].includes(j.status) && d !== null ? (d < 0 ? '-' : d + ' ngày') : '-'}</td>
         <td><div class="acts">
-          ${j.status !== 'removed' ? `<a class="btn btn-quiet btn-s" href="/nha-tuyen-dung/dang-tin?sua=${j.id}" title="Sửa">${icon('edit')}<span class="sr">Sửa</span></a>` : ''}
+          ${j.status !== 'removed' ? `<a class="btn btn-quiet btn-s" href="/trang-quan-ly-tuyen-dung/dang-tin?sua=${j.id}" title="Sửa">${icon('edit')}<span class="sr">Sửa</span></a>` : ''}
           ${['live', 'hidden', 'expired'].includes(j.status) ? `<button class="btn btn-quiet btn-s" type="button" data-renew="${j.id}" title="Gia hạn">${icon('refresh')}<span class="sr">Gia hạn</span></button>` : ''}
           ${j.status === 'live' ? `<button class="btn btn-quiet btn-s" type="button" data-hide="${j.id}" data-on="1" title="Tạm ẩn">${icon('pause')}<span class="sr">Ẩn</span></button>` : ''}
           ${j.status === 'hidden' ? `<button class="btn btn-quiet btn-s" type="button" data-hide="${j.id}" data-on="" title="Hiện lại">${icon('eye')}<span class="sr">Hiện lại</span></button>` : ''}
         </div></td></tr>`;
       }).join('')}
-      </tbody></table></div>` : '<div class="empty"><h3>Chưa có tin nào</h3><p>Đăng tin miễn phí, hiển thị 1 - 4 tuần.</p><a class="btn btn-primary" href="/nha-tuyen-dung/dang-tin">Đăng tin đầu tiên</a></div>'}`,
+      </tbody></table></div>` : '<div class="empty"><h3>Chưa có tin nào</h3><p>Đăng tin miễn phí, hiển thị 1 - 4 tuần.</p><a class="btn btn-primary" href="/trang-quan-ly-tuyen-dung/dang-tin">Đăng tin đầu tiên</a></div>'}`,
 
     'ung-vien': () => {
       const only = query.get('tin');
@@ -210,7 +210,7 @@ export default async function ({ params: [tab = ''], query }) {
       </form>`
   };
 
-  const html = `<div class="wrap desk">${deskNav('/nha-tuyen-dung', tabs, tab, `<b>${esc(c.short)}</b><small>${c.verified ? 'Đã xác thực' : c.verifyStatus === 'pending' ? 'Chờ xác thực' : 'Chưa xác thực'}</small>`)}<div>${views[tab]()}</div></div>`;
+  const html = `<div class="wrap desk">${deskNav('/trang-quan-ly-tuyen-dung', tabs, tab, `<b>${esc(c.short)}</b><small>${c.verified ? 'Đã xác thực' : c.verifyStatus === 'pending' ? 'Chờ xác thực' : 'Chưa xác thực'}</small>`)}<div>${views[tab]()}</div></div>`;
 
   function mount(root) {
     const reload = () => go(location.pathname + location.search, { replace: true, keepScroll: true });
@@ -262,7 +262,7 @@ export default async function ({ params: [tab = ''], query }) {
             await uploadImage(`/employer/jobs/${r.id}/images`, pending[i].file).catch((err) => toast('Ảnh ' + (i + 1) + ': ' + err.message, 'alert'));
           }
           toast(r.status === 'live' || r.status === 'hidden' ? 'Đã lưu. Tin đang hiển thị trên website.' : r.status === 'pending' ? 'Tin đang chờ kiểm duyệt, thường xong trong 2 giờ.' : 'Đã lưu nháp.');
-          go('/nha-tuyen-dung/tin-dang');
+          go('/trang-quan-ly-tuyen-dung/tin-dang');
         } catch (err) { stop(); toast(err.message, 'alert'); }
       };
       jf.addEventListener('submit', (e) => { e.preventDefault(); save('submit', e.submitter); });
@@ -295,11 +295,11 @@ export default async function ({ params: [tab = ''], query }) {
     $('#cs', root)?.addEventListener('submit', (e) => {
       e.preventDefault();
       const f = new URLSearchParams([...new FormData(e.target)].filter(([, v]) => v));
-      go('/nha-tuyen-dung/tim-ung-vien' + (f.toString() ? '?' + f : ''));
+      go('/trang-quan-ly-tuyen-dung/tim-ung-vien' + (f.toString() ? '?' + f : ''));
     });
 
     /* Ứng viên */
-    $('#byJob', root)?.addEventListener('change', (e) => go('/nha-tuyen-dung/ung-vien' + (e.target.value ? '?tin=' + e.target.value : '')));
+    $('#byJob', root)?.addEventListener('change', (e) => go('/trang-quan-ly-tuyen-dung/ung-vien' + (e.target.value ? '?tin=' + e.target.value : '')));
     $$('[data-move]', root).forEach((s) => s.addEventListener('change', async () => {
       try { await api(`/employer/applications/${s.dataset.move}`, { method: 'POST', body: { status: s.value } }); toast('Đã cập nhật trạng thái.'); } catch (err) { toast(err.message, 'alert'); }
     }));
@@ -363,7 +363,7 @@ function onboarding(u) {
   const mount = (root) => $('#ob', root).addEventListener('submit', async (e) => {
     e.preventDefault();
     const stop = busy(e.submitter);
-    try { await api('/employer/company', { method: 'POST', body: Object.fromEntries(new FormData(e.target)) }); await syncMe(); go('/nha-tuyen-dung', { replace: true }); } catch (err) { stop(); toast(err.message, 'alert'); }
+    try { await api('/employer/company', { method: 'POST', body: Object.fromEntries(new FormData(e.target)) }); await syncMe(); go('/trang-quan-ly-tuyen-dung', { replace: true }); } catch (err) { stop(); toast(err.message, 'alert'); }
   });
   return { nav: 'employer', html, mount, title: 'Thông tin công ty', noindex: true };
 }

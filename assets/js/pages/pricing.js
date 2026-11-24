@@ -23,7 +23,7 @@ export default function () {
         <span class="price">${p.price ? money(p.price) : 'Miễn phí'}</span>
         <span class="unit">${esc(p.unit) || 'không cần thanh toán'}</span>
         <ul>${p.features.map((f) => `<li>${icon('check')}<span>${esc(f)}</span></li>`).join('')}</ul>
-        <a class="btn ${p.featured ? 'btn-gold' : 'btn-line'} btn-block" href="${p.id === 'free' ? '/nha-tuyen-dung/dang-tin' : '/chinh-sach/lien-he'}">${esc(p.cta)}</a>
+        <a class="btn ${p.featured ? 'btn-gold' : 'btn-line'} btn-block" href="${p.id === 'free' ? '/trang-quan-ly-tuyen-dung/dang-tin' : '/chinh-sach/lien-he'}">${esc(p.cta)}</a>
       </div>`).join('')}</div>
     </section>
     <section class="sec" id="quang-cao">

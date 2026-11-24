@@ -212,7 +212,7 @@ async function googleCallback(env, req, url) {
   } else if (!u.google_sub) {
     await env.DB.prepare('UPDATE users SET google_sub = ? WHERE id = ?').bind(claims.sub, u.id).run();
   }
-  const headers = new Headers({ location: url.origin + (saved.next || '/nha-tuyen-dung') + (saved.next?.includes('?') ? '&' : '?') + 'dang-nhap=google' });
+  const headers = new Headers({ location: url.origin + (saved.next || '/trang-quan-ly-tuyen-dung') + (saved.next?.includes('?') ? '&' : '?') + 'dang-nhap=google' });
   headers.append('set-cookie', await createSession(env, req, u.id));
   headers.append('set-cookie', cookie('gst', '', 0, url.protocol === 'https:'));
   return new Response(null, { status: 302, headers });

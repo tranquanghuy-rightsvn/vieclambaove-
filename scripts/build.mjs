@@ -102,7 +102,7 @@ write('/data/site.js', `/* Sinh bởi scripts/build.mjs từ data/site.json - kh
 
 const pub = [];          // [path, lastmod] cho sitemap
 const add = (path, lastmod = BUILT) => pub.push([path, lastmod]);
-add('/'); add('/viec-lam'); add('/tin-tuc'); add('/video'); add('/cong-ty');
+add('/'); add('/viec-lam'); add('/tin-tuc'); add('/video'); add('/cong-ty-tuyen-dung');
 ['dieu-khoan', 'bao-mat', 'quy-che', 'lien-he'].forEach((s) => add('/chinh-sach/' + s));
 const withJobs = new Set(V.jobs.map((j) => j.province + '|' + j.district));
 V.provinces.forEach((p) => {
@@ -128,12 +128,12 @@ write('/chinh-sach', htmlPage('/chinh-sach', await render('/chinh-sach/dieu-khoa
 const PRIVATE = {
   '/dang-nhap': 'Đăng nhập',
   '/ung-vien': 'Hồ sơ của tôi', '/ung-vien/da-ung-tuyen': 'Đã ứng tuyển', '/ung-vien/da-luu': 'Việc đã lưu', '/ung-vien/cai-dat': 'Cài đặt',
-  '/nha-tuyen-dung': 'Nhà tuyển dụng', '/nha-tuyen-dung/dang-tin': 'Đăng tin', '/nha-tuyen-dung/tin-dang': 'Tin đã đăng', '/nha-tuyen-dung/ung-vien': 'Ứng viên', '/nha-tuyen-dung/tim-ung-vien': 'Tìm ứng viên',
-  '/nha-tuyen-dung/xac-thuc': 'Xác thực công ty', '/nha-tuyen-dung/cong-ty': 'Thông tin công ty'
+  '/trang-quan-ly-tuyen-dung': 'Nhà tuyển dụng', '/trang-quan-ly-tuyen-dung/dang-tin': 'Đăng tin', '/trang-quan-ly-tuyen-dung/tin-dang': 'Tin đã đăng', '/trang-quan-ly-tuyen-dung/ung-vien': 'Ứng viên', '/trang-quan-ly-tuyen-dung/tim-ung-vien': 'Tìm ứng viên',
+  '/trang-quan-ly-tuyen-dung/xac-thuc': 'Xác thực công ty', '/trang-quan-ly-tuyen-dung/cong-ty': 'Thông tin công ty'
 };
 const loading = '<div class="wrap" style="padding:80px 0;text-align:center"><p class="mute">Đang tải…</p></div>';
 for (const [path, title] of Object.entries(PRIVATE)) {
-  write(path, htmlPage(path, { title, noindex: true, html: loading, nav: path.startsWith('/nha-tuyen-dung') ? 'employer' : '', tabbar: path !== '/dang-nhap' }));
+  write(path, htmlPage(path, { title, noindex: true, html: loading, nav: path.startsWith('/trang-quan-ly-tuyen-dung') ? 'employer' : '', tabbar: path !== '/dang-nhap' }));
 }
 // Khung trống: Worker trả cho nội dung vừa duyệt chưa kịp build (JS vẽ từ dữ liệu trực tiếp)
 write('/_shell', htmlPage('/', { title: '', noindex: true, html: loading }).replace('<link rel="canonical" href="' + SITE + '/">', '<link rel="canonical" href="/">'));

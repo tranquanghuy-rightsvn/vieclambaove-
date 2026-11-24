@@ -74,7 +74,7 @@ export default function () {
     </section>
 
     <section class="panel-box" aria-labelledby="coH">
-      <div class="pb-head"><h2 id="coH">Nhà tuyển dụng tiêu biểu</h2>${tops.length > 18 ? `<a class="more" href="/cong-ty">Xem tất cả ${tops.length} công ty ${icon('arrow', 'ico-s')}</a>` : ''}</div>
+      <div class="pb-head"><h2 id="coH">Nhà tuyển dụng tiêu biểu</h2>${tops.length > 18 ? `<a class="more" href="/cong-ty-tuyen-dung">Xem tất cả ${tops.length} công ty ${icon('arrow', 'ico-s')}</a>` : ''}</div>
       <div class="cogrid">${tops.slice(0, 18).map(coBox).join('')}</div>
     </section>
 
@@ -99,8 +99,8 @@ export default function () {
         <h2>Tuyển đủ quân số trong 24 giờ</h2>
         <p>Đăng tin miễn phí 1 - 4 tuần, nhận cuộc gọi từ ứng viên đã xuất ngũ, có chứng chỉ nghiệp vụ.</p>
         <div class="eb-act">
-          <a class="btn btn-gold" href="/nha-tuyen-dung/dang-tin">Đăng tin miễn phí</a>
-          <a class="btn btn-ghost" href="/nha-tuyen-dung/tim-ung-vien">Tìm ứng viên</a>
+          <a class="btn btn-gold" href="/trang-quan-ly-tuyen-dung/dang-tin">Đăng tin miễn phí</a>
+          <a class="btn btn-ghost" href="/trang-quan-ly-tuyen-dung/tim-ung-vien">Tìm ứng viên</a>
         </div>
       </section>
     </div>

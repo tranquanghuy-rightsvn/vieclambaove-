@@ -11,6 +11,9 @@ export function clean(href) {
   if (p.length > 1) p = p.replace(/\/+$/, '');
   // "Cẩm nang" đã đổi thành "Tin tức": link cũ /cam-nang chuyển sang /tin-tuc
   if (/^\/cam-nang(\/|$)/.test(p)) p = p.replace(/^\/cam-nang/, '/tin-tuc');
+  // Đường dẫn cũ: /nha-tuyen-dung → /trang-quan-ly-tuyen-dung, /cong-ty (danh sách) → /cong-ty-tuyen-dung
+  if (/^\/nha-tuyen-dung(\/|$)/.test(p)) p = p.replace(/^\/nha-tuyen-dung/, '/trang-quan-ly-tuyen-dung');
+  if (p === '/cong-ty' && !u.searchParams.get('id')) p = '/cong-ty-tuyen-dung';
   const id = u.searchParams.get('id');
   const seg = p.slice(1);
   if (LEGACY[seg] && id) { u.searchParams.delete('id'); p = seg === 'chi-tiet' ? `/tin/tin-${id}` : `/tin-tuc/${id}`; }

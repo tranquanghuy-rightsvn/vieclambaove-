@@ -11,7 +11,7 @@ function robots(url) {
   // Tên miền tạm (*.workers.dev) không cho Google lập chỉ mục, tránh trùng nội dung khi gắn tên miền thật
   const body = isTemporaryHost(url)
     ? 'User-agent: *\nDisallow: /\n'
-    : `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /ung-vien\nDisallow: /nha-tuyen-dung\nDisallow: /quan-tri\nDisallow: /dang-nhap\n\nSitemap: ${url.origin}/sitemap.xml\n`;
+    : `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /ung-vien\nDisallow: /trang-quan-ly-tuyen-dung\nDisallow: /quan-tri\nDisallow: /dang-nhap\n\nSitemap: ${url.origin}/sitemap.xml\n`;
   return new Response(body, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
 }
 
@@ -56,6 +56,9 @@ export default {
     }
     if (url.pathname === '/robots.txt') return robots(url);
     if (url.pathname === '/data/site.js') return serveLive(env, req);
+    // Đường dẫn cũ đã đổi tên → 301 sang đường dẫn mới
+    if (/^\/nha-tuyen-dung(\/|$)/.test(url.pathname)) return Response.redirect(url.origin + url.pathname.replace(/^\/nha-tuyen-dung/, '/trang-quan-ly-tuyen-dung').replace(/\/+$/, '') + url.search, 301);
+    if (/^\/cong-ty\/?$/.test(url.pathname)) return Response.redirect(url.origin + '/cong-ty-tuyen-dung' + url.search, 301);
     // Toàn site thống nhất KHÔNG có / cuối: /slug/ → /slug (301, giữ query)
     if (url.pathname.length > 1 && url.pathname.endsWith('/')) {
       return Response.redirect(url.origin + url.pathname.replace(/\/+$/, '') + url.search, 301);
