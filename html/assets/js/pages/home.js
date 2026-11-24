@@ -1,4 +1,5 @@
 import { V, $, $$, esc, icon, url, mono, jobCard, activeJobs, company, province, SITE } from '../core.js';
+import { companyList, coBox } from './companies.js';
 import { go } from '../router.js';
 
 const PER = 6;
@@ -17,7 +18,7 @@ export default function () {
   ];
 
 
-  const tops = V.companies.map((c) => ({ c, n: count((j) => j.company === c.id) })).sort((a, b) => b.c.verified - a.c.verified || b.n - a.n);
+  const tops = companyList();
   // Banner: tin nổi bật có thật (VIP, rồi tin gấp, lương cao); không có thì ẩn
   const hot = [...jobs].sort((a, b) => (b.tier === 'vip') - (a.tier === 'vip') || b.urgent - a.urgent || b.salaryMax - a.salaryMax)[0];
   const hotCo = hot && company(hot.company);
@@ -73,12 +74,8 @@ export default function () {
     </section>
 
     <section class="panel-box" aria-labelledby="coH">
-      <div class="pb-head"><h2 id="coH">Nhà tuyển dụng tiêu biểu</h2></div>
-      <div class="cogrid">${tops.map(({ c, n }) => `<a class="cobox" href="${url.company(c)}">
-        ${mono(c, 'mono-l')}
-        <b>${esc(c.name)}</b>
-        <span>${c.verified ? `<i class="vtick">${icon('check')}</i>` : ''}${n} việc đang tuyển</span>
-      </a>`).join('')}</div>
+      <div class="pb-head"><h2 id="coH">Nhà tuyển dụng tiêu biểu</h2>${tops.length > 18 ? `<a class="more" href="/cong-ty">Xem tất cả ${tops.length} công ty ${icon('arrow', 'ico-s')}</a>` : ''}</div>
+      <div class="cogrid">${tops.slice(0, 18).map(coBox).join('')}</div>
     </section>
 
     <section class="trust" aria-label="Cam kết">

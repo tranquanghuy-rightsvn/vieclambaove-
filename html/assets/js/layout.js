@@ -16,6 +16,7 @@ export const ROUTES = [
   [/^\/$/, () => import('./pages/home.js')],
   [/^\/viec-lam(?:\/([a-z0-9-]+))?(?:\/([a-z0-9-]+))?$/, () => import('./pages/jobs.js')],
   [/^\/tin\/(?:[a-z0-9-]*-)?(\d+)$/, () => import('./pages/job.js')],
+  [/^\/cong-ty$/, () => import('./pages/companies.js')],
   [/^\/cong-ty\/([a-z0-9-]+)$/, () => import('./pages/company.js')],
   [/^\/tin-tuc$/, () => import('./pages/blog.js')],
   [/^\/tin-tuc\/([a-z0-9-]+)$/, () => import('./pages/post.js')],
@@ -127,6 +128,7 @@ export function footerHtml(path) {
         <li><a href="/ung-vien">Hồ sơ của tôi</a></li>
         <li><a href="/tin-tuc">Tin tức nghề bảo vệ</a></li>
         <li><a href="/video">Video nghề bảo vệ</a></li>
+        <li><a href="/cong-ty">Nhà tuyển dụng</a></li>
         <li><a href="/tin-tuc/dau-hieu-cong-ty-bao-ve-lua-dao">Cảnh báo lừa đảo</a></li>
       </ul></div>
       <div><h4>Dành cho nhà tuyển dụng</h4><ul>
