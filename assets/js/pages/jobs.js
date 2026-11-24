@@ -1,4 +1,4 @@
-import { V, $, $$, esc, icon, url, jobRow, adRow, activeJobs, province, shift, target, districtBySlug, crumbs, SITE, company } from '../core.js';
+import { V, $, $$, esc, icon, url, jobRow, activeJobs, province, shift, target, districtBySlug, crumbs, SITE, company } from '../core.js';
 import { go } from '../router.js';
 
 const PAY = [['', 'Mọi mức lương'], ['duoi-8', 'Dưới 8 triệu'], ['8-10', '8 - 10 triệu'], ['10-15', '10 - 15 triệu'], ['tren-15', 'Trên 15 triệu']];
@@ -112,7 +112,7 @@ export default function ({ params: [ps, ds], query }) {
     <div class="listing2">
       <div>
         <div class="jlist">
-          ${shown.length ? shown.map((j, i) => jobRow(j) + (i === 3 ? adRow(page) : '')).join('') : `<div class="empty"><h3>Không có tin phù hợp</h3><p class="mute">Bỏ bớt điều kiện lọc hoặc xem khu vực lân cận.</p><p><a class="btn btn-soft" href="${url.area(s.tinh)}">Bỏ bộ lọc</a></p></div>`}
+          ${shown.length ? shown.map(jobRow).join('') : `<div class="empty"><h3>Không có tin phù hợp</h3><p class="mute">Bỏ bớt điều kiện lọc hoặc xem khu vực lân cận.</p><p><a class="btn btn-soft" href="${url.area(s.tinh)}">Bỏ bộ lọc</a></p></div>`}
         </div>
         ${pages > 1 ? `<nav class="pager" aria-label="Phân trang">${Array.from({ length: pages }, (_, i) => i + 1).map((n) => (n === page ? `<span class="on" aria-current="page">${n}</span>` : `<a href="${buildHref(s, n)}">${n}</a>`)).join('')}</nav>` : ''}
         <section class="seo-text">

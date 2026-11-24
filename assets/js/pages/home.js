@@ -103,7 +103,7 @@ export default function () {
         <p>Đăng tin miễn phí 1 - 4 tuần, nhận cuộc gọi từ ứng viên đã xuất ngũ, có chứng chỉ nghiệp vụ.</p>
         <div class="eb-act">
           <a class="btn btn-gold" href="/nha-tuyen-dung/dang-tin">Đăng tin miễn phí</a>
-          <a class="btn btn-ghost" href="/bang-gia">Xem bảng giá</a>
+          <a class="btn btn-ghost" href="/nha-tuyen-dung/tim-ung-vien">Tìm ứng viên</a>
         </div>
       </section>
     </div>

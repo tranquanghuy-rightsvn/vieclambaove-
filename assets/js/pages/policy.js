@@ -5,7 +5,7 @@ const PAGES = {
     <p>Cập nhật ngày 01/11/2026. Khi dùng Việc Làm Bảo Vệ, bạn đồng ý với các điều khoản dưới đây.</p>
     <h2>1. Tài khoản</h2><p>Mỗi số điện thoại tương ứng một tài khoản. Bạn chịu trách nhiệm về thông tin đã cung cấp và giữ bí mật mã xác nhận.</p>
     <h2>2. Ứng viên</h2><p>Ứng viên dùng miễn phí mọi tính năng. Thông tin hồ sơ phải đúng sự thật; hồ sơ giả mạo sẽ bị khóa.</p>
-    <h2>3. Nhà tuyển dụng</h2><ul><li>Chỉ đăng tin cho vị trí có thật, tại mục tiêu có thật.</li><li>Không thu bất kỳ khoản phí nào của người xin việc.</li><li>Gói dịch vụ đã kích hoạt không hoàn tiền, trừ trường hợp nêu trong Bảng giá.</li></ul>
+    <h2>3. Nhà tuyển dụng</h2><ul><li>Chỉ đăng tin cho vị trí có thật, tại mục tiêu có thật.</li><li>Không thu bất kỳ khoản phí nào của người xin việc.</li><li>Đăng tin tuyển dụng miễn phí trong giai đoạn ra mắt.</li></ul>
     <h2>4. Giới hạn trách nhiệm</h2><p>Chúng tôi kiểm duyệt tin và xác thực giấy phép nhưng không phải bên ký hợp đồng lao động. Hãy đọc kỹ hợp đồng trước khi ký.</p>`],
   'bao-mat': ['Chính sách bảo mật', `
     <p>Chính sách tuân theo Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân.</p>
