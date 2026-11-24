@@ -37,8 +37,13 @@ export default async function ({ params: [tab = ''], query }) {
   }
   const { company: c, jobs, applications: apps, approveMode } = data;
   const newApps = apps.filter((a) => a.status === 'new').length;
-  const tabs = [['', 'Tổng quan', 'chart'], ['dang-tin', 'Đăng tin', 'plus'], ['tin-dang', 'Tin đã đăng', 'list', jobs.length || ''], ['ung-vien', 'Ứng viên', 'users', newApps || ''], ['xac-thuc', 'Xác thực công ty', 'shield'], ['cong-ty', 'Thông tin công ty', 'building']];
+  const tabs = [['', 'Tổng quan', 'chart'], ['dang-tin', 'Đăng tin', 'plus'], ['tin-dang', 'Tin đã đăng', 'list', jobs.length || ''], ['ung-vien', 'Ứng viên', 'users', newApps || ''], ['tim-ung-vien', 'Tìm ứng viên', 'search'], ['xac-thuc', 'Xác thực công ty', 'shield'], ['cong-ty', 'Thông tin công ty', 'building']];
   if (!tabs.some((t) => t[0] === tab)) return { redirect: '/nha-tuyen-dung' };
+  // Tìm ứng viên: tải khi mở tab; lọc tỉnh ở máy chủ, các điều kiện khác lọc ngay trên trình duyệt
+  let cands = [];
+  if (tab === 'tim-ung-vien') {
+    try { cands = (await api('/employer/candidates?tinh=' + encodeURIComponent(query.get('tinh') || ''))).items; } catch (e) { toast(e.message, 'alert'); }
+  }
   const count = (s) => jobs.filter((j) => shown(j) === s).length;
   const statusCell = (j) => `<span class="${STATUS[shown(j)][0]}"><b>${STATUS[shown(j)][1]}</b></span>${j.status === 'rejected' || j.status === 'removed' ? `<br><small class="mute">${esc(j.rejectReason)}</small>` : j.status === 'pending' && j.risks.length ? `<br><small class="mute">${esc(j.risks[0])}</small>` : ''}`;
   const verifyTag = c.verified ? `<span class="verified">${icon('check')}Đã xác thực</span>` : c.verifyStatus === 'pending' ? '<span class="tag tag-off">Đang chờ duyệt</span>' : c.verifyStatus === 'rejected' ? '<span class="tag tag-urgent">Bị từ chối</span>' : '<span class="tag tag-off">Chưa xác thực</span>';
@@ -135,6 +140,36 @@ export default async function ({ params: [tab = ''], query }) {
       </tbody></table></div>` : '<div class="empty"><h3>Chưa có ứng viên</h3><p>Ứng viên bấm "Ứng tuyển nhanh" ở tin của bạn sẽ hiện ở đây.</p></div>'}`;
     },
 
+    'tim-ung-vien': () => {
+      const kn = query.get('kn') || '', ca = query.get('ca') || '', o = query.get('o') === '1', q = (query.get('q') || '').toLowerCase();
+      const list = cands.filter((x) => (!kn || x.exp.includes(kn)) && (!ca || !x.shift || x.shift === ca) && (!o || x.stay) && (!q || x.name.toLowerCase().includes(q)));
+      const age = (y) => (/^\d{4}$/.test(y) ? new Date().getFullYear() - Number(y) + ' tuổi' : '');
+      const EXPS = ['Xuất ngũ', 'Công an nghĩa vụ', 'Chứng chỉ PCCC', 'Võ thuật', 'Đã làm bảo vệ', 'Chưa có kinh nghiệm'];
+      return `
+      <div class="desk-title"><div><h1>Tìm ứng viên</h1><p>Ứng viên đã đồng ý cho nhà tuyển dụng xem hồ sơ và liên hệ. Hãy giới thiệu rõ tên công ty khi gọi.</p></div></div>
+      <form class="formcard" id="cs">
+        <div class="grid3">
+          <label class="field"><span>Khu vực muốn làm</span><select class="select" name="tinh"><option value="">Mọi tỉnh/thành</option>${V.provinces.map((p) => `<option value="${p.slug}" ${query.get('tinh') === p.slug ? 'selected' : ''}>${p.name}</option>`).join('')}</select></label>
+          <label class="field"><span>Kinh nghiệm</span><select class="select" name="kn"><option value="">Bất kỳ</option>${EXPS.map((e) => `<option ${kn === e ? 'selected' : ''}>${e}</option>`).join('')}</select></label>
+          <label class="field"><span>Ca mong muốn</span><select class="select" name="ca"><option value="">Bất kỳ</option>${V.shifts.map((x) => `<option value="${x.id}" ${ca === x.id ? 'selected' : ''}>${x.name}</option>`).join('')}</select></label>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-top:8px">
+          <label class="field" style="flex:1;min-width:200px;margin:0"><span>Tên ứng viên</span><input class="input" name="q" value="${esc(query.get('q') || '')}"></label>
+          <label class="check" style="margin:0 0 10px"><input type="checkbox" name="o" value="1" ${o ? 'checked' : ''}>Cần chỗ ở</label>
+          <button class="btn btn-primary" type="submit">${icon('search')}Tìm</button>
+        </div>
+      </form>
+      <p class="mute" style="margin:14px 0 10px">${list.length} ứng viên</p>
+      ${list.length ? `<div class="people">${list.map((x) => {
+        const pv = V.provinces.find((p) => p.slug === x.area);
+        const sh = V.shifts.find((s) => s.id === x.shift);
+        const digits = x.phone.replace(/\D/g, '');
+        return `<div class="person">${mono({ initials: (x.name.trim().split(/\s+/).pop() || '?')[0].toUpperCase(), color: '#1e2a6e' })}
+          <div><b>${esc(x.name)}</b><p>${[age(x.year), x.height && 'cao ' + esc(x.height) + (/^\d+$/.test(x.height) ? ' cm' : ''), pv && 'muốn làm ở ' + esc(pv.short), sh && esc(sh.name.toLowerCase()), x.stay && 'cần chỗ ở'].filter(Boolean).join(' · ')}</p>
+          <p class="mute">${x.exp.length ? x.exp.map(esc).join(', ') : 'Chưa ghi kinh nghiệm'} · cập nhật ${ago(x.updatedAt)}</p></div>
+          <div class="acts"><a class="btn btn-call btn-s" href="tel:${digits}">${icon('phone')}${esc(x.phone)}</a><a class="btn btn-zalo btn-s" href="https://zalo.me/${digits}" target="_blank" rel="noopener">Zalo</a></div></div>`;
+      }).join('')}</div>` : '<div class="empty"><h3>Chưa có ứng viên phù hợp</h3><p>Thử bỏ bớt điều kiện lọc, hoặc quay lại sau khi có thêm hồ sơ mới.</p></div>'}`;
+    },
     'xac-thuc': () => `
       <div class="desk-title"><div><h1>Xác thực công ty</h1><p>Tin của công ty đã xác thực được gắn dấu và ưu tiên hiển thị.</p></div>${verifyTag}</div>
       ${c.verifyStatus === 'rejected' && c.verifyNote ? `<div class="notice notice-warn" style="margin-bottom:16px">${icon('alert')}<p><b>Chưa được duyệt:</b> ${esc(c.verifyNote)}</p></div>` : ''}
@@ -254,6 +289,13 @@ export default async function ({ params: [tab = ''], query }) {
           try { await api(`/employer/jobs/${j.id}/renew`, { method: 'POST', body: { weeks: Number($('input[name=w]:checked', box).value) } }); closeModal(); toast('Đã gia hạn tin.'); reload(); } catch (err) { stop(); toast(err.message, 'alert'); }
         });
       }
+    });
+
+    /* Tìm ứng viên */
+    $('#cs', root)?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const f = new URLSearchParams([...new FormData(e.target)].filter(([, v]) => v));
+      go('/nha-tuyen-dung/tim-ung-vien' + (f.toString() ? '?' + f : ''));
     });
 
     /* Ứng viên */

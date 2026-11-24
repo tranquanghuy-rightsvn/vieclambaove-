@@ -1606,7 +1606,7 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
   .emp-link small { display: none; }
 }
 @media (max-width: 1240px) { .logo-text small { display: none; } }
-@media (max-width: 1399px) { .emp-link { display: none; } }
+@media (max-width: 960px) { .emp-link { display: none; } }
 
 /* ---------- Đăng nhập: công tắc Người tìm việc / Nhà tuyển dụng ---------- */
 .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: var(--fill, #f2f4f7); border-radius: 10px; margin-bottom: 22px; }
@@ -1684,3 +1684,16 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 .auth-form .phone span { background: var(--fill-2, #eceef3); border-right: 1px solid #c9ced8 !important; border-radius: 0; }
 .auth-form .phone:hover, .auth-form .input:hover { border-color: #98a2b3 !important; }
 .auth-form .phone:focus-within, .auth-form .input:focus { border-color: var(--brand) !important; outline: 1px solid var(--brand); outline-offset: 0; }
+.consent { align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.45; padding: 10px 12px; background: var(--fill, #f4f5f8); border-radius: 8px; }
+.consent input { margin-top: 2px; }
+.person { background: #fff; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; box-shadow: var(--card-sh); }
+.person .mono { color: #fff; }
+@media (max-width: 720px) { .person { grid-template-columns: 44px minmax(0, 1fr); } .person .mono { width: 44px; height: 44px; } .person .acts { grid-column: 1 / -1; flex-direction: row; align-items: center; } }
+/* 961-1080px: chưa có menu thu gọn nên vẫn phải có lối đăng nhập + đăng tin trên đầu trang */
+@media (min-width: 961px) and (max-width: 1080px) {
+  .emp-link { display: flex; }
+  .emp-link small { display: none; }
+  .mast-act .btn-primary, .mast-act .acct { display: inline-flex; }
+}
+@media (min-width: 961px) and (max-width: 999px) { .emp-link { display: none; } }
+@media (max-width: 1100px) { .mast-act .btn-line { display: none; } }

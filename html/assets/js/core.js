@@ -370,7 +370,7 @@ export function quickProfile() {
   const me = u?.role === 'candidate';
   const p = store.get('profile', {});
   const box = modal(`<h2>Tạo hồ sơ xin việc nhanh</h2>
-    <p>Chỉ cần tên và số điện thoại. Công ty bảo vệ đã xác thực gần bạn sẽ gọi hoặc nhắn Zalo.</p>
+    <p>Chỉ cần tên và số điện thoại. Nhà tuyển dụng bảo vệ gần bạn sẽ tìm thấy hồ sơ và gọi hoặc nhắn Zalo.</p>
     <form class="stack" id="quickForm">
       <label class="field"><span>Họ và tên</span><input class="input" name="name" required autocomplete="name" value="${esc(p.name || u?.name || '')}"></label>
       <label class="field"><span>Số điện thoại / Zalo</span><input class="input" name="phone" required inputmode="tel" autocomplete="tel" pattern="[0-9 .+]{9,13}" placeholder="09xx xxx xxx" value="${esc(me ? u.phone : p.phone || '')}" ${me ? 'readonly' : ''}></label>
@@ -381,6 +381,7 @@ export function quickProfile() {
       <div class="field"><span>Kinh nghiệm (chọn nếu có)</span>
         <div class="pills">${QUICK_EXP.map((e) => `<label class="pill"><input type="checkbox" name="exp" value="${e}" ${(p.exp || []).includes(e) ? 'checked' : ''}><span>${e}</span></label>`).join('')}</div>
       </div>
+      <label class="check consent"><input type="checkbox" name="share" required ${p.share ? 'checked' : ''}><span>Tôi đồng ý cho <b>nhà tuyển dụng trên website</b> xem hồ sơ này và gọi/nhắn Zalo cho tôi. Có thể tắt bất cứ lúc nào trong trang hồ sơ.</span></label>
       <button class="btn btn-quick btn-l btn-block" type="submit">Gửi hồ sơ - nhận cuộc gọi tuyển dụng</button>
       <p class="mute" style="margin:0;font-size:13.5px">Miễn phí hoàn toàn. Không công ty nào được thu phí đồng phục hay đặt cọc.${me ? '' : ' Muốn xem lại và sửa hồ sơ? <a href="/dang-nhap?dang-ky=1">Tạo tài khoản</a> bằng chính số điện thoại này.'}</p>
     </form>`);
@@ -389,7 +390,7 @@ export function quickProfile() {
     const f = new FormData(e.target);
     const done = busy(e.submitter);
     try {
-      const r = await api('/profile', { method: 'POST', body: { ...Object.fromEntries(f), exp: f.getAll('exp') } });
+      const r = await api('/profile', { method: 'POST', body: { ...Object.fromEntries(f), exp: f.getAll('exp'), share: !!f.get('share') } });
       store.set('profile', r.profile);
       closeModal();
       toast('Đã gửi hồ sơ. Nhà tuyển dụng sẽ liên hệ bạn sớm.');

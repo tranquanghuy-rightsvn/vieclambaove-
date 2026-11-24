@@ -40,6 +40,7 @@ export default async function ({ params: [tab = ''] }) {
           <label class="field"><span>Ca mong muốn</span><select class="select" name="shift"><option value="">Ca nào cũng được</option>${V.shifts.map((s) => `<option value="${s.id}" ${p.shift === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}</select></label>
         </div>
         <label class="check"><input type="checkbox" name="stay" ${p.stay ? 'checked' : ''}>Cần chỗ ở</label>
+        <label class="check consent"><input type="checkbox" name="share" ${p.share ? 'checked' : ''}><span><b>Cho nhà tuyển dụng trên website tìm thấy hồ sơ của tôi</b> và gọi/nhắn Zalo khi có việc phù hợp. Tắt thì chỉ công ty bạn ứng tuyển mới thấy số điện thoại.</span></label>
         <div class="form-foot"><button class="btn btn-primary" type="submit">Lưu hồ sơ</button></div>
       </form>`,
     'da-ung-tuyen': () => `
@@ -82,7 +83,7 @@ export default async function ({ params: [tab = ''] }) {
       const f = new FormData(e.target);
       const stop = busy(e.submitter, 'Đang lưu…');
       try {
-        const r = await api('/profile', { method: 'POST', body: { ...Object.fromEntries(f), exp: f.getAll('exp'), stay: !!f.get('stay') } });
+        const r = await api('/profile', { method: 'POST', body: { ...Object.fromEntries(f), exp: f.getAll('exp'), stay: !!f.get('stay'), share: !!f.get('share') } });
         store.set('profile', r.profile);
         store.set('user', { ...u, name: r.profile.name });
         toast('Đã lưu hồ sơ.');
