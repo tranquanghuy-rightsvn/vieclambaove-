@@ -1720,3 +1720,7 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 @media (max-width: 960px) { .mast-logout { display: none; } }
 .desk-nav .desk-logout { color: #b42318; margin-top: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
 .desk-nav .desk-logout .ico { color: #b42318; }
+
+/* Nhà tuyển dụng đã đăng nhập: ẩn nút tạo hồ sơ xin việc (header, thanh dưới, trang chủ, danh sách) */
+.is-employer [data-quick], .is-employer .hero-cta { display: none !important; }
+@media (max-width: 720px) { .is-employer .tabbar { grid-template-columns: repeat(4, 1fr); } }

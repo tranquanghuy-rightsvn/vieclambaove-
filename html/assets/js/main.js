@@ -44,6 +44,8 @@ async function render({ keepScroll = false } = {}) {
   });
   document.body.classList.toggle('has-mbar', !!page.mbar);
   document.body.classList.toggle('has-tabbar', page.tabbar !== false);
+  // Nhà tuyển dụng đã đăng nhập: ẩn mọi nút "Tạo hồ sơ xin việc nhanh" (dành cho người tìm việc)
+  document.body.classList.toggle('is-employer', user()?.role === 'employer');
 
   $('#header').innerHTML = cleanLinks(headerHtml(page.nav));
   $('#footer').innerHTML = cleanLinks(footerHtml(path));
