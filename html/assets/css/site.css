@@ -1757,3 +1757,11 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 /* Tìm việc theo loại mục tiêu: viền rõ + bóng nổi (ghi đè quy tắc tắt viền toàn trang) */
 .tiles .tile { background: #fff; border: 1.5px solid #cfd6e4 !important; box-shadow: 0 2px 4px rgba(16, 24, 40, .06), 0 6px 16px rgba(16, 24, 40, .10); border-radius: 12px; }
 .tiles .tile:hover { border-color: var(--brand) !important; box-shadow: 0 10px 24px rgba(30, 42, 110, .18); transform: translateY(-3px); }
+
+/* Tin tuyển dụng (toàn site): viền rõ + bóng nổi, tách biệt từng tin (ghi đè quy tắc tắt viền toàn trang) */
+.jrow, .jcard { background: #fff; border: 1.5px solid #cfd6e4 !important; border-radius: 12px; box-shadow: 0 2px 4px rgba(16, 24, 40, .06), 0 6px 16px rgba(16, 24, 40, .10); transition: border-color .15s, box-shadow .15s, transform .15s; }
+.jrow:hover, .jcard:hover { border-color: var(--brand) !important; box-shadow: 0 10px 24px rgba(30, 42, 110, .16); transform: translateY(-2px); }
+.jrow.is-vip, .jcard.is-vip { border-color: #e9c46a !important; }
+.jrow.is-vip:hover, .jcard.is-vip:hover { border-color: #d4a017 !important; }
+.jlist { gap: 12px; }
+.detail .jrow, .article .jrow { background: #fff; }
