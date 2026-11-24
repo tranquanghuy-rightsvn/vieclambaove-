@@ -12,7 +12,7 @@ export default async function ({ query }) {
   let mode = query.get('dang-ky') ? 'register' : 'login';
   const back = (query.get('tiep') || '').startsWith('/') ? query.get('tiep') : '';
   const u = user();
-  if (u) return { redirect: back || (u.role === 'employer' ? '/nha-tuyen-dung' : '/ung-vien') };
+  if (u) return { redirect: back || (u.role === 'employer' ? '/trang-quan-ly-tuyen-dung' : '/ung-vien') };
   const cfg = await api('/auth/config').catch(() => ({ google: false }));
 
   const side = {
@@ -47,7 +47,7 @@ export default async function ({ query }) {
       $('#authP', root).innerHTML = reg ? 'Đã có tài khoản? <button class="linkbtn" type="button" data-mode="login">Đăng nhập</button>' : `Chưa có tài khoản? <button class="linkbtn" type="button" data-mode="register">Đăng ký miễn phí</button>`;
       const pw = `<label class="field"><span>Mật khẩu</span><input class="input" type="password" name="password" required minlength="6" autocomplete="${reg ? 'new-password' : 'current-password'}" placeholder="${reg ? 'Ít nhất 6 ký tự' : ''}"></label>`;
       const google = role === 'employer' ? `<div class="or">hoặc</div>
-        <a class="btn btn-quiet btn-l btn-block${cfg.google ? '' : ' is-off'}" href="/api/auth/google/start?tiep=${encodeURIComponent(back || '/nha-tuyen-dung')}" ${cfg.google ? '' : 'aria-disabled="true" data-nogoogle'}>${icon('google')}${reg ? 'Đăng ký' : 'Đăng nhập'} với Google</a>` : '';
+        <a class="btn btn-quiet btn-l btn-block${cfg.google ? '' : ' is-off'}" href="/api/auth/google/start?tiep=${encodeURIComponent(back || '/trang-quan-ly-tuyen-dung')}" ${cfg.google ? '' : 'aria-disabled="true" data-nogoogle'}>${icon('google')}${reg ? 'Đăng ký' : 'Đăng nhập'} với Google</a>` : '';
       form.innerHTML = role === 'candidate'
         ? `${reg ? '<label class="field"><span>Họ và tên</span><input class="input" name="name" required autocomplete="name"></label>' : ''}
            <div class="field"><span class="lbl">Số điện thoại</span><div class="phone"><span>+84</span><input name="phone" inputmode="tel" autocomplete="tel" placeholder="909 123 456" required></div></div>
@@ -81,7 +81,7 @@ export default async function ({ query }) {
         store.set('user', r.user);
         await syncMe();
         toast(mode === 'register' ? 'Tạo tài khoản thành công.' : 'Đăng nhập thành công.');
-        go(back || (r.user.role === 'employer' ? '/nha-tuyen-dung' : '/ung-vien'));
+        go(back || (r.user.role === 'employer' ? '/trang-quan-ly-tuyen-dung' : '/ung-vien'));
       } catch (err) { done(); toast(err.message, 'alert'); }
     });
     draw();

@@ -8,7 +8,7 @@ const tr = (n) => String(n).replace('.', ',');
 export default async function ({ params: [tab = ''] }) {
   const u = user();
   if (!u) return { redirect: '/dang-nhap?tiep=/ung-vien' };
-  if (u.role === 'employer') return { redirect: '/nha-tuyen-dung' };
+  if (u.role === 'employer') return { redirect: '/trang-quan-ly-tuyen-dung' };
   const p = { exp: [], ...store.get('profile', {}), phone: u.phone, name: store.get('profile', {}).name || u.name };
   const saved = store.get('saved', []);
   const tabs = [['', 'Hồ sơ của tôi', 'user'], ['da-ung-tuyen', 'Đã ứng tuyển', 'send'], ['da-luu', 'Việc đã lưu', 'bookmark', saved.length || ''], ['cai-dat', 'Cài đặt', 'settings']];

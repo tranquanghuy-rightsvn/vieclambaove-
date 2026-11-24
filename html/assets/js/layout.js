@@ -16,7 +16,7 @@ export const ROUTES = [
   [/^\/$/, () => import('./pages/home.js')],
   [/^\/viec-lam(?:\/([a-z0-9-]+))?(?:\/([a-z0-9-]+))?$/, () => import('./pages/jobs.js')],
   [/^\/tin\/(?:[a-z0-9-]*-)?(\d+)$/, () => import('./pages/job.js')],
-  [/^\/cong-ty$/, () => import('./pages/companies.js')],
+  [/^\/cong-ty-tuyen-dung$/, () => import('./pages/companies.js')],
   [/^\/cong-ty\/([a-z0-9-]+)$/, () => import('./pages/company.js')],
   [/^\/tin-tuc$/, () => import('./pages/blog.js')],
   [/^\/tin-tuc\/([a-z0-9-]+)$/, () => import('./pages/post.js')],
@@ -24,7 +24,7 @@ export const ROUTES = [
   // Bảng giá tạm ẩn (Phase 1 đăng tin miễn phí). Bật lại: thêm dòng [/^\/bang-gia$/, () => import('./pages/pricing.js')]
   [/^\/dang-nhap$/, () => import('./pages/auth.js')],
   [/^\/ung-vien(?:\/([a-z-]+))?$/, () => import('./pages/candidate.js')],
-  [/^\/nha-tuyen-dung(?:\/([a-z-]+))?$/, () => import('./pages/employer.js')],
+  [/^\/trang-quan-ly-tuyen-dung(?:\/([a-z-]+))?$/, () => import('./pages/employer.js')],
   [/^\/chinh-sach(?:\/([a-z-]+))?$/, () => import('./pages/policy.js')],
 
 ];
@@ -46,7 +46,7 @@ export const NAV = [
 
 function acctLink(u) {
   if (!u) return { href: '/dang-nhap', label: 'Đăng nhập' };
-  return { href: u.role === 'employer' ? '/nha-tuyen-dung' : '/ung-vien', label: u.role === 'employer' ? 'Quản lý tuyển dụng' : esc(u.name?.split(' ').pop() || 'Tài khoản') };
+  return { href: u.role === 'employer' ? '/trang-quan-ly-tuyen-dung' : '/ung-vien', label: u.role === 'employer' ? 'Quản lý tuyển dụng' : esc(u.name?.split(' ').pop() || 'Tài khoản') };
 }
 
 // Logo theo mẫu "Cổng thông tin tuyển dụng bảo vệ": ô vàng gradient + khiên, chữ vieclam·baove·.vn
@@ -58,7 +58,7 @@ const brand = () => `<a class="brand logo" href="/" aria-label="vieclambaove.vn 
 export function headerHtml(navKey) {
   const u = user();
   const a = acctLink(u);
-  const postHref = u?.role === 'employer' ? '/nha-tuyen-dung/dang-tin' : '/dang-nhap?vai-tro=nha-tuyen-dung';
+  const postHref = u?.role === 'employer' ? '/trang-quan-ly-tuyen-dung/dang-tin' : '/dang-nhap?vai-tro=nha-tuyen-dung';
   const right = u
     ? `<a class="acct" href="${a.href}">${icon('user')}${a.label}</a>`
     : `<a class="btn btn-line btn-s" href="/dang-nhap?dang-ky=1">Đăng ký</a><a class="btn btn-primary btn-s" href="/dang-nhap">Đăng nhập</a>`;
@@ -95,7 +95,7 @@ function tabbar(path) {
     ['/', 'Trang chủ', 'building', path === '/'],
     ['/viec-lam', 'Tìm việc', 'search', path.startsWith('/viec-lam') || path.startsWith('/tin/')],
     ['/ung-vien/da-luu', 'Đã lưu', 'bookmark', path === '/ung-vien/da-luu'],
-    [u ? acctLink(u).href : '/dang-nhap', 'Tài khoản', 'user', (path.startsWith('/ung-vien') && path !== '/ung-vien/da-luu') || path.startsWith('/dang-nhap') || path.startsWith('/nha-tuyen-dung')]
+    [u ? acctLink(u).href : '/dang-nhap', 'Tài khoản', 'user', (path.startsWith('/ung-vien') && path !== '/ung-vien/da-luu') || path.startsWith('/dang-nhap') || path.startsWith('/trang-quan-ly-tuyen-dung')]
   ];
   const link = ([h, t, ic, on]) => `<a href="${h}" class="${on ? 'on' : ''}">${icon(ic)}${t}</a>`;
   // Nút "Tạo hồ sơ xin việc nhanh" nằm giữa thanh dưới, luôn thấy rõ trên mobile ở mọi trang
@@ -128,12 +128,12 @@ export function footerHtml(path) {
         <li><a href="/ung-vien">Hồ sơ của tôi</a></li>
         <li><a href="/tin-tuc">Tin tức nghề bảo vệ</a></li>
         <li><a href="/video">Video nghề bảo vệ</a></li>
-        <li><a href="/cong-ty">Nhà tuyển dụng</a></li>
+        <li><a href="/cong-ty-tuyen-dung">Nhà tuyển dụng</a></li>
         <li><a href="/tin-tuc/dau-hieu-cong-ty-bao-ve-lua-dao">Cảnh báo lừa đảo</a></li>
       </ul></div>
       <div><h4>Dành cho nhà tuyển dụng</h4><ul>
-        <li><a href="/nha-tuyen-dung/dang-tin">Đăng tin tuyển dụng</a></li>
-        <li><a href="/nha-tuyen-dung/xac-thuc">Xác thực công ty</a></li>
+        <li><a href="/trang-quan-ly-tuyen-dung/dang-tin">Đăng tin tuyển dụng</a></li>
+        <li><a href="/trang-quan-ly-tuyen-dung/xac-thuc">Xác thực công ty</a></li>
       </ul></div>
       <div><h4>Việc làm theo tỉnh</h4><ul>${V.provinces.map((p) => `<li><a href="/viec-lam/${p.slug}">Bảo vệ ${p.short}</a></li>`).join('')}</ul></div>
     </div>
