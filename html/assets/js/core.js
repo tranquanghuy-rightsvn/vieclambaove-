@@ -265,7 +265,7 @@ export function jobRow(j) {
       </p>
     </div>
     <div class="jr-act">
-      ${off ? "" : j.source ? `<a class="btn btn-quiet jr-apply" href="${url.job(j)}">${icon("phone")}Xem cách liên hệ</a>` : `<button class="btn btn-primary jr-apply" type="button" data-apply="${j.id}">${icon("bolt")}Ứng tuyển nhanh</button>`}
+      ${off ? "" : `<button class="btn btn-primary jr-apply" type="button" data-apply="${j.id}">${icon("bolt")}Ứng tuyển nhanh</button>`}
       ${save}
     </div>
   </article>`;
