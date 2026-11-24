@@ -63,7 +63,7 @@ export function headerHtml(navKey) {
     <nav class="nav" aria-label="Chính">${NAV.map(([k, h, t]) => `<a href="${h}" class="${k === navKey ? 'on' : ''}">${t}</a>`).join('')}</nav>
     <div class="mast-act">
       <button class="btn btn-quick btn-s mast-quick" type="button" data-quick>${icon('bolt')}<span class="q-full">Tạo hồ sơ xin việc nhanh</span><span class="q-short">Hồ sơ xin việc</span></button>
-      ${u?.role === 'employer' ? '' : `<a class="emp-link" href="${postHref}"><small>Dành cho nhà tuyển dụng</small>Đăng tuyển, tìm ứng viên</a>`}
+      ${u?.role === 'employer' ? '' : `<a class="emp-link" href="${postHref}"><small>Dành cho nhà tuyển dụng</small>Đăng tin tuyển dụng</a>`}
       ${right}
       <button class="burger" type="button" data-drawer aria-label="Mở menu" aria-expanded="false">${icon('menu')}</button>
     </div>
