@@ -131,7 +131,52 @@
    "name": "Trực 24h"
   }
  ],
- "companies": [],
- "jobs": [],
+ "companies": [
+  {
+   "id": "thu-nghiem-he-thong-717",
+   "name": "Công ty Thử Nghiệm Hệ Thống 717",
+   "short": "Thử Nghiệm Hệ",
+   "initials": "TNH",
+   "color": "#7a5a12",
+   "phone": "",
+   "about": "",
+   "size": "",
+   "founded": "",
+   "rating": null,
+   "reviews": 0,
+   "mst": "",
+   "license": "",
+   "verified": false
+  }
+ ],
+ "jobs": [
+  {
+   "id": 1,
+   "title": "[TIN THỬ] Tuyển bảo vệ tòa nhà Quận 1 kiểm tra hệ thống",
+   "company": "thu-nghiem-he-thong-717",
+   "province": "tp-hcm",
+   "district": "Quận 1",
+   "address": "1 Lê Lợi, Quận 1, TP.HCM",
+   "target": "toa-nha",
+   "shift": "8h",
+   "qty": 1,
+   "salaryMin": 8,
+   "salaryMax": 9,
+   "housing": false,
+   "meals": false,
+   "urgent": false,
+   "tier": "normal",
+   "age": "",
+   "height": "",
+   "desc": "Tin thử nghiệm, sẽ xoá ngay.",
+   "phone": "",
+   "views": 0,
+   "calls": 0,
+   "images": [],
+   "postedAt": 1795490066524,
+   "expiresAt": 1796094866524,
+   "updatedAt": 1795490066524
+  }
+ ],
  "videos": []
 }
