@@ -1,4 +1,4 @@
-import { V, esc, icon, url, pay, num, crumbs, activeJobs, province, SITE } from '../core.js';
+import { V, esc, icon, url, pay, num, crumbs, activeJobs, province, company, jobThumb, ago, SITE } from '../core.js';
 
 // Nội dung bài: file HTML riêng assets/content/tin-tuc/<slug>.html (khi dựng trang tĩnh thì đọc file, khi chuyển trang thì tải về)
 const cache = {};
@@ -16,29 +16,29 @@ export default async function ({ params: [id] }) {
   const p = V.posts.find((x) => x.id === id);
   if (!p) return { redirect: '/tin-tuc' };
   const related = V.posts.filter((x) => x.id !== p.id).slice(0, 3);
-  const urgent = activeJobs().filter((j) => j.urgent).slice(0, 4);
+  const latest = activeJobs().slice().sort((a, b) => a.posted - b.posted || b.id - a.id).slice(0, 8);
   const html = `
   <div class="wrap article">
     <article>
       ${crumbs([['Trang chủ', '/'], ['Tin tức', '/tin-tuc'], [p.cat, null]])}
       <span class="cat">${esc(p.cat)}</span>
-      <h1 class="d-title" style="margin-top:8px;max-width:32ch">${esc(p.title)}</h1>
+      <h1 class="d-title post-title">${esc(p.title)}</h1>
       <div class="byline"><span>Ban biên tập Việc Làm Bảo Vệ</span><span>${p.date}</span><span>${p.read} phút đọc</span><span>${num(p.views)} lượt đọc</span></div>
       <figure class="post-hero"><img src="${p.img}" alt="${esc(p.title)}" width="800" height="500"></figure>
       <link rel="stylesheet" href="/assets/css/article.css">
       <div class="prose post-detail-body">${(await loadBody(p.id)) || generic(p)}</div>
-      <section class="sec" style="padding-top:40px">
-        <div class="sec-head"><h2>Đọc tiếp</h2></div>
-        <ul class="glist">${related.map((r) => `<li><div><span class="cat">${esc(r.cat)}</span><br><a href="${url.post(r)}">${esc(r.title)}</a></div><time>${r.date}</time></li>`).join('')}</ul>
+      <section class="post-more">
+        <h2>Đọc tiếp</h2>
+        <div class="pm-grid">${related.map((r) => `<a class="pm-card" href="${url.post(r)}"><span class="pm-img"><img src="${r.img}" alt="" loading="lazy" width="400" height="250"></span><span class="pm-body"><span class="cat">${esc(r.cat)}</span><b>${esc(r.title)}</b><small>${r.date} · ${r.read} phút đọc</small></span></a>`).join('')}</div>
+        <p class="pm-all"><a class="more" href="/tin-tuc">Xem tất cả tin tức ${icon('arrow', 'ico-s')}</a></p>
       </section>
     </article>
-    <aside class="aside">
-      <div class="board">
-        <div class="board-head"><h2>Đang tuyển gấp</h2></div>
-        <ol>${urgent.map((j) => `<li><a href="${url.job(j)}"><span class="b-place">${esc(j.district)} · ${esc(province(j.province).short)}</span><span class="b-title">${esc(j.title)}</span><span class="b-pay">${pay(j)}<small>triệu</small></span></a></li>`).join('')}</ol>
-        <div class="board-foot"><a class="more" href="/viec-lam?gap=1">Tất cả việc gấp ${icon('arrow', 'ico-s')}</a></div>
+    <aside class="aside post-aside">
+      <div class="side-jobs">
+        <h2>Việc làm bảo vệ mới nhất</h2>
+        <ul>${latest.map((j) => { const c = company(j.company) || {}; return `<li><a href="${url.job(j)}"><span class="sj-logo">${jobThumb(j, c)}</span><span class="sj-body"><b>${esc(j.title)}</b><span class="sj-co">${esc(c.name || '')}</span><span class="sj-meta"><em>${pay(j)} triệu</em> · ${esc(j.district)}, ${esc(province(j.province).short)}</span></span></a></li>`; }).join('')}</ul>
+        <a class="btn btn-primary btn-block" href="/viec-lam">Xem tất cả việc làm</a>
       </div>
-      <aside class="jrow-ad" aria-label="Quảng cáo"><span class="adlabel">Quảng cáo</span><p><b>Khóa PCCC cơ bản</b> - học 2 ngày cuối tuần, cấp chứng chỉ.</p></aside>
     </aside>
   </div>`;
   return {
