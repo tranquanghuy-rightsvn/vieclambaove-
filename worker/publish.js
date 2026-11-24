@@ -77,6 +77,9 @@ export async function markDirty(env) {
 }
 
 /* ---------- /data/site.js trực tiếp từ D1 ---------- */
+// Tăng số này mỗi khi đổi khuôn dữ liệu công khai (thêm/bớt trường, thêm mục như posts):
+// bản đã lưu từ code cũ sẽ tự dựng lại ngay lần đọc đầu tiên sau khi deploy.
+const LIVE_VERSION = 2;
 export async function buildLive(env) {
   const data = await buildData(env);
   const body = `/* Dữ liệu trực tiếp lúc ${new Date().toISOString()} - không sửa tay */
@@ -90,13 +93,14 @@ export async function buildLive(env) {
   for (var k in d) V[k] = d[k];
 })(window.VLBV = window.VLBV || {}, ${JSON.stringify(data).replace(/</g, '\\u003c')});
 `;
-  const snap = { body, etag: '"' + (await sha256(body)).slice(0, 16) + '"' };
+  const snap = { v: LIVE_VERSION, body, etag: '"' + (await sha256(body)).slice(0, 16) + '"' };
   await setKv(env, 'live_site_js', snap);
   return snap;
 }
 
 export async function serveLive(env, req) {
-  const snap = (await getKv(env, 'live_site_js')) || (await buildLive(env));
+  let snap = await getKv(env, 'live_site_js');
+  if (!snap || snap.v !== LIVE_VERSION) snap = await buildLive(env);
   if (req.headers.get('if-none-match') === snap.etag) return new Response(null, { status: 304, headers: { etag: snap.etag } });
   return new Response(snap.body, { headers: { 'content-type': 'text/javascript; charset=utf-8', etag: snap.etag, 'cache-control': 'no-cache' } });
 }
