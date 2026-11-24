@@ -134,6 +134,8 @@ const P = {
   logout: '<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',
   bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
   play: '<path d="M8 5v14l11-7z"/>',
+  calendar: '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  ruler: '<path d="M4 17 17 4l3 3L7 20z"/><path d="m8 13 2 2M11 10l2 2M14 7l2 2"/>',
   bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
   send: '<path d="M21 3 3 10.5l7 3 3 7z"/><path d="m10 13.5 4-4"/>',
   mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
@@ -357,7 +359,7 @@ export function reportJob(id) {
 export function deskNav(base, items, active, who) {
   return `<aside class="desk-nav">
     ${who ? `<div class="desk-who">${who}</div>` : ''}
-    <nav aria-label="Mục">${items.map(([k, label, ic, badge]) => `<a href="${base}${k ? '/' + k : ''}" class="${k === active ? 'on' : ''}"${k === active ? ' aria-current="page"' : ''}>${icon(ic)}${label}${badge ? `<em>${badge}</em>` : ''}</a>`).join('')}</nav>
+    <nav aria-label="Mục">${items.map(([k, label, ic, badge]) => `<a href="${base}${k ? '/' + k : ''}" class="${k === active ? 'on' : ''}"${k === active ? ' aria-current="page"' : ''}>${icon(ic)}${label}${badge ? `<em>${badge}</em>` : ''}</a>`).join('')}<a href="#" class="desk-logout" data-logout>${icon('logout')}Đăng xuất</a></nav>
   </aside>`;
 }
 
