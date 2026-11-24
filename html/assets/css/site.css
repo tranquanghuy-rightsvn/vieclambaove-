@@ -1735,3 +1735,14 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 .facts.facts-row .big dd { font: 800 17px/1.2 var(--f-head); color: var(--pay-c, #d9480f); }
 @media (max-width: 720px) { .facts.facts-row { grid-template-columns: 1fr; } }
 .cand-about { white-space: pre-line; font-size: 14.5px; color: var(--txt-2); margin: 4px 0 2px; max-width: 70ch; }
+
+/* Phân trang: ‹ 1 2 … 5 6 › */
+.pager { display: flex; justify-content: center; align-items: center; gap: 6px; margin: 22px 0 0; flex-wrap: wrap; }
+.pager a, .pager span, .pager button { min-width: 40px; height: 40px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid var(--line, #e4e7ec) !important; background: #fff; color: var(--txt); font: 600 15px var(--f-body); text-decoration: none; box-shadow: none; cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+.pager a:hover, .pager button:hover { border-color: var(--brand) !important; color: var(--brand); }
+.pager .on { background: var(--brand); border-color: var(--brand) !important; color: #fff; cursor: default; box-shadow: 0 4px 10px rgba(30, 42, 110, .25); }
+.pager .gap { border: 0 !important; background: none; min-width: 24px; padding: 0; color: var(--txt-3); cursor: default; }
+.pager .pg-arrow { font-size: 20px; line-height: 1; }
+.pager .pg-arrow.off { color: var(--line-2, #d0d5dd); cursor: default; }
+@media (max-width: 420px) { .pager a, .pager span, .pager button { min-width: 36px; height: 36px; font-size: 14px; } }
+#hotPg { display: block; }

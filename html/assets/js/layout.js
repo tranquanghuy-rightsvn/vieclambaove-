@@ -81,10 +81,6 @@ export function headerHtml(navKey) {
       ${u ? '<a href="#" data-logout>Đăng xuất</a>' : ''}
       ${u?.role === 'candidate' ? '' : `<a class="btn btn-primary btn-l" href="${postHref}">Đăng tin tuyển dụng</a>`}
     </div>
-  </div>
-  <div class="floaty" aria-label="Hỗ trợ nhanh">
-    <a href="/chinh-sach/lien-he" class="fz" aria-label="Chat Zalo với tư vấn viên">Zalo</a>
-    <a href="tel:19006868" aria-label="Gọi hotline 1900 6868">${icon('phone')}</a>
   </div>`;
 }
 

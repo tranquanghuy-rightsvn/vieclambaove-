@@ -363,6 +363,23 @@ export function deskNav(base, items, active, who) {
   </aside>`;
 }
 
+/* ---------- Phân trang: ‹ 1 2 … 5 6 › (2 trang đầu, 2 trang cuối, trang hiện tại ±1) ---------- */
+export function pageNums(page, pages) {
+  const keep = [...new Set([1, 2, pages - 1, pages, page - 1, page, page + 1])].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
+  const out = [];
+  keep.forEach((n, i) => { if (i && n - keep[i - 1] > 1) out.push('…'); out.push(n); });
+  return out;
+}
+// href(n) trả về link (trang có URL riêng) hoặc null (đổi trang tại chỗ bằng nút data-page)
+export function pagerHtml(page, pages, href = null) {
+  if (pages <= 1) return '';
+  const item = (n, label, aria, off) => off ? `<span class="pg-arrow off" aria-hidden="true">${label}</span>`
+    : n === page && !aria ? `<span class="on" aria-current="page">${n}</span>`
+    : href ? `<a href="${href(n)}"${aria ? ` aria-label="${aria}" class="pg-arrow"` : ''}>${label}</a>`
+    : `<button type="button" data-page="${n}"${aria ? ` aria-label="${aria}" class="pg-arrow"` : ''}>${label}</button>`;
+  return `<nav class="pager" aria-label="Phân trang">${item(page - 1, '‹', 'Trang trước', page === 1)}${pageNums(page, pages).map((n) => (n === '…' ? '<span class="gap">…</span>' : item(n, n))).join('')}${item(page + 1, '›', 'Trang sau', page === pages)}</nav>`;
+}
+
 export const crumbs = (items) => `<ol class="crumbs">${items.map(([t, h]) => `<li>${h ? `<a href="${h}">${esc(t)}</a>` : `<span aria-current="page">${esc(t)}</span>`}</li>`).join('')}</ol>`;
 
 /* ---------- Tạo hồ sơ xin việc nhanh: ít gõ, chọn là xong ---------- */
