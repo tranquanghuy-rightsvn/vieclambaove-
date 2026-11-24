@@ -36,6 +36,15 @@ export const publicJob = (j) => ({
   postedAt: j.posted_at, expiresAt: j.expires_at, updatedAt: j.updated_at
 });
 
+// Bài tin tức: chỉ thông tin để liệt kê (nội dung bài đi riêng, file assets/content/tin-tuc/<slug>.html)
+const vnDate = (ms) => new Date(ms + 7 * 3600e3).toISOString().slice(0, 10).split('-').reverse().join('/');
+export const readMinutes = (html) => Math.max(1, Math.round(String(html || '').replace(/<(svg|style|script)[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length / 200));
+export const publicPost = (p) => ({
+  id: p.slug, img: p.cover || '/assets/img/photos/doi-bao-ve.jpg', cat: p.cat, title: p.title, excerpt: p.excerpt,
+  read: readMinutes(p.content), views: p.views || 0, date: vnDate(p.published_at), updatedAt: p.updated_at
+});
+export const POSTS_SQL = 'SELECT * FROM posts WHERE published = 1 ORDER BY published_at DESC, id DESC';
+
 export const publicVideo = (v) => ({ slug: v.slug, yt: v.youtube_id, title: v.title, desc: v.descr, date: v.created_at, updatedAt: v.updated_at });
 
 // Tin công khai: đang hiển thị, chưa hết hạn, công ty không bị khoá
@@ -44,13 +53,17 @@ export const LIVE_SQL = `SELECT j.* FROM jobs j JOIN companies c ON c.id = j.com
 
 export async function buildData(env) {
   const t = now();
-  const [cats, cos, jobs, videos] = await Promise.all([
+  const [cats, cos, jobs, videos, posts] = await Promise.all([
     categories(env),
     env.DB.prepare('SELECT * FROM companies WHERE locked = 0 ORDER BY verified DESC, name').all(),
     env.DB.prepare(LIVE_SQL + ' ORDER BY (j.tier = \'vip\') DESC, j.posted_at DESC, j.id DESC').bind(t).all(),
-    env.DB.prepare('SELECT * FROM videos WHERE published = 1 ORDER BY created_at DESC').all()
+    env.DB.prepare('SELECT * FROM videos WHERE published = 1 ORDER BY created_at DESC').all(),
+    env.DB.prepare(POSTS_SQL).all()
   ]);
-  return { ...cats, companies: cos.results.map(publicCompany), jobs: jobs.results.map(publicJob), videos: videos.results.map(publicVideo) };
+  const data = { ...cats, companies: cos.results.map(publicCompany), jobs: jobs.results.map(publicJob), videos: videos.results.map(publicVideo), posts: posts.results.map(publicPost) };
+  // Nội dung bài không đưa vào dữ liệu công khai (nặng); commit thành file riêng khi xuất bản
+  Object.defineProperty(data, 'postContents', { value: Object.fromEntries(posts.results.map((p) => [p.slug, p.content])), enumerable: false });
+  return data;
 }
 
 /**
@@ -91,6 +104,7 @@ export async function serveLive(env, req) {
 /* ---------- GitHub Git Data API: 1 commit / lần xuất bản ---------- */
 const DATA_PATH = 'data/site.json';
 const IMG_DIR = 'html/images/';
+const POST_DIR = 'assets/content/tin-tuc/';
 
 function b64(bytes) {
   let bin = '';
@@ -113,6 +127,9 @@ function wantedImages(data) {
   const set = new Set();
   data.jobs.forEach((j) => (j.images || []).forEach((u) => set.add(u.slice(8))));
   data.companies.forEach((c) => c.logo?.startsWith('/images/') && set.add(c.logo.slice(8)));
+  // Ảnh bài tin tức: ảnh đại diện + ảnh chèn trong nội dung
+  (data.posts || []).forEach((p) => p.img?.startsWith('/images/') && set.add(p.img.slice(8)));
+  Object.values(data.postContents || {}).forEach((html) => (String(html).match(/\/images\/posts\/[a-z0-9-]+\.(?:jpg|png|webp)/g) || []).forEach((u) => set.add(u.slice(8))));
   return set;
 }
 
@@ -126,6 +143,14 @@ async function commitOnce(env, data, json) {
   const ref = await gh(env, 'GET', `git/ref/heads/${encodeURIComponent(branch)}`);
   const head = await gh(env, 'GET', `git/commits/${ref.object.sha}`);
   const tree = [{ path: DATA_PATH, mode: '100644', type: 'blob', content: json }];
+  // Nội dung bài tin tức: ghi file cho bài đang hiển thị, xoá file của bài đã ẩn/xoá
+  const postFiles = data.postContents || {};
+  for (const [slug, html] of Object.entries(postFiles)) tree.push({ path: `${POST_DIR}${slug}.html`, mode: '100644', type: 'blob', content: html });
+  try {
+    (await gh(env, 'GET', `contents/${POST_DIR.slice(0, -1)}?ref=${encodeURIComponent(branch)}`))
+      .filter((f) => f.name.endsWith('.html') && !(f.name.slice(0, -5) in postFiles))
+      .forEach((f) => tree.push({ path: f.path, mode: '100644', type: 'blob', sha: null }));
+  } catch (e) { if (e.status !== 404) throw e; }
   for (const name of add) {
     const obj = await env.FILES.get('img/' + name);
     if (!obj) continue; // ảnh đã bị xoá khỏi R2 (NTD vừa xoá) - bỏ qua
@@ -143,7 +168,7 @@ async function commitOnce(env, data, json) {
   const newTree = await gh(env, 'POST', 'git/trees', { base_tree: head.tree.sha, tree });
   if (newTree.sha === head.tree.sha) return { commit: '', images: wanted };
   const commit = await gh(env, 'POST', 'git/commits', {
-    message: `data: cập nhật website (${data.jobs.length} tin, ${data.videos.length} video${add.length ? `, +${add.length} ảnh` : ''}${del.length ? `, -${del.length} ảnh` : ''})`,
+    message: `data: cập nhật website (${data.jobs.length} tin, ${data.videos.length} video, ${data.posts.length} bài viết${add.length ? `, +${add.length} ảnh` : ''}${del.length ? `, -${del.length} ảnh` : ''})`,
     tree: newTree.sha, parents: [head.sha],
     author: { name: 'vieclambaove-bot', email: 'bot@vieclambaove.invalid' }
   });

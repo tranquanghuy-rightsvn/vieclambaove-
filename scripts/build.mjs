@@ -16,7 +16,7 @@ const BUILT = Date.now();
 
 /* ---------- Dữ liệu ---------- */
 const dataFile = join(root, 'data/site.json');
-const data = existsSync(dataFile) ? JSON.parse(readFileSync(dataFile, 'utf8')) : { provinces: [], targets: [], shifts: [], companies: [], jobs: [], videos: [] };
+const data = { posts: [], ...(existsSync(dataFile) ? JSON.parse(readFileSync(dataFile, 'utf8')) : { provinces: [], targets: [], shifts: [], companies: [], jobs: [], videos: [] }) };
 
 // Tính ngày đăng / số ngày còn lại theo giờ build; tin đã quá hạn không sinh trang (giống trình duyệt)
 const DAY = 864e5;
@@ -117,7 +117,7 @@ const topics = await imp('assets/js/topics.js');
 topics.topicPages().forEach((x) => add(topics.topicPath(x.t, x.pv), newest(live.filter((j) => x.t.test(j) && (!x.pv || j.province === x.pv.slug)))));
 V.jobs.forEach((j) => add(core.url.job(j), j.updatedAt || j.postedAt, live.includes(j)));
 V.companies.forEach((c) => { const cj = live.filter((j) => j.company === c.id); add(core.url.company(c), newest(cj), cj.length > 0); }); // công ty không còn tin: không vào sitemap
-V.posts.forEach((p) => add(core.url.post(p), Date.parse(p.date.split('/').reverse().join('-')) || BUILT));
+V.posts.forEach((p) => add(core.url.post(p), p.updatedAt || Date.parse(p.date.split('/').reverse().join('-')) || BUILT));
 (V.videos || []).forEach((v) => add('/video/' + v.slug, v.updatedAt || v.date));
 
 let n = 0;
@@ -149,4 +149,4 @@ write('/_404', htmlPage('/404', layout.notFoundPage()));
 const day = (ms) => new Date(ms).toISOString().slice(0, 10);
 write('/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pub.filter((x) => x[2]).map(([u, d]) => `  <url><loc>${escAttr(SITE + u)}</loc><lastmod>${day(d)}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 
-console.log(`build: ${n} trang công khai, ${Object.keys(PRIVATE).length} khung trang tài khoản, ${V.jobs.length} tin, ${(V.videos || []).length} video → html/ (SITE_URL=${SITE})`);
+console.log(`build: ${n} trang công khai, ${Object.keys(PRIVATE).length} khung trang tài khoản, ${V.jobs.length} tin, ${(V.videos || []).length} video, ${V.posts.length} bài viết → html/ (SITE_URL=${SITE})`);

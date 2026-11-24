@@ -20,7 +20,7 @@ commit html/ → Cloudflare Workers Builds nối thẳng repo, deploy html/ + Wo
 
 ## 0. Phạm vi (Phase 1, không làm rộng hơn)
 
-Duyệt tin · Báo cáo vi phạm · Video YouTube · Công ty (xác thực/khoá) · Người dùng website
+Duyệt tin · Báo cáo vi phạm · Tin tức (bài viết) · Video YouTube · Công ty (xác thực/khoá) · Người dùng website
 (khoá/mở) · Danh mục + chế độ duyệt · Quản trị viên. Không có: blog AI, gói/thanh toán,
 banner/AdSense, danh sách đen, email báo việc mới.
 
@@ -32,7 +32,7 @@ banner/AdSense, danh sách đen, email báo việc mới.
 4. Phân quyền 3 cấp `root > admin > moderator` (chốt 22/11/2026):
    | Chức năng | moderator (Kiểm duyệt) | admin | root |
    |---|---|---|---|
-   | Tổng quan (kèm trạng thái xuất bản, nút Xuất bản ngay), Duyệt tin, Báo cáo vi phạm, Video | ✔ | ✔ | ✔ |
+   | Tổng quan (kèm trạng thái xuất bản, nút Xuất bản ngay), Duyệt tin, Báo cáo vi phạm, Tin tức, Video | ✔ | ✔ | ✔ |
    | Công ty (xác thực, khoá), Người dùng website (khoá/mở) | | ✔ | ✔ |
    | Danh mục + chế độ duyệt tin | | ✔ | ✔ |
    | Quản trị viên: thêm/xoá moderator | | ✔ | ✔ |
@@ -69,6 +69,24 @@ banner/AdSense, danh sách đen, email báo việc mới.
   Tiêu đề (bắt buộc), Mô tả (tuỳ chọn), Hiển thị (bật/tắt).
 - Slug tự sinh từ tiêu đề lúc tạo, BẤT BIẾN (URL `/video/<slug>`).
 - Xoá có bước xác nhận.
+
+## IV-b. Tin tức (bài viết) - thêm 24/11/2026
+
+- Lưu ở D1 bảng `posts` (migration 0006, đã nạp sẵn 6 bài cũ). Quyền: moderator trở lên.
+- Field: Tiêu đề, Đường dẫn (tự sinh từ tiêu đề, sửa được lúc tạo, BẤT BIẾN sau khi lưu - URL
+  `/tin-tuc/<slug>`), Chủ đề (gõ tự do, gợi ý từ chủ đề đã có), Ngày đăng, Mô tả ngắn (bắt buộc,
+  dùng làm mô tả Google), Ảnh đại diện (không bắt buộc), Nội dung, Hiển thị (bật/tắt). Xoá có xác nhận.
+- Soạn nội dung: TinyMCE 6.8.5 TỰ HOST tại `assets/vendor/tinymce` của website (không CDN), nút
+  "Chèn ảnh" nhanh (mở thẳng hộp chọn file, nén ≤1600px JPEG, chèn kèm chú thích; alt = chú thích
+  hoặc tiêu đề). Có chế độ HTML: bài chứa svg/details/summary/style... TỰ mở ở chế độ HTML vì
+  TinyMCE làm mất các phần này; chuyển sang Soạn thảo phải xác nhận.
+- Ảnh bài viết: R2 `img/posts/<slug>-<băm>.jpg`, Worker phục vụ ngay `/images/posts/...`; khi xuất
+  bản chép sang `html/images/posts/` (chỉ ảnh đang dùng ở bài hiển thị).
+- Xuất bản: `data/site.json` có mảng `posts` (không kèm nội dung); nội dung mỗi bài hiển thị được
+  commit thành `assets/content/tin-tuc/<slug>.html` (bài ẩn/xoá thì xoá file). Worker trả nội dung
+  mới nhất từ D1 cho `/assets/content/tin-tuc/*` và trả khung trang cho bài mới chưa kịp build.
+- Worker lọc nội dung khi lưu: bỏ script/iframe/form, thuộc tính on..., link javascript:.
+- Link trong bài nên trỏ tới trang việc làm (khu vực, "Tìm kiếm nhiều"), không trỏ sang bài tin tức khác.
 
 ## V. Công ty, Người dùng website
 

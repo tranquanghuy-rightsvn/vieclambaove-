@@ -23,6 +23,8 @@ async function existsLive(env, path) {
   if (m) return !!(await env.DB.prepare(LIVE_SQL + ' AND j.id = ?2').bind(now(), Number(m[1])).first());
   m = path.match(/^\/cong-ty\/([a-z0-9-]+)$/);
   if (m) return !!(await env.DB.prepare('SELECT 1 FROM companies WHERE id = ? AND locked = 0').bind(m[1]).first());
+  m = path.match(/^\/tin-tuc\/([a-z0-9-]+)$/);
+  if (m) return !!(await env.DB.prepare('SELECT 1 FROM posts WHERE slug = ? AND published = 1').bind(m[1]).first());
   m = path.match(/^\/video\/([a-z0-9-]+)$/);
   if (m) return !!(await env.DB.prepare('SELECT 1 FROM videos WHERE slug = ? AND published = 1').bind(m[1]).first());
   // Trang tìm kiếm phổ biến (assets/js/topics.js) chưa kịp dựng tĩnh: trả khung để JS vẽ
@@ -40,8 +42,9 @@ async function existsLive(env, path) {
 
 // Ảnh công khai chưa kịp lên GitHub (vừa tải/vừa duyệt): phục vụ tạm từ R2, chỉ ảnh đang được dùng công khai
 async function liveImage(env, name) {
-  if (!/^(jobs|companies)\/[a-z0-9-]+\.(jpg|png|webp)$/.test(name)) return null;
-  const used = name.startsWith('jobs/')
+  if (!/^(jobs|companies|posts)\/[a-z0-9-]+\.(jpg|png|webp)$/.test(name)) return null;
+  // Ảnh bài viết do quản trị tải lên: phục vụ ngay (trang quản trị cần xem trước khi bài được lưu)
+  const used = name.startsWith('posts/') ? true : name.startsWith('jobs/')
     ? await env.DB.prepare(LIVE_SQL + ' AND j.images LIKE ?2').bind(now(), '%"' + name + '"%').first()
     : await env.DB.prepare('SELECT 1 FROM companies WHERE locked = 0 AND logo = ?').bind('/images/' + name).first();
   if (!used) return null;
@@ -60,6 +63,13 @@ export default {
     }
     if (url.pathname === '/robots.txt') return robots(url);
     if (url.pathname === '/data/site.js') return serveLive(env, req);
+    // Nội dung bài tin tức: luôn lấy bản mới nhất (vừa sửa trong trang quản trị), không có thì dùng file tĩnh
+    const pc = url.pathname.match(/^\/assets\/content\/tin-tuc\/([a-z0-9-]+)\.html$/);
+    if (pc) {
+      const r = await env.DB.prepare('SELECT content FROM posts WHERE slug = ? AND published = 1').bind(pc[1]).first().catch(() => null);
+      if (r) return new Response(r.content, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-cache' } });
+    }
+    if (url.pathname.startsWith('/assets/')) return env.ASSETS.fetch(req);
     // Đường dẫn cũ đã đổi tên → 301 sang đường dẫn mới
     if (/^\/nha-tuyen-dung(\/|$)/.test(url.pathname)) return Response.redirect(url.origin + url.pathname.replace(/^\/nha-tuyen-dung/, '/trang-quan-ly-tuyen-dung').replace(/\/+$/, '') + url.search, 301);
     if (/^\/cong-ty\/?$/.test(url.pathname)) return Response.redirect(url.origin + '/cong-ty-tuyen-dung' + url.search, 301);

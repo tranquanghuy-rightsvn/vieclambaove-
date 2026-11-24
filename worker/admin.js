@@ -340,6 +340,67 @@ async function adminRoute(req, env, url, p) {
     return json({ ok: true });
   }
 
+  /* ---------- Tin tức (bài viết) ---------- */
+  if (p === '/posts' && m === 'GET') {
+    const r = await env.DB.prepare('SELECT id, slug, cat, title, excerpt, cover, published, views, published_at, created_at, updated_at, LENGTH(content) AS size FROM posts ORDER BY published_at DESC, id DESC').all();
+    return json({ items: r.results });
+  }
+  // Tải ảnh cho bài (ảnh đại diện / ảnh trong nội dung): JSON { data: "data:image/jpeg;base64,...", name: "<slug gợi ý>" }
+  if (p === '/posts/image' && m === 'POST') {
+    const b = await body(req);
+    const mt = String(b.data || '').match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
+    if (!mt) fail(400, 'Chỉ nhận ảnh JPG, PNG hoặc WEBP.');
+    const buf = Uint8Array.from(atob(mt[2]), (c) => c.charCodeAt(0));
+    if (buf.byteLength > 3 * 1024 * 1024) fail(400, 'Ảnh tối đa 3MB.');
+    const base = (slugify(b.name || '').slice(0, 60) || 'anh');
+    const name = `posts/${base}-${(await sha256(mt[2].slice(0, 4096) + buf.byteLength + t)).slice(0, 8)}.${IMG_TYPES[mt[1]]}`;
+    await env.FILES.put('img/' + name, buf, { httpMetadata: { contentType: mt[1], cacheControl: 'public, max-age=31536000, immutable' } });
+    return json({ ok: true, url: '/images/' + name });
+  }
+  const pm = p.match(/^\/posts(?:\/(\d+))?$/);
+  if (pm && pm[1] && m === 'GET') {
+    const r = await env.DB.prepare('SELECT * FROM posts WHERE id = ?').bind(Number(pm[1])).first();
+    if (!r) fail(404, 'Không tìm thấy bài viết.');
+    return json({ item: r });
+  }
+  if (pm && (m === 'POST' || m === 'PUT')) {
+    const b = await body(req);
+    const title = str(b.title, 200);
+    if (!title) fail(400, 'Vui lòng nhập tiêu đề bài viết.');
+    const cat = str(b.cat, 60);
+    if (!cat) fail(400, 'Vui lòng nhập chủ đề.');
+    const excerpt = str(b.excerpt, 400);
+    if (!excerpt) fail(400, 'Vui lòng nhập mô tả ngắn.');
+    const content = cleanHtml(b.content);
+    if (content.replace(/<[^>]+>/g, '').trim().length < 50) fail(400, 'Nội dung bài quá ngắn.');
+    const cover = str(b.cover, 300);
+    if (cover && !/^\/(images\/posts|assets\/img)\/[\w./-]+\.(jpe?g|png|webp)$/i.test(cover)) fail(400, 'Ảnh đại diện không hợp lệ.');
+    const pubAt = Number(b.publishedAt) || t;
+    const published = b.published === false ? 0 : 1;
+    if (m === 'POST' && !pm[1]) {
+      const base = slugify(b.slug || title).slice(0, 90).replace(/-+$/, '') || 'bai-viet';
+      let slug = base;
+      for (let i = 2; await env.DB.prepare('SELECT 1 FROM posts WHERE slug = ?').bind(slug).first(); i++) slug = `${base}-${i}`;
+      const r = await env.DB.prepare('INSERT INTO posts (slug, cat, title, excerpt, cover, content, published, views, published_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?) RETURNING id, slug')
+        .bind(slug, cat, title, excerpt, cover, content, published, pubAt, t, t).first();
+      await markDirty(env);
+      return json({ ok: true, id: r.id, slug: r.slug });
+    }
+    if (m === 'PUT' && pm[1]) {
+      // Đường dẫn (slug) không đổi sau khi tạo: Google và các trang khác đã trỏ tới
+      const r = await env.DB.prepare('UPDATE posts SET cat = ?, title = ?, excerpt = ?, cover = ?, content = ?, published = ?, published_at = ?, updated_at = ? WHERE id = ? RETURNING slug')
+        .bind(cat, title, excerpt, cover, content, published, pubAt, t, Number(pm[1])).first();
+      if (!r) fail(404, 'Không tìm thấy bài viết.');
+      await markDirty(env);
+      return json({ ok: true, id: Number(pm[1]), slug: r.slug });
+    }
+  }
+  if (pm && pm[1] && m === 'DELETE') {
+    await env.DB.prepare('DELETE FROM posts WHERE id = ?').bind(Number(pm[1])).run();
+    await markDirty(env);
+    return json({ ok: true });
+  }
+
   /* ---------- Nhập tin tổng hợp từ nguồn công khai (seeding) ---------- */
   // Mỗi tin giữ đúng công ty/lương/liên hệ như tin gốc, ghi nguồn; hạn hiển thị = hạn tin gốc, tối đa 30 ngày kể từ ngày đăng gốc.
   if (p === '/import-jobs' && m === 'POST') {
@@ -385,6 +446,16 @@ async function adminRoute(req, env, url, p) {
   if (p === '/export' && m === 'GET') return json(await buildData(env));
 
   fail(404, 'Không tìm thấy.');
+}
+
+// Nội dung bài do quản trị soạn: bỏ script, iframe, thuộc tính sự kiện (on...) và link javascript:
+function cleanHtml(html) {
+  return String(html ?? '').slice(0, 400000)
+    .replace(/<(script|iframe|object|embed|form)\b[\s\S]*?<\/\1\s*>/gi, '')
+    .replace(/<(script|iframe|object|embed|form|meta|link|base)\b[^>]*>/gi, '')
+    .replace(/\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/(href|src)\s*=\s*(["'])\s*javascript:[^"']*\2/gi, '$1="#"')
+    .trim();
 }
 
 // Nhận mọi dạng link YouTube: watch?v=, youtu.be/, shorts/, embed/, live/ hoặc chỉ mã 11 ký tự

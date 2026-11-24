@@ -22,7 +22,7 @@ export default function ({ query }) {
         <span class="cat">${esc(lead.cat)}</span>
         <h2><a href="${url.post(lead)}">${esc(lead.title)}</a></h2>
         <p>${esc(lead.excerpt)}</p>
-        <span class="meta">${lead.date} · ${lead.read} phút đọc · ${num(lead.views)} lượt đọc</span>
+        <span class="meta">${lead.date} · ${lead.read} phút đọc${lead.views ? ` · ${num(lead.views)} lượt đọc` : ''}</span>
       </div>
     </article>` : ''}
     ${rest.length ? `<div class="bgrid">${rest.map((p) => `<article class="bcard">

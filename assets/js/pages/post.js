@@ -23,7 +23,7 @@ export default async function ({ params: [id] }) {
       ${crumbs([['Trang chủ', '/'], ['Tin tức', '/tin-tuc'], [p.cat, null]])}
       <span class="cat">${esc(p.cat)}</span>
       <h1 class="d-title post-title">${esc(p.title)}</h1>
-      <div class="byline"><span>Ban biên tập Việc Làm Bảo Vệ</span><span>${p.date}</span><span>${p.read} phút đọc</span><span>${num(p.views)} lượt đọc</span></div>
+      <div class="byline"><span>Ban biên tập Việc Làm Bảo Vệ</span><span>${p.date}</span><span>${p.read} phút đọc</span>${p.views ? `<span>${num(p.views)} lượt đọc</span>` : ''}</div>
       <figure class="post-hero"><img src="${p.img}" alt="${esc(p.title)}" width="800" height="500"></figure>
       <link rel="stylesheet" href="/assets/css/article.css">
       <div class="prose post-detail-body">${(await loadBody(p.id)) || generic(p)}</div>
