@@ -89,6 +89,21 @@ async function adminRoute(req, env, url, p) {
   }
 
   /* ---------- Báo cáo vi phạm ---------- */
+  /* ---------- Hồ sơ ứng tuyển vào tin tổng hợp (công ty chưa có tài khoản): quản trị gọi lại / chuyển cho công ty ---------- */
+  if (p === '/applications' && m === 'GET') {
+    const r = await env.DB.prepare(`SELECT a.id, a.name, a.phone, a.year, a.height, a.status, a.created_at, j.id AS job_id, j.title, j.source_url, j.source_name, c.name AS company_name, c.phone AS company_phone
+      FROM applications a JOIN jobs j ON j.id = a.job_id JOIN companies c ON c.id = j.company_id
+      WHERE c.aggregated = 1 ORDER BY a.created_at DESC LIMIT 500`).all();
+    return json({ items: r.results });
+  }
+  const am = p.match(/^\/applications\/(\d+)$/);
+  if (am && m === 'POST') {
+    const b = await body(req);
+    if (!['new', 'called', 'interview', 'hired', 'rejected'].includes(b.status)) fail(400, 'Trạng thái không hợp lệ.');
+    await env.DB.prepare('UPDATE applications SET status = ? WHERE id = ?').bind(b.status, Number(am[1])).run();
+    return json({ ok: true });
+  }
+
   if (p === '/reports' && m === 'GET') {
     const r = await env.DB.prepare(`SELECT r.job_id, j.title, j.status AS job_status, c.name AS company_name, COUNT(*) AS n,
         GROUP_CONCAT(r.reason, ' | ') AS reasons, GROUP_CONCAT(NULLIF(r.note, ''), ' | ') AS notes, MAX(r.created_at) AS last_at
