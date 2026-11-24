@@ -161,7 +161,7 @@
    "id": "bao-ve-vincom",
    "name": "Bảo Vệ Vincom",
    "short": "Bảo Vệ Vincom",
-   "initials": "BVV",
+   "initials": "B",
    "color": "#8b1e2d",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -178,7 +178,7 @@
    "id": "bao-ve-dai-truong-hai",
    "name": "Bảo Vệ Đại Trường Hải",
    "short": "Bảo Vệ Đại Trường Hải",
-   "initials": "BVĐ",
+   "initials": "B",
    "color": "#1f2a6b",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -195,7 +195,7 @@
    "id": "benh-vien-ung-buou-tp-hcm-co-so-2",
    "name": "Bệnh Viện Ung Bướu Tp.hcm - Cơ Sở 2",
    "short": "Bệnh Viện Ung",
-   "initials": "BVU",
+   "initials": "B",
    "color": "#5b3a8a",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -212,7 +212,7 @@
    "id": "c-tuyen",
    "name": "C Tuyền",
    "short": "C Tuyền",
-   "initials": "CT",
+   "initials": "C",
    "color": "#0b6b8a",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -229,7 +229,7 @@
    "id": "chi-nhanh-cong-ty-co-phan-bong-sen-khach-san-p",
    "name": "Chi Nhánh Công Ty Cổ Phần Bông Sen - Khách Sạn Palace Sài Gòn",
    "short": "Chi Nhánh Công",
-   "initials": "B",
+   "initials": "C",
    "color": "#0b6b8a",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -246,7 +246,7 @@
    "id": "le-thanh",
    "name": "Cty TNHH dịch vụ An Ninh Lê Thành",
    "short": "Lê Thành",
-   "initials": "LT",
+   "initials": "L",
    "color": "#7a5a12",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -298,7 +298,7 @@
    "id": "nam-ky",
    "name": "Công Ty Cp Dv Bảo Vệ Nam Kỳ",
    "short": "Nam Kỳ",
-   "initials": "NK",
+   "initials": "N",
    "color": "#0b6b8a",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -315,7 +315,7 @@
    "id": "tm-dv-bao-ve-ngay-dem",
    "name": "Công Ty Cp Tm Dv Bảo Vệ Ngày & Đêm",
    "short": "Tm Dv Bảo",
-   "initials": "TDB",
+   "initials": "T",
    "color": "#5b3a8a",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -332,7 +332,7 @@
    "id": "be-tong-hong-ha",
    "name": "Công Ty Cổ Phần Bê Tông Hồng Hà",
    "short": "Bê Tông Hồng Hà",
-   "initials": "BTH",
+   "initials": "B",
    "color": "#8b1e2d",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -349,7 +349,7 @@
    "id": "an-ninh-canh-ve",
    "name": "Công Ty Cổ Phần Dịch Vụ Bảo Vệ An Ninh Cảnh Vệ",
    "short": "An Ninh Cảnh Vệ",
-   "initials": "ANC",
+   "initials": "A",
    "color": "#1f2a6b",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -420,7 +420,7 @@
    "id": "song-hoa-long-group",
    "name": "Công Ty Cổ Phần Dịch Vụ Bảo Vệ Song Hỏa Long Group",
    "short": "Song Hỏa Long Group",
-   "initials": "SHL",
+   "initials": "S",
    "color": "#8b1e2d",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -437,7 +437,7 @@
    "id": "sai-gon-thang-loi",
    "name": "Công Ty Cổ Phần Dịch Vụ Bảo Vệ Sài Gòn Thắng Lợi",
    "short": "Sài Gòn Thắng Lợi",
-   "initials": "SGT",
+   "initials": "S",
    "color": "#5b3a8a",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -454,7 +454,7 @@
    "id": "kinh-doanh-dich-vu-bao-ve-long-hai",
    "name": "Công Ty Cổ Phần Kinh Doanh Dịch Vụ Bảo Vệ Long Hải",
    "short": "Kinh Doanh Dịch",
-   "initials": "L",
+   "initials": "K",
    "color": "#7a5a12",
    "logo": "/images/companies/kinh-doanh-dich-vu-bao-ve-long-hai-40a77e56.jpg",
    "phone": "",
@@ -526,7 +526,7 @@
    "id": "thuong-mai-va-dich-vu-an-ninh-ht",
    "name": "Công Ty Cổ Phần Thương Mại Và Dịch Vụ An Ninh Ht",
    "short": "Thương Mại Và",
-   "initials": "H",
+   "initials": "T",
    "color": "#7a5a12",
    "logo": "/images/companies/thuong-mai-va-dich-vu-an-ninh-ht-472ce76d.png",
    "phone": "",
@@ -544,7 +544,7 @@
    "id": "truyen-thong-luat-viet-nam",
    "name": "Công Ty Cổ Phần Truyền Thông Luật Việt Nam",
    "short": "Truyền Thông Luật",
-   "initials": "TTL",
+   "initials": "T",
    "color": "#0b6b8a",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -615,7 +615,7 @@
    "id": "phat-trien-dich-vu-bao-ve-long-hai",
    "name": "Công Ty TNHH Phát Triển Dịch Vụ Bảo Vệ Long Hải",
    "short": "Phát Triển Dịch",
-   "initials": "L",
+   "initials": "P",
    "color": "#2d4a8a",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -632,7 +632,7 @@
    "id": "tmdv-cong-ich-van-trung",
    "name": "Công Ty TNHH TMDV Công ích Văn Trung",
    "short": "TMDV Công ích",
-   "initials": "TCÍ",
+   "initials": "T",
    "color": "#8a4b0b",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -649,7 +649,7 @@
    "id": "thuong-mai-dich-vu-hang-hai-nam-viet",
    "name": "Công Ty TNHH Thương Mại Dịch Vụ Hàng Hải Nam Việt",
    "short": "Thương Mại Dịch",
-   "initials": "H",
+   "initials": "T",
    "color": "#5b3a8a",
    "logo": "/images/companies/thuong-mai-dich-vu-hang-hai-nam-viet-4f7d40a2.jpg",
    "phone": "",
@@ -667,7 +667,7 @@
    "id": "dau-tu-va-phat-trien-thien-phuc",
    "name": "Công Ty TNHH Đầu Tư Và Phát Triển Thiên Phúc",
    "short": "Đầu Tư Và",
-   "initials": "T",
+   "initials": "Đ",
    "color": "#8a4b0b",
    "logo": "/images/companies/dau-tu-va-phat-trien-thien-phuc-b299178f.jpg",
    "phone": "",
@@ -685,7 +685,7 @@
    "id": "an-ninh-thanh-an",
    "name": "Công Ty Tnhh Dịch Vụ Bảo Vệ An Ninh Thành An",
    "short": "An Ninh Thành An",
-   "initials": "ANT",
+   "initials": "A",
    "color": "#0b6b8a",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -736,7 +736,7 @@
    "id": "cpdvbv-long-hai",
    "name": "Công ty CPDVBV Long Hải",
    "short": "CPDVBV Long Hải",
-   "initials": "CLH",
+   "initials": "C",
    "color": "#7a5a12",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -753,7 +753,7 @@
    "id": "kinh-doanh-dich-vu-bao-ve-long-hai-2",
    "name": "Công ty Cổ Phần Kinh Doanh Dịch Vụ Bảo Vệ Long Hải",
    "short": "Kinh Doanh Dịch",
-   "initials": "L",
+   "initials": "K",
    "color": "#1f2a6b",
    "logo": "/images/companies/kinh-doanh-dich-vu-bao-ve-long-hai-2-0c6654e1.jpg",
    "phone": "",
@@ -789,7 +789,7 @@
    "id": "trung-kien-24h",
    "name": "Công ty TNHH Dịch vụ Bảo vệ Trung Kiên 24H",
    "short": "Trung Kiên 24H",
-   "initials": "TK2",
+   "initials": "T",
    "color": "#8a4b0b",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -839,7 +839,7 @@
    "id": "sao-vang-fb",
    "name": "Công ty bảo vệ sao vàng FB",
    "short": "sao vàng FB",
-   "initials": "SVF",
+   "initials": "S",
    "color": "#7a5a12",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -856,7 +856,7 @@
    "id": "duong-an",
    "name": "Duong An",
    "short": "Duong An",
-   "initials": "DA",
+   "initials": "D",
    "color": "#7a5a12",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -873,7 +873,7 @@
    "id": "gia-huy-pham",
    "name": "Gia Huy Phạm",
    "short": "Gia Huy Phạm",
-   "initials": "GHP",
+   "initials": "G",
    "color": "#8a4b0b",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -890,7 +890,7 @@
    "id": "hoang-phuc",
    "name": "Hoàng Phúc",
    "short": "Hoàng Phúc",
-   "initials": "HP",
+   "initials": "H",
    "color": "#0f6b4f",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -907,7 +907,7 @@
    "id": "ho-kinh-doanh-innovix",
    "name": "Hộ Kinh Doanh Innovix",
    "short": "Hộ Kinh Doanh Innovix",
-   "initials": "HKD",
+   "initials": "H",
    "color": "#0b6b8a",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -959,7 +959,7 @@
    "id": "ly-minh-huy",
    "name": "Lý Minh Huy",
    "short": "Lý Minh Huy",
-   "initials": "LMH",
+   "initials": "L",
    "color": "#7a5a12",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -976,7 +976,7 @@
    "id": "nguyen-ngoc-quang",
    "name": "Nguyễn Ngọc Quang",
    "short": "Nguyễn Ngọc Quang",
-   "initials": "NNQ",
+   "initials": "N",
    "color": "#8b1e2d",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -1099,7 +1099,7 @@
    "id": "tran-minh-tuan",
    "name": "Trần Minh Tuấn",
    "short": "Trần Minh Tuấn",
-   "initials": "TMT",
+   "initials": "T",
    "color": "#8b1e2d",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -1116,7 +1116,7 @@
    "id": "tran-van-thanh",
    "name": "Trần Văn Thành",
    "short": "Trần Văn Thành",
-   "initials": "TVT",
+   "initials": "T",
    "color": "#8a4b0b",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -1167,7 +1167,7 @@
    "id": "chi-hang",
    "name": "chị Hằng",
    "short": "chị Hằng",
-   "initials": "CH",
+   "initials": "C",
    "color": "#8a4b0b",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -1184,7 +1184,7 @@
    "id": "do-hoang-hen",
    "name": "Đỗ Hoàng Hên",
    "short": "Đỗ Hoàng Hên",
-   "initials": "ĐHH",
+   "initials": "Đ",
    "color": "#0b6b8a",
    "phone": "",
    "about": "Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.",
@@ -1199,99 +1199,6 @@
   }
  ],
  "jobs": [
-  {
-   "id": 68,
-   "title": "Tuyển Bảo Vệ Ca Đêm Tại Quán Nhậu Thủ Đức",
-   "company": "duong-an",
-   "province": "tp-hcm",
-   "district": "Thủ Đức",
-   "address": "TP. Thủ Đức - Quận Thủ Đức, TP.HCM",
-   "target": "toa-nha",
-   "shift": "dem",
-   "qty": 1,
-   "salaryMin": 7,
-   "salaryMax": 7.5,
-   "housing": false,
-   "meals": true,
-   "urgent": false,
-   "tier": "normal",
-   "age": "",
-   "height": "",
-   "desc": "Vị trí: Nhân viên trông giữ xe\nĐịa điểm: QUÁN NHẬU XÌN KÝ\nMô tả công việc:\n- Ca 12/24h (16:00 - 04:00). Thực tế có thể đóng cửa sớm khoảng 01:00 để nghỉ ngơi.\n- Đảm bảo an ninh khu vực làm việc.\n- Trông giữ, xếp xe gọn gàng, an toàn.\n- Hỗ trợ khách lấy xe khi cần, giữ thái độ niềm nở, chuyên nghiệp.\nQuyền lợi:\n- Đồng phục miễn phí sau 5 tháng làm việc.\n- Lễ hưởng lương x2; Tết x3 cho 4 ngày (01 ngày cuối năm và 03 ngày đầu năm).\n- Hỗ trợ ứng lương trong tháng đầu và có thể ứng lương vào cuối tháng.\n- Thanh toán lương vào ngày 15 lịch Tây của tháng tiếp theo.\nYêu cầu:\n- Trung thực, có trách nhiệm, kỷ luật trong công việc.\n- Mong muốn làm việc ổn định, lâu dài.\n- Tác phong chỉn chu, giao tiếp rõ ràng khi hỗ trợ khách.\nNếu bạn muốn làm việc trong môi trường thân thiện, ổn định và có chế độ đãi ngộ rõ ràng, hãy gửi hồ sơ qua LinkedIn hoặc nhắn tin trực tiếp để biết thêm chi tiết. Chúng tôi chào đón những ứng viên nhiệt huyết gia nhập đội ngũ.",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-thu-duc-ho-chi-minh/tuyen-bao-ve-ca-dem-tai-quan-nhau-thu-duc-id71380043"
-   },
-   "postedAt": 1795478400000,
-   "expiresAt": 1796711158410,
-   "updatedAt": 1795501558410
-  },
-  {
-   "id": 67,
-   "title": "tuyển dụng bảo vệ bệnh viện Nhân dân 115",
-   "company": "tran-minh-tuan",
-   "province": "tp-hcm",
-   "district": "Quận 10",
-   "address": "Quận 10, TP.HCM",
-   "target": "truong-hoc",
-   "shift": "",
-   "qty": 1,
-   "salaryMin": 7,
-   "salaryMax": 7,
-   "housing": false,
-   "meals": true,
-   "urgent": false,
-   "tier": "normal",
-   "age": "",
-   "height": "",
-   "desc": "Bảo vệ Đại An tuyển 3 nhân sự trực tại Bệnh viện Nhân dân 115\nChúng tôi đang tìm đồng đội tận tâm, trách nhiệm để đảm bảo an toàn và tạo môi trường yên tâm cho bệnh nhân, nhân viên và khách thăm. Công việc ổn định, không áp lực, phù hợp với những ai muốn làm việc nghiêm túc trong môi trường chuyên nghiệp và nhân văn.\nQuyền lợi:\n- Làm việc trực tiếp tại Bệnh viện Nhân dân 115.\n- Công việc không căng thẳng, lịch ca rõ ràng.\n- Có cơm từ thiện phục vụ hàng ngày.\n- Môi trường tôn trọng, đồng nghiệp hỗ trợ.\nYêu cầu cơ bản:\n- Trung thực, đúng giờ, có tinh thần trách nhiệm.\n- Sẵn sàng tuân thủ nội quy, hướng dẫn công việc.\n- Ưu tiên ứng viên có kinh nghiệm bảo vệ (không bắt buộc).\nNếu bạn quan tâm hoặc muốn biết thêm chi tiết, vui lòng nhắn tin để được hướng dẫn thủ tục ứng tuyển. Chúng tôi chào đón những ứng viên mong muốn cống hiến cho cộng đồng và phát triển bền vững cùng đội ngũ.",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-10-ho-chi-minh/tuyen-dung-bao-ve-benh-vien-nhan-dan-115-id71363444"
-   },
-   "postedAt": 1795478400000,
-   "expiresAt": 1796711158410,
-   "updatedAt": 1795501558410
-  },
-  {
-   "id": 66,
-   "title": "Tuyển Bảo Vệ Nghiệp Vụ Cơ Động",
-   "company": "duong-an",
-   "province": "tp-hcm",
-   "district": "Tân Bình",
-   "address": "Quận Tân Bình, TP.HCM",
-   "target": "toa-nha",
-   "shift": "12h",
-   "qty": 1,
-   "salaryMin": 10,
-   "salaryMax": 15,
-   "housing": false,
-   "meals": false,
-   "urgent": false,
-   "tier": "normal",
-   "age": "tuổi 30-55",
-   "height": "",
-   "desc": "VỊ TRÍ: Nhân viên Bảo vệ Cơ động\nMức lương: Lương cứng 9.500.000 đồng/tháng (ca 12 tiếng). Sau 12 tiếng được tính tăng ca riêng.\nYêu cầu:\n- Nam, tuổi 30-55.\n- Sức khỏe tốt, tác phong nghiêm túc, trung thực và có trách nhiệm.\n- Có khả năng di chuyển, hỗ trợ nhiều mục tiêu theo phân công.\n- Có nghiệp vụ bảo vệ cơ bản; có thể lắp chốt khi phát sinh.\n- Có phương tiện cá nhân (xe máy).\nQuyền lợi:\n- Thưởng lễ, Tết, sinh nhật, hiếu hỉ.\n- Phụ cấp xăng xe.\n- Đồng phục miễn phí.\n- Chế độ Lễ x2, Tết x3 trong 4 ngày (01 ngày cuối năm và 03 ngày đầu năm).\n- Ứng lương cuối tháng khi cần.\n- Thanh toán lương vào ngày 15 (dương lịch) của tháng tiếp theo.\n- Quà và thưởng Tết cuối năm.\nĐịa điểm làm việc: TP. Hồ Chí Minh\nỨng tuyển: gửi hồ sơ/ CV qua hệ thống tuyển dụng hoặc nộp trực tiếp tại văn phòng tuyển dụng. Liên hệ để biết chi tiết và lịch phỏng vấn. Chúng tôi ưu tiên ứng viên có kinh nghiệm và tác phong chuyên nghiệp.",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-tan-binh-ho-chi-minh/tuyen-bao-ve-nghiep-vu-co-dong-id71390191"
-   },
-   "postedAt": 1795478400000,
-   "expiresAt": 1796711158410,
-   "updatedAt": 1795501558410
-  },
   {
    "id": 65,
    "title": "Bảo Vệ Văn Phòng Công Ty 7h-19h; Bao Nhàn Mát Mẻ",
@@ -1316,39 +1223,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-thu-duc-ho-chi-minh/bao-ve-van-phong-cong-ty-7h-19h-bao-nhan-mat-me-id71303137"
-   },
-   "postedAt": 1795478400000,
-   "expiresAt": 1796711158410,
-   "updatedAt": 1795501558410
-  },
-  {
-   "id": 64,
-   "title": "Tuyển Bảo Vệ Nội Bộ Tại Tp.hcm",
-   "company": "tran-van-thanh",
-   "province": "tp-hcm",
-   "district": "Thủ Đức",
-   "address": "TP. Thủ Đức - Quận Thủ Đức, TP.HCM",
-   "target": "toa-nha",
-   "shift": "12h",
-   "qty": 1,
-   "salaryMin": 8.5,
-   "salaryMax": 11,
-   "housing": false,
-   "meals": true,
-   "urgent": false,
-   "tier": "normal",
-   "age": "Tuổi: từ 19 - 55",
-   "height": "",
-   "desc": "CƠ HỘI NGHỀ NGHIỆP: Nhân viên Bảo vệ Nội bộ (Tuyển gấp)\nCông ty TNHH Weland tuyển nhân viên bảo vệ nội bộ - gia nhập đội ngũ chuyên nghiệp, ổn định và có chế độ phúc lợi rõ ràng.\nĐịa điểm làm việc:\n- 141D Phan Đăng Lưu, P. Cầu Kiễu, TP.HCM\n- 28 Mai Chí Thọ, P. Bình Trưng, TP.HCM\nMô tả ca làm việc:\n- Ca 12 tiếng: Ca 1: 06:00 - 18:00; Ca 2: 18:00 - 06:00\n- Làm full tháng (theo lịch phân ca)\nQuyền lợi:\n- Thu nhập cơ bản: 7.500.000 VNĐ/tháng\n- Phụ cấp cơm: 30.000 VNĐ/ngày làm việc\n- Thưởng làm thêm giờ - tổng thu nhập thực tế ~ 9 - 11 triệu/tháng\n- Đóng BHXH đầy đủ; thưởng Lương tháng 13; thưởng Lễ/Tết theo hiệu quả kinh doanh\nYêu cầu:\n- Giới tính: Nam\n- Tuổi: từ 19 - 55\n- Tác phong chuyên nghiệp, trung thực, chịu được ca đêm và công việc trực tiếp\nCách ứng tuyển:\n- Chụp ảnh tin nhắn và gửi qua Zalo để nhận lịch phỏng vấn và có thể nhận việc ngay (không cần gọi điện).\nChúng tôi tìm kiếm ứng viên yêu thích công việc ổn định, có trách nhiệm và mong muốn phát triển lâu dài. Nếu bạn phù hợp, đừng bỏ lỡ cơ hội này!",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-thu-duc-ho-chi-minh/tuyen-bao-ve-noi-bo-tai-tp-hcm-id71377777"
+    "name": "muaban.net"
    },
    "postedAt": 1795478400000,
    "expiresAt": 1796711158410,
@@ -1378,197 +1253,10 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-tan-phu-ho-chi-minh/can-tuyen-bao-ve-van-phong-toa-nha-quan-tan-phu-id71253057"
+    "name": "muaban.net"
    },
    "postedAt": 1795478400000,
    "expiresAt": 1796711158410,
-   "updatedAt": 1795501558410
-  },
-  {
-   "id": 62,
-   "title": "Tại Tân Phú Cần Chú Bảo Vệ Văn Phòng, Toà Nhà",
-   "company": "hoang-phuc",
-   "province": "tp-hcm",
-   "district": "Tân Phú",
-   "address": "Phường Tân Quý, Quận Tân Phú, TP.HCM",
-   "target": "toa-nha",
-   "shift": "",
-   "qty": 1,
-   "salaryMin": 8,
-   "salaryMax": 8,
-   "housing": false,
-   "meals": false,
-   "urgent": false,
-   "tier": "normal",
-   "age": "",
-   "height": "",
-   "desc": "TUYỂN BẢO VỆ VĂN PHÒNG - TÒA NHÀ ĐƯỜNG LŨY BÁN BÍCH, QUẬN TÂN PHÚ, TPHCM, LƯƠNG 8 TRIỆU.\nThời gian: từ sáng 7h đến 17h, hết ca về , không có làm đêm\nThu nhập: 8 triệu/tháng + phụ cấp\nMôi trường làm việc ổn định, sạch sẽ, lịch sự.\nCông việc: Trực sảnh/cổng, kiểm soát người & phương tiện ra vào, hướng dẫn khách, giữ gìn an ninh - trật tự, hỗ trợ sắp xếp xe và bàn giao ca.\nQuyền lợi:\nĐược hưởng BHYT, BHXH đầy đủ theo quy định\nĐược hướng dẫn khi nhận việc\nCó phụ cấp, thưởng theo chính sách\nYêu cầu: Nam, sức khỏe tốt, trung thực, trách nhiệm, tác phong lịch sự. Không yêu cầu kinh nghiệm.\nCÓ NHU CẦU LIÊN HỆ TRỰC TIẾP 098759**** Hiện số Đã sao chép\nGẶP ANH PHÚC",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-tan-phu-ho-chi-minh/tuyen-dung-bao-ve-van-phong-toa-duong-id71286305"
-   },
-   "postedAt": 1795478400000,
-   "expiresAt": 1796711158410,
-   "updatedAt": 1795501558410
-  },
-  {
-   "id": 61,
-   "title": "[Ứng Lương] Nhân Viên Bảo Vệ Bãi Xe Quận 7",
-   "company": "gia-huy-pham",
-   "province": "tp-hcm",
-   "district": "Quận 7",
-   "address": "Quận 7, TP.HCM",
-   "target": "toa-nha",
-   "shift": "",
-   "qty": 1,
-   "salaryMin": 7.5,
-   "salaryMax": 13,
-   "housing": false,
-   "meals": false,
-   "urgent": false,
-   "tier": "normal",
-   "age": "Tuổi: 25 - 50",
-   "height": "",
-   "desc": "TUYỂN DỤNG: PHÓ QUẢN LÝ BÃI XE (TOÀN THỜI GIAN)\nBạn năng động, có kinh nghiệm quản lý ca và muốn phát triển trong môi trường chuyên nghiệp, thân thiện? Chúng mình đang tìm bạn đồng hành!\nMô tả công việc:\n- Quản lý & điều phối nhân sự tại bãi xe\n- Kiểm soát hoạt động tại các chung cư, trung tâm thương mại\n- Báo cáo công việc bằng máy tính & email\nYêu cầu:\n- Tuổi: 25 - 50 tuổi\n- Ưu tiên ứng viên từng làm ca trưởng\n- Sử dụng máy tính và email thành thạo\nQuyền lợi:\n- Lương: 13 triệu/tháng\n- Thử việc hưởng 85% lương (nếu có kinh nghiệm thực tế sẽ được cân nhắc hưởng đủ lương ngay từ đầu)\n- Môi trường làm việc chuyên nghiệp, hỗ trợ & có cơ hội thăng tiến\nThông tin công ty:\n- SPM - Dịch vụ quản lý bãi xe\n- Văn phòng: Số 1 đường 61TML, Cát Lái, TP.HCM\n- Địa điểm làm việc: Quận 7\nỨng tuyển ngay: gửi CV qua email công ty hoặc nộp trực tiếp tại văn phòng. Rất mong sớm gặp bạn trong đội ngũ của chúng mình!",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-7-ho-chi-minh/ung-luong-nhan-vien-bao-ve-bai-xe-quan-7-id71391136"
-   },
-   "postedAt": 1795478400000,
-   "expiresAt": 1796711158410,
-   "updatedAt": 1795501558410
-  },
-  {
-   "id": 60,
-   "title": "Tuyển Nam Nhân Viên Bảo Vệ Văn Phòng ( Bình Thạnh )",
-   "company": "ly-minh-huy",
-   "province": "tp-hcm",
-   "district": "Bình Thạnh",
-   "address": "Quận Bình Thạnh, TP.HCM",
-   "target": "toa-nha",
-   "shift": "",
-   "qty": 1,
-   "salaryMin": 8.5,
-   "salaryMax": 8.5,
-   "housing": false,
-   "meals": true,
-   "urgent": false,
-   "tier": "normal",
-   "age": "",
-   "height": "cao 1m65",
-   "desc": "BÌNH THẠNH - TUYỂN NAM NHÂN VIÊN BẢO VỆ VĂN PHÒNG\nCông ty Bảo vệ Thiên Ưng cần tuyển nhân viên làm việc tại văn phòng, môi trường máy lạnh, lịch sự, an toàn - phù hợp gắn bó lâu dài.\nĐịa điểm: 248A Nơ Trang Long, P.12, Q. Bình Thạnh, TP.HCM.\nThu nhập: 8.500.000đ/tháng.\nThời gian: 06h30 - 18h30 (Thứ 2 - Thứ 6, Nghỉ 1 ngày Thứ 7 hoặc Chủ nhật).\nQuyền lợi: Tham gia đầy đủ BHXH, BHYT, BHTN theo quy định; có cơ hội được cân nhắc lên vị trí Đội trưởng khi làm việc tốt.\nCông việc: Đảm bảo an ninh văn phòng, quan sát người ra vào, hỗ trợ sắp xếp xe và đón tiếp khách.\nYêu cầu: Nam 18-45 tuổi, chiều cao 1m65 trở lên , sức khỏe tốt, tác phong gọn gàng, trung thực và có trách nhiệm. Chưa có kinh nghiệm sẽ được hướng dẫn.\nLiên hệ tuyển dụng - gọi/Zalo:\n086838****\nHiện số\n-\n096216****\nHiện số\n-\n038387****\nHiện số\nCông ty tuyển trực tiếp, trao đổi rõ ràng về công việc và lịch nhận việc.",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-binh-thanh-ho-chi-minh/tuyen-nam-nhan-vien-bao-ve-van-phong-bi-nh-tha-nh-id71381544"
-   },
-   "postedAt": 1795478400000,
-   "expiresAt": 1796711158410,
-   "updatedAt": 1795501558410
-  },
-  {
-   "id": 59,
-   "title": "CTy BẢO VỆ KIM BẢO AN TUYỂN bảo vệ, nam, nữ làm việc tất cả các Quận",
-   "company": "chi-hang",
-   "province": "tp-hcm",
-   "district": "Thủ Đức",
-   "address": "Phường Linh Xuân, TP. Thủ Đức - Quận Thủ Đức, TP.HCM",
-   "target": "toa-nha",
-   "shift": "",
-   "qty": 1,
-   "salaryMin": 7,
-   "salaryMax": 16,
-   "housing": false,
-   "meals": true,
-   "urgent": false,
-   "tier": "normal",
-   "age": "",
-   "height": "",
-   "desc": "CÔNG TY CPDV BẢO VỆ KIM BẢO AN TUYỂN DỤNG\nCông ty cổ phần dịch vụ bảo vệ Kim Bảo An : cần tuyển 02 nhân viên nam giúp công ty quản lý, hoặc hợp tác cùng công công ty cùng điều hành để phát triển: yều cầu chung là sức khỏe tốt có sự đam mê và thích nghành bảo vệ, có kinh nghiệm , lương cao, các chế độ theo quy định của bộ luật lao động. tuổi từ 30 tuổi đến 50 tuổi.\n05 nhân viên cơ động lương thỏa thuận cao có đầy đủ chế độ theo quy định. Công ty tuyển liên tục 100 nhân viên bảo vệ, nam, nữ làm việc tất cả các phường xã trong TP HCM, sau sát nhập công ty có nhà đội cho nhân viên ở xa nhà, làm tùy công ty có nơi có cơm trưa hoặc chiều lương từ 07 triệu, 8.0 triệu đến 16 triệu /tháng, tùy từng mục tiêu trực của mỗi công ty, công ty tuyển nhân viên, sinh viên làm thời vụ hoặc theo ca ngày hoặc ca tối (làm thời vụ được nhận tiền ngay trong sau khi xin nghỉ) nhân viên vào công ty làm việc sẽ được cấp 02 bộ đồng phục miễn phí. Và không phải đóng bất cứ một khoản tiền nào khác. có thưởng tiền cho người giới thiệu nhân viên mới vào công ty làm sẽ được nhận từ 500k - 600k/ 01 NVBV\n( lưu ý: công ty của chúng tôi không phạt 15 ngày lương khi nhân viên xin nghỉ việc suốt hơn 22 năm qua, khi nhân viên nghỉ làm là được nhận đầy đủ tiền lương như đã cam kết). Liên hệ nộp hồ sơ lần đầu tại trụ sở số : 45/21 Hoàng Diệu 2. Phường Linh Xuân, TP HCM. Có thể gửi hồ sơ qua Email: . Điện thoại: 090601**** Hiện số Đã sao chép\ngặp chị Hằng - 090968**** Hiện số Đã sao chép\ngặp anh Thịnh. Để được tư vấn trực tiếp.",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-thu-duc-ho-chi-minh/cty-bao-ve-kim-bao-an-tuyen-bao-ve-nam-nu-lam-viec-tat-ca-cac-quan-id71389073"
-   },
-   "postedAt": 1795478400000,
-   "expiresAt": 1796711158410,
-   "updatedAt": 1795501558410
-  },
-  {
-   "id": 58,
-   "title": "KS Xena số 9 Nguyễn Chí Thanh, Q5 cũ cần tuyển 3 Nam Bảo vệ làm ca đêm",
-   "company": "c-tuyen",
-   "province": "tp-hcm",
-   "district": "Quận 5",
-   "address": "Phường 9, Quận 5, TP.HCM",
-   "target": "toa-nha",
-   "shift": "dem",
-   "qty": 3,
-   "salaryMin": 7,
-   "salaryMax": 7,
-   "housing": false,
-   "meals": false,
-   "urgent": false,
-   "tier": "normal",
-   "age": "tuổi từ 45- 55",
-   "height": "",
-   "desc": "Khách sạn Xena số 9 Nguyễn Chí Thanh, P9, Quận 5 cũ cần tuyển 3 Nam Bảo vệ tuổi từ 45- 55t làm ca đêm\n- Thời gian làm việc: Ca đêm từ : 19h - > 7h sáng.\n- Lương 7 triệu/tháng.\nLiên hệ: C Tuyền 090983**** Hiện số Đã sao chép",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-5-ho-chi-minh/ks-xena-so-9-nguyen-chi-thanh-q5-cu-can-tuyen-3-nam-bao-ve-lam-ca-dem-id71382114"
-   },
-   "postedAt": 1795478400000,
-   "expiresAt": 1796711158410,
-   "updatedAt": 1795501558410
-  },
-  {
-   "id": 57,
-   "title": "Cty Minh Phụng Cần Bổ Sung Bảo Vệ Cửa Hàng 8triệu",
-   "company": "do-hoang-hen",
-   "province": "tp-hcm",
-   "district": "Tân Phú",
-   "address": "Phường Tân Quý, Quận Tân Phú, TP.HCM",
-   "target": "toa-nha",
-   "shift": "",
-   "qty": 1,
-   "salaryMin": 8,
-   "salaryMax": 10,
-   "housing": false,
-   "meals": true,
-   "urgent": false,
-   "tier": "normal",
-   "age": "",
-   "height": "",
-   "desc": "Công ty Minh Phụng tuyển dụng nhân viên bảo vệ cửa hàng\nĐịa điểm làm việc :79D ( gần chợ Sơn Kỳ ), P. Tân Sơn Nhì, Q. Tân Phú\nMức lương: 8.000.000-10.000.000/tháng.\nMÔ TẢ CÔNG VIỆC\n+ Trông coi, đảm bảo an ninh cửa hàng.\n+ Hỗ trợ sắp xếp xe cho khách hàng.\n+ Quan sát, giữ gìn tài sản và khu vực làm việc.\n+ Thực hiện các công việc theo sự phân công.\nYÊU CẦU\n+ Nam/Nữ, sức khỏe tốt, trung thực và có trách nhiệm.\n+ Siêng năng, thái độ làm việc nghiêm túc.\n+ Ưu tiên ứng viên có kinh nghiệm, chưa có kinh nghiệm sẽ được hướng dẫn.\nQUYỀN LỢI\n+ Môi trường làm việc ổn định.\n+ Tham gia đầy đủ BHXH,....\n+ Thưởng theo chế độ nhà nước\nLIÊN HỆ ỨNG TUYỂN: 091985**** Hiện số Đã sao chép\nỨng viên quan tâm vui lòng liên hệ để được tư vấn và sắp xếp phỏng vấn!",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-tan-phu-ho-chi-minh/cty-minh-phung-can-bo-sung-bao-ve-8trieu-id71300608"
-   },
-   "postedAt": 1795478400000,
-   "expiresAt": 1796169599999,
    "updatedAt": 1795501558410
   },
   {
@@ -1595,42 +1283,10 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-thu-duc-ho-chi-minh/tuyen-dung-bao-ve-quan-nhau-ca-24-luong-12tr-th-id71375371"
+    "name": "muaban.net"
    },
    "postedAt": 1795478400000,
    "expiresAt": 1796711158410,
-   "updatedAt": 1795501558410
-  },
-  {
-   "id": 55,
-   "title": "Tuyển gấp bảo vệ kho ở quận tân phú",
-   "company": "nguyen-ngoc-quang",
-   "province": "tp-hcm",
-   "district": "Tân Phú",
-   "address": "Phường Tây Thạnh, Quận Tân Phú, TP.HCM",
-   "target": "kcn",
-   "shift": "",
-   "qty": 1,
-   "salaryMin": 7,
-   "salaryMax": 9,
-   "housing": false,
-   "meals": false,
-   "urgent": false,
-   "tier": "normal",
-   "age": "Độ tuổi : (25 - 60",
-   "height": "",
-   "desc": "Mức lương: 7.000.000 - 9.000.000 VNĐ/tháng\nCa làm việc: Xoay ca hoặc cố định (7h - 17h)\nMô tả công việc:\n- Giám sát xe, hàng hóa xuất - nhập kho\n- Tuần tra an ninh, PCCC, theo dõi camera và ghi sổ nhật ký ca trực.\nYêu cầu:\n- Độ tuổi : (25 - 60 tuổi), sức khỏe tốt, trung thực.\n- Ưu tiên có kinh nghiệm.\nQuyền lợi:\n- Chế độ BHXH, BHYT, thưởng Lễ/Tết và tháng 13 đầy đủ.\nLiên hệ: Zalo/SĐT: 037505**** Hiện số Đã sao chép\n(Anh Quang)",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-tan-phu-ho-chi-minh/tuyen-gap-bao-ve-kho-o-quan-tan-phu-id71221692"
-   },
-   "postedAt": 1795478400000,
-   "expiresAt": 1796083199999,
    "updatedAt": 1795501558410
   },
   {
@@ -1657,8 +1313,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/cong-ty-bao-ve-sao-vang-fb-v91BABjOrW"
+    "name": "123job.vn"
    },
    "postedAt": 1795478400000,
    "expiresAt": 1796711158410,
@@ -1688,8 +1343,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/long-hai-securitas-tuyen-20-bao-ve-quan-1-cu-ND4ZLZo3rv"
+    "name": "123job.vn"
    },
    "postedAt": 1795478400000,
    "expiresAt": 1796711158410,
@@ -1719,8 +1373,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/lam-ngay-bao-ve-ngan-hang-vietcombank-long-thanh-v91BABpXrW"
+    "name": "123job.vn"
    },
    "postedAt": 1795478400000,
    "expiresAt": 1796704593367,
@@ -1750,8 +1403,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tuyen-3-nv-bao-ve-o-nhon-trach-dong-nai-JD60A015rn"
+    "name": "123job.vn"
    },
    "postedAt": 1795478400000,
    "expiresAt": 1796704593367,
@@ -1781,8 +1433,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tuyen-bao-ve-an-o-lai-kdc-celadoncity-aeon-tan-phu-v91BdG3grW"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796711158410,
@@ -1812,8 +1463,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/bao-ve-chung-cu-q1-q2-q7-q10-bao-an-oco-ca-24-o9jyvz6RDR"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796711158410,
@@ -1843,8 +1493,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tphcm-bao-ve-noi-bo-vinhomes-ca-8-tieng-lroWzaQer4"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796711158410,
@@ -1874,8 +1523,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tuyen-dung-bao-ve-luong-tuan-nhan-viec-ngay-PDbozjGx9R"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796711158410,
@@ -1905,8 +1553,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tuyen-bao-ve-chung-cu-q2-luong-tuan-o-mien-phi-v90o6GRXDk"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796711158410,
@@ -1936,8 +1583,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tuyen-dung-bao-ve-giu-xe-thu-ngan-quet-the-xe-5DOVoEBVqV"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796711158410,
@@ -1967,8 +1613,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tuyen-dung-nhan-vien-bao-ve-LqkEzQek93"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796711158410,
@@ -1998,8 +1643,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tuyen-bao-ve-khu-vuc-quan-11-co-cho-o-lai-y9BwYPWMrA"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796711158410,
@@ -2029,8 +1673,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tuyen-dung-bao-ve-muc-tieu-luc-luong-co-dong-o9jyvz4RDR"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796711158410,
@@ -2060,8 +1703,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tuyen-nhan-vien-bao-ve-di-lam-ngay-LqkEzQ3O93"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796711158410,
@@ -2091,8 +1733,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tuyen-bao-ve-tphcm-39Jmnj07Dm"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796711158410,
@@ -2122,8 +1763,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/long-hai-securitas-tuyen-20-bao-ve-phu-nhuan-o9jyvzQwDR"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796711158410,
@@ -2153,8 +1793,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/nhan-vien-bao-ve-cong-trinh-4q3LpNOPD2"
+    "name": "123job.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796083199999,
@@ -2184,8 +1823,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-toa-nha-viettel-commerce-c2p210000160id201001368.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796704593367,
@@ -2215,8 +1853,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-thi-xa-tan-uyen-binh-duong/30-11-tuyen-5-bao-ve-nha-may-khanh-binh-tan-uyen-id71389310"
+    "name": "muaban.net"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796687999999,
@@ -2246,8 +1883,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/quan-3-nhan-vien-bao-ve-c2p210000187id201001262.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1795392000000,
    "expiresAt": 1796083199999,
@@ -2277,8 +1913,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/nhan-vien-bao-ve-tuyen-gap-yreJzBdGqz"
+    "name": "123job.vn"
    },
    "postedAt": 1795132800000,
    "expiresAt": 1796704593367,
@@ -2308,8 +1943,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-tai-viettelstore-xa-hoc-mon-tp-hcm-c2p210000187id201000163.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1795132800000,
    "expiresAt": 1796704593367,
@@ -2339,8 +1973,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-c2p210000187id200999070.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1795046400000,
    "expiresAt": 1796704593367,
@@ -2370,8 +2003,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tuyen-dung-security-bao-ve-W9pX1v1M9p"
+    "name": "123job.vn"
    },
    "postedAt": 1794960000000,
    "expiresAt": 1796687999999,
@@ -2401,8 +2033,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-toa-nha-c2p210000187id200998449.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794960000000,
    "expiresAt": 1796704593367,
@@ -2432,8 +2063,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-hai-chau-da-nang/tuyen-bao-ve-lam-viec-tai-da-nang-id71373576"
+    "name": "muaban.net"
    },
    "postedAt": 1794873600000,
    "expiresAt": 1796169599999,
@@ -2459,12 +2089,11 @@
    "height": "Từ 1m65",
    "desc": "Đảm bảo an ninh trật tự tại khu vực được phân công, hỗ trợ cư dân và công trường đang xây dựng. Thu nhập trung bình 14-25 triệu/tháng gồm lương cứng, phụ cấp và hỗ trợ; làm 8 tiếng/ngày, nghỉ 1 ngày/tuần. Có phụ cấp ăn 960 nghìn/tháng, hỗ trợ công trường 3 triệu, phụ cấp nhà ở/đi lại đến 3 triệu, đồng phục miễn phí. Không cần kinh nghiệm, yêu cầu không cận thị, không hình xăm lộ.",
    "phone": "",
-   "views": 0,
+   "views": 1,
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-tai-gia-binh-bac-ninh-c2p210000170id200996246.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794873600000,
    "expiresAt": 1796704593367,
@@ -2494,8 +2123,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-toa-nha-219-trung-kinh-c2p210000160id200996176.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794873600000,
    "expiresAt": 1796704593367,
@@ -2525,8 +2153,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-vinhomes-times-city-minh-khai-c2p210000160id200996267.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794873600000,
    "expiresAt": 1796704593367,
@@ -2556,8 +2183,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-tai-vinhomes-riverside-long-bien-c2p210000160id200996204.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794873600000,
    "expiresAt": 1796704593367,
@@ -2587,8 +2213,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-thu-nhap-toi-16-trieu-c2p210000160id200996867.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794873600000,
    "expiresAt": 1796704593367,
@@ -2618,8 +2243,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-c2p210000187id200996918.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794873600000,
    "expiresAt": 1796704593367,
@@ -2649,42 +2273,10 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/khach-san-nha-hang-du-lich/khach-san-palace-sai-gon-nhan-vien-bao-ve-c5p210000187id200995432.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794787200000,
    "expiresAt": 1796704593367,
-   "updatedAt": 1795494993367
-  },
-  {
-   "id": 33,
-   "title": "Tuyển 2 bảo vệ nhà hàng - khách sạn Ngũ Hành Sơn, ca 7h-19h, bao ăn",
-   "company": "long-viet",
-   "province": "da-nang",
-   "district": "Ngũ Hành Sơn",
-   "address": "Nhà hàng & Khách sạn, Ngũ Hành Sơn, Đà Nẵng",
-   "target": "toa-nha",
-   "shift": "12h",
-   "qty": 2,
-   "salaryMin": 7,
-   "salaryMax": 7.5,
-   "housing": false,
-   "meals": true,
-   "urgent": false,
-   "tier": "normal",
-   "age": "Nam 25-50 tuổi",
-   "height": "",
-   "desc": "Hỗ trợ, hướng dẫn khách lưu trú và sử dụng dịch vụ, giữ an toàn trật tự khu vực được giao. Làm từ 7h đến 19h, có bao ăn trong ca trực. Người mới được ứng lương theo ngày trước kỳ lương và được đào tạo cơ bản.",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-quan-ngu-hanh-son-da-nang/tuyen-nhan-vien-bao-ve-id71368082"
-   },
-   "postedAt": 1794700800000,
-   "expiresAt": 1795996799999,
    "updatedAt": 1795494993367
   },
   {
@@ -2711,8 +2303,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-thanh-pho-thu-dau-mot-binh-duong/tuyen-bao-ve-ca-ngay-tai-lo-lu-thu-dau-mot-bd-id71363742"
+    "name": "muaban.net"
    },
    "postedAt": 1794614400000,
    "expiresAt": 1795910399999,
@@ -2742,8 +2333,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/giam-sat-an-ninh-lam-viec-ha-noi-c2p210000160id200994207.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794528000000,
    "expiresAt": 1796704593367,
@@ -2773,8 +2363,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-thanh-pho-di-an-binh-duong/cong-ty-bao-ve-becatech-mien-dong-tuyen-nvbv-id71361225"
+    "name": "muaban.net"
    },
    "postedAt": 1794528000000,
    "expiresAt": 1795823999999,
@@ -2804,8 +2393,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "muaban.net",
-    "url": "https://muaban.net/viec-lam/an-ninh-bao-ve-tp-thuan-an-binh-duong/tuyen-nam-bao-ve-tai-thuan-giao-thuan-an-id71357595"
+    "name": "muaban.net"
    },
    "postedAt": 1794441600000,
    "expiresAt": 1795737599999,
@@ -2835,8 +2423,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/ben-cat-nhan-vien-bao-ve-kiem-bao-tri-toa-nha-c2p210000187id200992982.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794441600000,
    "expiresAt": 1796704593367,
@@ -2866,8 +2453,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/bao-ve-noi-bo-ben-cat-binh-duong-di-ca-co-dinh-c2p210000187id200992989.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794441600000,
    "expiresAt": 1796704593367,
@@ -2897,8 +2483,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-ngan-hang-hdbank-vikki-bank-khong-can-kinh-nghiem-nhan-viec-ngay-c2p210000187id200991034.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794355200000,
    "expiresAt": 1796083199999,
@@ -2928,42 +2513,10 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-quan-3-c2p210000187id200988051.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1794182400000,
    "expiresAt": 1796083199999,
-   "updatedAt": 1795494993367
-  },
-  {
-   "id": 34,
-   "title": "Nhân viên bảo vệ nhà máy Anh Quân Bakery tại Hòa Vang",
-   "company": "anh-quan-bakery",
-   "province": "da-nang",
-   "district": "Hòa Vang",
-   "address": "Trường Sơn, Hòa Nhơn, Hòa Vang, Đà Nẵng",
-   "target": "kcn",
-   "shift": "",
-   "qty": 1,
-   "salaryMin": 6.5,
-   "salaryMax": 6.5,
-   "housing": false,
-   "meals": false,
-   "urgent": false,
-   "tier": "normal",
-   "age": "Nam",
-   "height": "",
-   "desc": "Kiểm soát xe giao hàng ra vào cổng nhà máy, tuần tra khu sản xuất và kho, hướng dẫn khách và nhà cung cấp, báo cáo sự cố. Phải làm được cả ca ngày và ca đêm. Có BHXH, BHYT, thưởng lễ Tết và thưởng hiệu quả; ưu tiên người từng đi bộ đội, công an.",
-   "phone": "",
-   "views": 0,
-   "calls": 0,
-   "images": [],
-   "source": {
-    "name": "careerlink.vn",
-    "url": "https://careerlink.vn/tim-viec-lam/nhan-vien-bao-ve/3669786"
-   },
-   "postedAt": 1793836800000,
-   "expiresAt": 1796704593367,
    "updatedAt": 1795494993367
   },
   {
@@ -2990,8 +2543,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-hanh-ly-bao-ve-c2p210000160id200981919.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1793836800000,
    "expiresAt": 1796169599999,
@@ -3021,8 +2573,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-noi-bo-lam-viec-theo-ca-binh-duong-c2p210000187id200983013.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1793750400000,
    "expiresAt": 1796083199999,
@@ -3052,8 +2603,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-an-ninh-bao-ve-truong-hoc-pathway-school-c2p210000187id200983744.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1793750400000,
    "expiresAt": 1796428799999,
@@ -3083,8 +2633,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "123job.vn",
-    "url": "https://123job.vn/viec-lam/tuyen-nv-bao-ve-o-loc-an-long-thanh-y9BwYkOdrA"
+    "name": "123job.vn"
    },
    "postedAt": 1793664000000,
    "expiresAt": 1796704593367,
@@ -3114,8 +2663,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/ha-noi-nhan-vien-bao-ve-truong-hoc-c2p210000160id200982715.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1793664000000,
    "expiresAt": 1796342399999,
@@ -3145,8 +2693,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-noi-bo-thu-dau-mot-binh-duong-c2p210000187id200981506.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1793577600000,
    "expiresAt": 1795910399999,
@@ -3176,8 +2723,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-toa-nha-c2p122id200946290.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1793491200000,
    "expiresAt": 1796255999999,
@@ -3207,8 +2753,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-toa-nha-c2p210000160id200966178.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1793491200000,
    "expiresAt": 1796711158410,
@@ -3238,8 +2783,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/thu-mua-kho-van-chuoi-cung-ung/thu-kho-kiem-bao-ve-c14p210000187id200978953.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1793318400000,
    "expiresAt": 1795737599999,
@@ -3269,8 +2813,7 @@
    "calls": 0,
    "images": [],
    "source": {
-    "name": "vieclam24h.vn",
-    "url": "https://vieclam24h.vn/an-ninh-bao-ve/nhan-vien-bao-ve-noi-bo-linh-xuan-tp-hcm-c2p210000187id200976436.html"
+    "name": "vieclam24h.vn"
    },
    "postedAt": 1793145600000,
    "expiresAt": 1795910399999,
