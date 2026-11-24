@@ -111,7 +111,7 @@ export async function createCompany(env, name, phone = '') {
   for (let i = 2; await env.DB.prepare('SELECT 1 FROM companies WHERE id = ?').bind(id).first(); i++) id = `${base}-${i}`;
   const words = core.split(/\s+/);
   const short = core.length <= 22 ? core : words.slice(0, 3).join(' ');
-  const initials = words.slice(0, 3).map((w) => w[0]).join('').toUpperCase();
+  const initials = (core.match(/\p{L}|\d/u) || ['?'])[0].toUpperCase(); // 1 chữ cái đầu của tên công ty (khi chưa có logo)
   const color = COLORS[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % COLORS.length];
   return env.DB.prepare('INSERT INTO companies (id, name, short, initials, color, phone, created_at) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *')
     .bind(id, name, short, initials, color, phone, now()).first();
@@ -532,7 +532,7 @@ async function saveJob(env, req, co, old) {
 }
 
 // Ảnh công khai (đã được trình duyệt nén ≤1200px): lưu R2 "img/<base>-<băm>.<đuôi>", trả tên file
-const IMG_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+export const IMG_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
 export async function putImage(env, req, base) {
   await rateLimit(req, 'img', 60, 3600);
   const form = await req.formData().catch(() => fail(400, 'Không đọc được ảnh.'));

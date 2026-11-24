@@ -72,7 +72,7 @@ export default function ({ params: [id] }) {
         <span class="tag tag-off">${esc(tg.name)}</span>
         ${src ? '<span class="tag tag-src">Tin tổng hợp</span>' : ''}
       </div>
-      ${src ? `<p class="src-note">${icon('alert', 'ico-s')}Tin tổng hợp từ nguồn công khai, công ty chưa xác nhận trên Việc Làm Bảo Vệ. Nguồn: <a href="${esc(src.url)}" target="_blank" rel="nofollow noopener">${esc(src.name)}</a>. Bấm "Ứng tuyển nhanh" để gửi hồ sơ, Việc Làm Bảo Vệ sẽ chuyển tới công ty.</p>` : ''}
+      ${src ? `<p class="src-note">${icon('alert', 'ico-s')}Tin tổng hợp từ nguồn công khai, công ty chưa xác nhận trên Việc Làm Bảo Vệ. Nguồn: ${esc(src.name || 'trang tuyển dụng công khai')}. Bấm "Ứng tuyển nhanh" để gửi hồ sơ, Việc Làm Bảo Vệ sẽ chuyển tới công ty.</p>` : ''}
       <h1 class="d-title">${esc(j.title)}</h1>
       <div class="d-co">
         ${mono(c)}

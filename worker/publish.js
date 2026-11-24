@@ -32,7 +32,7 @@ export const publicJob = (j) => ({
   housing: !!j.housing, meals: !!j.meals, urgent: !!j.urgent, tier: j.tier, age: j.age, height: j.height,
   desc: j.descr || '', phone: j.contact_phone || '', views: j.views, calls: j.calls,
   images: JSON.parse(j.images || '[]').map((x) => '/images/' + x),
-  ...(j.source_url ? { source: { name: j.source_name || '', url: j.source_url } } : {}),
+  ...(j.source_url ? { source: { name: j.source_name || '' } } : {}), // không công khai link tin gốc (không đặt link ra trang ngoài)
   postedAt: j.posted_at, expiresAt: j.expires_at, updatedAt: j.updated_at
 });
 

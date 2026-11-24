@@ -129,16 +129,19 @@ function fromJobPosting(jp) {
     title: jp.title, desc: [jp.description, jp.jobBenefits, jp.qualifications, jp.experienceRequirements?.description].filter((x) => typeof x === 'string').join('\n'),
     company: jp.hiringOrganization?.name || jp.identifier?.name, address: [loc.streetAddress, loc.addressLocality].filter(Boolean).join(', '),
     region: [loc.addressRegion, loc.addressLocality].filter(Boolean).join(' '), salaryMin: unit === 'MONTH' ? val.minValue ?? val.value : 0, salaryMax: unit === 'MONTH' ? val.maxValue ?? val.value : 0,
-    postedAt: jp.datePosted, deadline: jp.validThrough, qty: jp.totalJobOpenings
+    postedAt: jp.datePosted, deadline: jp.validThrough, qty: jp.totalJobOpenings,
+    logo: typeof jp.hiringOrganization?.logo === 'string' ? jp.hiringOrganization.logo : jp.hiringOrganization?.logo?.url || ''
   };
 }
 function fromMuaban(html) {
   const m = html.match(/__NEXT_DATA__[^>]*>([\s\S]*?)<\/script>/); if (!m) return null;
   const c = JSON.parse(m[1])?.props?.pageProps?.classified; if (!c || String(c.is_expired) === 'True') return null;
-  let org = ''; try { org = (String(c.organization).match(/'name':\s*'([^']+)'/) || [])[1] || ''; } catch { /* */ }
+  const orgStr = String(c.organization || '');
+  const org = (orgStr.match(/'name':\s*'([^']+)'/) || [])[1] || '';
+  const logo = (orgStr.match(/'logo':\s*'([^']+)'/) || [])[1] || '';
   return {
     title: c.title, desc: c.body, company: c.job_company_name || org, address: c.address || c.location, region: c.address_region || c.location,
-    salaryMin: Number(c.job_min_salary) || 0, salaryMax: Number(c.job_max_salary) || Number(c.price) || 0, postedAt: c.publish_at, deadline: c.job_submission_expired || '', qty: 0
+    salaryMin: Number(c.job_min_salary) || 0, salaryMax: Number(c.job_max_salary) || Number(c.price) || 0, postedAt: c.publish_at, deadline: c.job_submission_expired || '', qty: 0, logo
   };
 }
 
@@ -154,6 +157,10 @@ const SOURCES = [
     links: (h) => [...h.matchAll(/href="(\/tim-viec-lam\/[^"?#]+\/\d{6,})"/g)].map((m) => 'https://www.careerlink.vn' + m[1]), parse: (h) => { const jp = jsonLd(h); return jp && fromJobPosting(jp); } }
 ];
 
+// Tên người đăng phải là tổ chức (công ty, cửa hàng, trường...); tên cá nhân thì bỏ để không công khai tên người
+export const isOrg = (name) => /(?<!\p{L})(?:c[oô]ng ty|\bcty\b|tnhh|\bcp\b|c[oổ] ph[aầ]n|t[aậ]p đo[aà]n|ng[aâ]n h[aà]ng|tr[uư][oờ]ng|b[eệ]nh vi[eệ]n|kh[aá]ch s[aạ]n|nh[aà] h[aà]ng|nh[aà] kh[aá]ch|h[oộ] kinh doanh|trung t[aâ]m|chi nh[aá]nh|si[eê]u th[iị]|x[uư][oở]ng|qu[aá]n|c[uử]a h[aà]ng|security|corp\p{L}*|group|\p{L}*bank|\bjsc\b|ltd|co\.|company|school|hotel|resort|bank|vi[eệ]n|b[aả]o v[eệ]|an ninh|v[eệ] s[iĩ]|đ[aạ]i l[yý]|showroom|spa|clinic)(?!\p{L})/iu.test(String(name));
+const goodLogo = (u) => /^https?:\/\//.test(u || '') && !/default|no[-_]?logo|placeholder|avatar|noimage|no-image/i.test(u);
+
 /* ---------------- Chuẩn hoá 1 tin ---------------- */
 export function normalize(raw, url, source) {
   const title = titleCase(oneLine(raw.title)).slice(0, 150);
@@ -162,6 +169,7 @@ export function normalize(raw, url, source) {
   const all = `${title}\n${raw.address || ''}\n${desc}`;
   if (!title || !isSecurityJob(title)) return { skip: 'Không phải tin bảo vệ' };
   if (!company) return { skip: 'Thiếu tên công ty' };
+  if (!isOrg(company)) return { skip: 'Người đăng là cá nhân' };
   const where = locate(`${title} ${raw.address || ''}`, raw.region) || locate(all, raw.region);
   if (!where || !PROVINCES.some((p) => p.slug === where.province)) return { skip: 'Ngoài 6 tỉnh của website' };
   // TP.HCM: "Quận 11", "Q.11", "Q11" trong tiêu đề được ưu tiên (kể cả quận chưa có trên website)
@@ -177,7 +185,8 @@ export function normalize(raw, url, source) {
     province: where.province, district: where.district, address: oneLine(raw.address).slice(0, 200),
     company, companyPhone: phone(desc), title, target: target(title, desc), shift: shift(`${title} ${desc}`), qty: qtyOf(raw.qty, title),
     salaryMin: pay[0], salaryMax: pay[1], housing: housing(all), meals: meals(all), age: ageOf(desc), height: heightOf(desc), desc,
-    postedAt: raw.postedAt ? String(raw.postedAt).slice(0, 10) : today, deadline, sourceName: source, sourceUrl: url
+    postedAt: raw.postedAt ? String(raw.postedAt).slice(0, 10) : today, deadline, sourceName: source, sourceUrl: url,
+    companyLogo: goodLogo(raw.logo) ? raw.logo : ''
   };
 }
 
@@ -215,6 +224,13 @@ export async function crawl({ provinces, seen = {}, pages = 2, max = 40, only = 
   const cut = vnDay(Date.now() - 30 * 864e5);
   for (const [u, d] of Object.entries(seen)) if (d < cut) delete seen[u];
   return { items, stats, seen };
+}
+
+// Lấy logo công ty từ trang tin gốc (để bổ sung logo cho công ty đã nhập trước đây)
+export function logoFromPage(html, url) {
+  const src = SOURCES.find((x) => url.includes(x.name.replace(/^www\./, '')));
+  const raw = src ? src.parse(html) : null;
+  return raw && goodLogo(raw.logo) ? raw.logo : '';
 }
 
 export const statsText = (stats) => Object.entries(stats).map(([k, s]) => `${k}: ${s.links} link, lấy được ${s.ok} tin` + Object.entries(s.skip).map(([r, c]) => `; ${r}: ${c}`).join('') + (s.error ? `; LỖI ${s.error}` : '')).join('\n');

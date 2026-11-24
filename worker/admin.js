@@ -1,9 +1,9 @@
 // API quản trị: chỉ trang admin GAS gọi, xác thực bằng khoá bí mật ADMIN_API_KEY
 // (header Authorization: Bearer <key>). Không dùng cookie, không mở cho trình duyệt.
 import { fail, json, now, DAY, MAX_LIFE, body, str, sha256, slugify, hasLink, normPhone } from './lib.js';
-import { createCompany, putImage } from './api.js';
+import { createCompany, putImage, IMG_TYPES } from './api.js';
 import { markDirty, getKv, setKv, categories, publish, publishStatus, buildData } from './publish.js';
-import { crawl, statsText } from './crawl.js';
+import { crawl, statsText, logoFromPage, isOrg } from './crawl.js';
 
 /* ---------- Nhập tin tổng hợp (dùng cho /import-jobs, /crawl và cron hằng ngày) ---------- */
 export async function importJobs(env, items) {
@@ -37,8 +37,9 @@ export async function importJobs(env, items) {
     let co = await env.DB.prepare('SELECT * FROM companies WHERE name = ?').bind(company).first();
     if (!co) {
       co = await createCompany(env, company, phone);
+      if (it.companyLogo) co.logo = await saveRemoteLogo(env, co, it.companyLogo);
       await env.DB.prepare('UPDATE companies SET aggregated = 1, about = ? WHERE id = ?').bind('Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.', co.id).run();
-    }
+    } else if (!co.logo && it.companyLogo) co.logo = await saveRemoteLogo(env, co, it.companyLogo); // công ty đã có nhưng chưa có logo
     const r = await env.DB.prepare(`INSERT INTO jobs (company_id, title, province, district, address, target, shift, qty, salary_min, salary_max, housing, meals,
         age, height, descr, contact_phone, status, weeks, posted_at, expires_at, source_name, source_url, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'live', 2, ?, ?, ?, ?, ?, ?) RETURNING id`)
@@ -50,6 +51,39 @@ export async function importJobs(env, items) {
   if (provincesChanged) await setKv(env, 'provinces', cats.provinces);
   if (created.length) await markDirty(env);
   return { created, skipped };
+}
+
+// Tải logo công ty từ link ảnh của tin gốc về kho ảnh của website (không dùng link ảnh ngoài). Lỗi thì bỏ qua (dùng chữ cái đầu).
+export async function saveRemoteLogo(env, co, src) {
+  try {
+    if (co.logo) return co.logo;
+    const r = await fetch(src, { headers: { 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/131.0 Safari/537.36', accept: 'image/*' }, signal: AbortSignal.timeout(15000) });
+    const type = (r.headers.get('content-type') || '').split(';')[0].trim().replace('image/jpg', 'image/jpeg');
+    if (!r.ok || !IMG_TYPES[type]) return '';
+    const buf = await r.arrayBuffer();
+    if (buf.byteLength < 800 || buf.byteLength > 2 * 1024 * 1024) return ''; // ảnh quá nhỏ (ảnh trống) hoặc quá lớn
+    const name = `companies/${co.id}-${(await sha256(co.id + buf.byteLength + src)).slice(0, 8)}.${IMG_TYPES[type]}`;
+    await env.FILES.put('img/' + name, buf, { httpMetadata: { contentType: type, cacheControl: 'public, max-age=31536000, immutable' } });
+    await env.DB.prepare('UPDATE companies SET logo = ? WHERE id = ? AND (logo IS NULL OR logo = \'\')').bind('/images/' + name, co.id).run();
+    return '/images/' + name;
+  } catch { return ''; }
+}
+
+// Bổ sung logo cho công ty tin tổng hợp chưa có logo: đọc lại 1 tin gốc của công ty đó
+export async function backfillLogos(env, limit = 40) {
+  const rows = (await env.DB.prepare(`SELECT c.*, (SELECT j.source_url FROM jobs j WHERE j.company_id = c.id AND j.source_url IS NOT NULL ORDER BY j.id DESC LIMIT 1) AS src
+    FROM companies c WHERE c.aggregated = 1 AND (c.logo IS NULL OR c.logo = '') LIMIT ?`).bind(limit).all()).results.filter((c) => c.src);
+  let done = 0;
+  for (const c of rows) {
+    try {
+      const html = await (await fetch(c.src, { headers: { 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/131.0 Safari/537.36' }, signal: AbortSignal.timeout(20000) })).text();
+      const logo = logoFromPage(html, c.src);
+      if (logo && (await saveRemoteLogo(env, c, logo))) done++;
+    } catch { /* bỏ qua */ }
+    await new Promise((r) => setTimeout(r, 1500));
+  }
+  if (done) await markDirty(env);
+  return { checked: rows.length, logos: done };
 }
 
 // Cào các trang việc làm công khai rồi nhập. Lưu link đã xử lý và kết quả lần chạy gần nhất.
@@ -318,6 +352,22 @@ async function adminRoute(req, env, url, p) {
   /* ---------- Cào tin từ trang việc làm khác: cron 6h sáng tự chạy; quản trị xem kết quả / bấm chạy ngay ---------- */
   if (p === '/crawl' && m === 'GET') return json({ ok: true, last: await getKv(env, 'crawl_last') });
   if (p === '/crawl' && m === 'POST') return json({ ok: true, last: await crawlDaily(env) });
+  if (p === '/crawl/logos' && m === 'POST') return json({ ok: true, ...(await backfillLogos(env)) });
+  // Chuẩn hoá chữ cái đầu (1 ký tự) cho công ty chưa có logo; ẩn tin tổng hợp mà người đăng là cá nhân
+  if (p === '/crawl/cleanup' && m === 'POST') {
+    const cos = (await env.DB.prepare('SELECT id, name, initials, aggregated FROM companies').all()).results;
+    let fixed = 0; const hidden = [];
+    for (const c of cos) {
+      const one = (c.name.replace(/^(công ty|cty)\s+((cổ phần|cp|tnhh|mtv|một thành viên)\s+)*((dịch vụ|dv)\s+)?((bảo vệ|an ninh|vệ sĩ)\s+)?/i, '').match(/\p{L}|\d/u) || ['?'])[0].toUpperCase();
+      if (c.initials !== one) { await env.DB.prepare('UPDATE companies SET initials = ? WHERE id = ?').bind(one, c.id).run(); fixed++; }
+      if (c.aggregated && !isOrg(c.name)) {
+        const r = await env.DB.prepare("UPDATE jobs SET status = 'hidden', updated_at = ? WHERE company_id = ? AND status = 'live' AND source_url IS NOT NULL").bind(t, c.id).run();
+        if (r.meta.changes) hidden.push(c.name);
+      }
+    }
+    await markDirty(env);
+    return json({ ok: true, initialsFixed: fixed, hiddenCompanies: hidden });
+  }
 
   /* ---------- Hết hạn: GAS gọi mỗi ngày lúc 0h ---------- */
   if (p === '/expire' && m === 'POST') {
