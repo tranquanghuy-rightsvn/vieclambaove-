@@ -1,4 +1,4 @@
-import { V, $, $$, esc, icon, url, mono, jobRow, activeJobs, company, province, SITE } from '../core.js';
+import { V, $, $$, esc, icon, url, mono, jobRow, activeJobs, pagerHtml, company, province, SITE } from '../core.js';
 import { companyList, coBox } from './companies.js';
 import { go } from '../router.js';
 
@@ -127,14 +127,12 @@ export default function () {
       list.innerHTML = rows.length
         ? rows.slice((page - 1) * PER, page * PER).map(jobRow).join('')
         : `<div class="empty"><h3>Chưa có tin ở khu vực này</h3><p class="mute"><a href="/viec-lam">Xem việc ở khu vực khác</a></p></div>`;
-      pg.innerHTML = `<button type="button" data-d="-1" aria-label="Trang trước" ${page === 1 ? 'disabled' : ''}>${icon('arrow', 'ico-s flip')}</button>
-        <span><b>${page}</b> / ${pages} trang</span>
-        <button type="button" data-d="1" aria-label="Trang sau" ${page === pages ? 'disabled' : ''}>${icon('arrow', 'ico-s')}</button>`;
+      pg.innerHTML = pagerHtml(page, pages);
     };
     draw();
     pg.addEventListener('click', (e) => {
-      const b = e.target.closest('button[data-d]');
-      if (b) { page += Number(b.dataset.d); draw(); }
+      const b = e.target.closest('button[data-page]');
+      if (b) { page = Number(b.dataset.page); draw(); $('#hotH', root)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     });
     $$('.pills-row button', root).forEach((b) => b.addEventListener('click', () => {
       $$('.pills-row button', root).forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b); });
