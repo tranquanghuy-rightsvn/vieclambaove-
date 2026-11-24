@@ -172,10 +172,12 @@
    "phone": "",
    "views": 0,
    "calls": 0,
-   "images": [],
+   "images": [
+    "/images/jobs/1-6477629f.png"
+   ],
    "postedAt": 1795490066524,
    "expiresAt": 1796094866524,
-   "updatedAt": 1795490066524
+   "updatedAt": 1795490067791
   }
  ],
  "videos": []
