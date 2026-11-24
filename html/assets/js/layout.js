@@ -1,6 +1,6 @@
 // Phần dùng chung giữa trình duyệt (main.js) và script sinh trang tĩnh (scripts/build.mjs):
 // bảng tuyến, đầu trang, chân trang, tiêu đề trang. Sửa ở đây thì cả hai cùng đổi.
-import { icon, esc, user } from './core.js';
+import { icon, esc, user, store } from './core.js';
 
 export const SITE_NAME = 'Việc Làm Bảo Vệ';
 export const DEFAULT_TITLE = 'Việc Làm Bảo Vệ - Tuyển dụng bảo vệ, vệ sĩ toàn quốc';
@@ -17,6 +17,7 @@ export const ROUTES = [
   [/^\/viec-lam(?:\/([a-z0-9-]+))?(?:\/([a-z0-9-]+))?$/, () => import('./pages/jobs.js')],
   [/^\/tin\/(?:[a-z0-9-]*-)?(\d+)$/, () => import('./pages/job.js')],
   [/^\/cong-ty-tuyen-dung$/, () => import('./pages/companies.js')],
+  [/^\/viec-da-luu$/, () => import('./pages/saved.js')],
   [/^\/cong-ty\/([a-z0-9-]+)$/, () => import('./pages/company.js')],
   [/^\/tin-tuc$/, () => import('./pages/blog.js')],
   [/^\/tin-tuc\/([a-z0-9-]+)$/, () => import('./pages/post.js')],
@@ -66,6 +67,7 @@ export function headerHtml(navKey) {
     ${brand()}
     <nav class="nav" aria-label="Chính">${NAV.map(([k, h, t]) => `<a href="${h}" class="${k === navKey ? 'on' : ''}">${t}</a>`).join('')}</nav>
     <div class="mast-act">
+ ${u?.role === 'employer' ? '' : `<a class="mast-saved" href="/viec-da-luu" title="Việc đã lưu" aria-label="Việc đã lưu">${icon('heart')}${store.get('saved', []).length ? `<em>${store.get('saved', []).length}</em>` : ''}</a>`}
       <button class="btn btn-quick btn-s mast-quick" type="button" data-quick>${icon('bolt')}<span class="q-full">Tạo hồ sơ xin việc nhanh</span><span class="q-short">Hồ sơ xin việc</span></button>
       ${u ? '' : `<a class="emp-link" href="${postHref}"><small>Dành cho nhà tuyển dụng</small>Đăng tin tuyển dụng</a>`}
       ${right}
@@ -89,7 +91,7 @@ function tabbar(path) {
   const items = [
     ['/', 'Trang chủ', 'building', path === '/'],
     ['/viec-lam', 'Tìm việc', 'search', path.startsWith('/viec-lam') || path.startsWith('/tin/')],
-    ['/ung-vien/da-luu', 'Đã lưu', 'bookmark', path === '/ung-vien/da-luu'],
+    ['/viec-da-luu', 'Đã lưu', 'bookmark', path === '/viec-da-luu' || path === '/ung-vien/da-luu'],
     [u ? acctLink(u).href : '/dang-nhap', 'Tài khoản', 'user', (path.startsWith('/ung-vien') && path !== '/ung-vien/da-luu') || path.startsWith('/dang-nhap') || path.startsWith('/trang-quan-ly-tuyen-dung')]
   ];
   const link = ([h, t, ic, on]) => `<a href="${h}" class="${on ? 'on' : ''}">${icon(ic)}${t}</a>`;
@@ -123,6 +125,7 @@ export function footerHtml(path) {
         <li><a href="/ung-vien">Hồ sơ của tôi</a></li>
         <li><a href="/tin-tuc">Tin tức nghề bảo vệ</a></li>
         <li><a href="/video">Video nghề bảo vệ</a></li>
+        <li><a href="/viec-da-luu">Việc đã lưu</a></li>
         <li><a href="/cong-ty-tuyen-dung">Nhà tuyển dụng</a></li>
         <li><a href="/tin-tuc/dau-hieu-cong-ty-bao-ve-lua-dao">Cảnh báo lừa đảo</a></li>
       </ul></div>

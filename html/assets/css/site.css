@@ -1746,3 +1746,10 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 .pager .pg-arrow.off { color: var(--line-2, #d0d5dd); cursor: default; }
 @media (max-width: 420px) { .pager a, .pager span, .pager button { min-width: 36px; height: 36px; font-size: 14px; } }
 #hotPg { display: block; }
+
+/* Đầu trang: lối vào Việc đã lưu (cả khi chưa đăng nhập) */
+.mast-saved { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; color: var(--brand); text-decoration: none; }
+.mast-saved:hover { background: #fef3f2; color: #d92d20; }
+.mast-saved .ico { width: 20px; height: 20px; }
+.mast-saved em { position: absolute; top: 2px; right: 0; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: #d92d20; color: #fff; font: 700 11px/17px var(--f-body); font-style: normal; text-align: center; }
+@media (max-width: 960px) { .mast-saved { display: none; } }
