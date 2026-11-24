@@ -1797,7 +1797,7 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 
 /* Tìm kiếm chi tiết */
 .search-x { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 20px; align-items: start; }
-.sx-form { position: sticky; top: 84px; max-height: calc(100vh - 100px); overflow-y: auto; scrollbar-width: thin; display: flex; flex-direction: column; gap: 14px; }
+.sx-form { display: flex; flex-direction: column; gap: 14px; }
 .sx-form .field { margin: 0; }
 .sx-form .pills { display: flex; flex-wrap: wrap; gap: 6px; }
 .sx-form .pill span { min-height: 34px; font-size: 13.5px; padding: 0 10px; }
@@ -1806,7 +1806,7 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 .chip-btn { border: 1px solid var(--line-2, #d0d5dd) !important; background: #fff; border-radius: 16px; padding: 5px 11px; font: 600 13px var(--f-body); color: var(--txt-2); cursor: pointer; }
 .chip-btn.on, .chip-btn:hover { border-color: var(--brand) !important; color: var(--brand); background: var(--brand-wash, #eef0f8); }
 .sx-head { margin: 4px 0 12px; font-size: 16px; }
-@media (max-width: 960px) { .search-x { grid-template-columns: 1fr; } .sx-form { position: static; max-height: none; } }
+@media (max-width: 960px) { .search-x { grid-template-columns: 1fr; } }
 .sx-form .grid3 { grid-template-columns: 1fr 1fr; gap: 12px; }
 
 /* Trang bài Tin tức: tiêu đề 1 khối, Đọc tiếp dạng thẻ, cột phải việc làm mới nhất cố định */
@@ -1857,7 +1857,6 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 .chip-link { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; border: 1px solid #d0d5dd !important; background: #fff; color: #1d2939; font-size: 14px; text-decoration: none; }
 .chip-link em { font-style: normal; font-size: 12px; font-weight: 600; color: #1e2a6e; background: #eef0f8; border-radius: 999px; padding: 1px 7px; }
 .chip-link:hover { border-color: #1e2a6e !important; color: #1e2a6e; }
-.pop-links { padding: 4px 0 2px; }
 .foot-tags { border-top: 1px solid rgba(255, 255, 255, .08) !important; padding: 18px 0; }
 .foot-tags h4 { margin: 0 0 10px; }
 .foot-tags p { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; font-size: 13.5px; }
