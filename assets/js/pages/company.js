@@ -10,6 +10,7 @@ export default function ({ params: [id] }) {
     <div class="co-head">${mono(c, 'mono-l')}<div>
       <h1>${esc(c.name)}</h1>
       <p>${c.verified ? `<span class="verified">${icon('check')}Đã xác thực giấy phép kinh doanh dịch vụ bảo vệ</span>` : '<span class="tag tag-off">Đang chờ xác thực</span>'}
+      ${c.aggregated ? '<br><span class="mute">Thông tin tổng hợp từ tin tuyển dụng công khai, công ty chưa có tài khoản trên Việc Làm Bảo Vệ.</span>' : ''}
       ${c.rating ? `· <span class="stars">★ ${c.rating}</span> <span class="mute">${c.reviews} đánh giá từ nhân viên</span>` : ''}</p>
     </div></div>
   </div></div>

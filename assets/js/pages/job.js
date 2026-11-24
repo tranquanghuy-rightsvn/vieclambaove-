@@ -18,6 +18,7 @@ export default function ({ params: [id] }) {
   const digits = phone.replace(/\D/g, '');
   const zalo = 'https://zalo.me/' + digits;
   const tel = 'tel:' + digits;
+  const src = j.source || null; // tin tổng hợp: ghi nguồn, không nhận hồ sơ qua site
   const trk = (type) => `data-track="${type}" data-job="${j.id}"`;
 
   const facts = [
@@ -49,7 +50,7 @@ export default function ({ params: [id] }) {
           ${digits ? `<a class="btn btn-zalo" href="${zalo}" target="_blank" rel="noopener" ${trk('zalo')}>${icon('chat')}Zalo</a>` : ''}
           <button class="btn btn-quiet" type="button" data-save="${j.id}" data-label aria-pressed="${isSaved(j.id)}">${icon('bookmark')} ${isSaved(j.id) ? 'Đã lưu' : 'Lưu tin'}</button>
         </div>
-        <button class="btn btn-primary btn-l" type="button" data-apply="${j.id}">Ứng tuyển nhanh</button>
+        ${src ? `<a class="btn btn-primary btn-l" href="${esc(src.url)}" target="_blank" rel="nofollow noopener">Xem tin gốc</a>` : `<button class="btn btn-primary btn-l" type="button" data-apply="${j.id}">Ứng tuyển nhanh</button>`}
       </div>
       <p class="apply-note">Khi gọi, hãy nói bạn thấy tin trên Việc Làm Bảo Vệ.</p>
     </div>`;
@@ -69,7 +70,9 @@ export default function ({ params: [id] }) {
         ${!off && j.tier === 'vip' ? '<span class="tag tag-vip">VIP</span>' : ''}
         ${!off && j.urgent ? '<span class="tag tag-urgent">Tuyển gấp</span>' : ''}
         <span class="tag tag-off">${esc(tg.name)}</span>
+        ${src ? '<span class="tag tag-src">Tin tổng hợp</span>' : ''}
       </div>
+      ${src ? `<p class="src-note">${icon('alert', 'ico-s')}Tin tổng hợp từ nguồn công khai, công ty chưa xác nhận trên Việc Làm Bảo Vệ. Nguồn: <a href="${esc(src.url)}" target="_blank" rel="nofollow noopener">${esc(src.name)}</a>. Hãy liên hệ trực tiếp công ty theo thông tin trong tin.</p>` : ''}
       <h1 class="d-title">${esc(j.title)}</h1>
       <div class="d-co">
         ${mono(c)}
@@ -115,7 +118,7 @@ export default function ({ params: [id] }) {
       </div>
     </aside>
   </div>
-  ${off ? '' : `<div class="mbar">${digits ? `<a class="btn btn-call" href="${tel}" ${trk('call')}>${icon('phone')}Gọi</a><a class="btn btn-zalo" href="${zalo}" target="_blank" rel="noopener" ${trk('zalo')}>Zalo</a>` : ''}<button class="btn btn-primary" type="button" data-apply="${j.id}">Ứng tuyển</button></div>`}`;
+  ${off ? '' : `<div class="mbar">${digits ? `<a class="btn btn-call" href="${tel}" ${trk('call')}>${icon('phone')}Gọi</a><a class="btn btn-zalo" href="${zalo}" target="_blank" rel="noopener" ${trk('zalo')}>Zalo</a>` : ''}${src ? `<a class="btn btn-primary" href="${esc(src.url)}" target="_blank" rel="nofollow noopener">Tin gốc</a>` : `<button class="btn btn-primary" type="button" data-apply="${j.id}">Ứng tuyển</button>`}</div>`}`;
 
   // Đếm lượt xem: mỗi tin 1 lần trong một phiên trình duyệt
   const mount = () => {

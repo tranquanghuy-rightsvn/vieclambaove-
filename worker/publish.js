@@ -22,7 +22,8 @@ export const categories = async (env) => ({
 export const publicCompany = (c) => ({
   id: c.id, name: c.name, short: c.short, initials: c.initials, color: c.color, logo: c.logo || undefined,
   phone: c.phone || '', about: c.about || '', size: c.size || '', founded: c.founded || '',
-  rating: c.rating || null, reviews: c.reviews || 0, mst: c.mst || '', license: c.license || '', verified: !!c.verified
+  rating: c.rating || null, reviews: c.reviews || 0, mst: c.mst || '', license: c.license || '', verified: !!c.verified,
+  ...(c.aggregated ? { aggregated: true } : {})
 });
 
 export const publicJob = (j) => ({
@@ -31,6 +32,7 @@ export const publicJob = (j) => ({
   housing: !!j.housing, meals: !!j.meals, urgent: !!j.urgent, tier: j.tier, age: j.age, height: j.height,
   desc: j.descr || '', phone: j.contact_phone || '', views: j.views, calls: j.calls,
   images: JSON.parse(j.images || '[]').map((x) => '/images/' + x),
+  ...(j.source_url ? { source: { name: j.source_name || '', url: j.source_url } } : {}),
   postedAt: j.posted_at, expiresAt: j.expires_at, updatedAt: j.updated_at
 });
 

@@ -104,7 +104,7 @@ async function register(env, req) {
 // Bỏ phần loại hình ("Công ty TNHH Dịch vụ Bảo vệ ...") để lấy tên riêng: dùng cho mã URL, tên ngắn, chữ viết tắt
 const companyCore = (name) => name.replace(/^(công ty|cty)\s+((cổ phần|cp|tnhh|mtv|một thành viên)\s+)*((dịch vụ|dv)\s+)?((bảo vệ|an ninh|vệ sĩ)\s+)?/i, '').trim() || name;
 
-async function createCompany(env, name, phone = '') {
+export async function createCompany(env, name, phone = '') {
   const core = companyCore(name);
   const base = slugify(core).slice(0, 46) || 'cong-ty';
   let id = base;

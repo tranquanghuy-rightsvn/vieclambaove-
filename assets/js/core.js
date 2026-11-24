@@ -10,7 +10,7 @@ export const slug = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').re
 export const SITE = location.origin;
 export const company = (id) => V.companies.find((c) => c.id === id);
 export const province = (s) => V.provinces.find((p) => p.slug === s);
-export const shift = (id) => V.shifts.find((s) => s.id === id);
+export const shift = (id) => V.shifts.find((s) => s.id === id) || { id: '', name: 'Ca theo thỏa thuận' };
 export const target = (id) => V.targets.find((t) => t.id === id);
 export const districtBySlug = (p, ds) => p?.districts.find((d) => slug(d) === ds);
 // Tách "<quận>-<tỉnh>" (vd "hai-chau-da-nang") thành [mã tỉnh, tên quận]; không khớp trả null
@@ -261,10 +261,11 @@ export function jobRow(j) {
         <span class="chip">${esc(target(j.target).name)}</span>
         <span class="chip">${esc(shift(j.shift).name)}</span>
         ${j.housing ? '<span class="chip chip-ok">Bao ở</span>' : ""}${j.meals ? '<span class="chip chip-ok">Bao ăn</span>' : ""}
+        ${j.source ? '<span class="chip chip-src" title="Tin tổng hợp từ nguồn công khai">Tin tổng hợp</span>' : ""}
       </p>
     </div>
     <div class="jr-act">
-      ${off ? "" : `<button class="btn btn-primary jr-apply" type="button" data-apply="${j.id}">${icon("bolt")}Ứng tuyển nhanh</button>`}
+      ${off ? "" : j.source ? `<a class="btn btn-quiet jr-apply" href="${url.job(j)}">${icon("phone")}Xem cách liên hệ</a>` : `<button class="btn btn-primary jr-apply" type="button" data-apply="${j.id}">${icon("bolt")}Ứng tuyển nhanh</button>`}
       ${save}
     </div>
   </article>`;
