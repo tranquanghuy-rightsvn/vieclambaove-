@@ -59,7 +59,7 @@ export function headerHtml(navKey) {
   const a = acctLink(u);
   const postHref = u?.role === 'employer' ? '/trang-quan-ly-tuyen-dung/dang-tin' : '/dang-nhap?vai-tro=nha-tuyen-dung';
   const right = u
-    ? `<a class="acct" href="${a.href}">${icon('user')}${a.label}</a>`
+    ? `<a class="acct" href="${a.href}">${icon('user')}${a.label}</a><button class="mast-logout" type="button" data-logout title="Đăng xuất" aria-label="Đăng xuất">${icon('logout')}<span>Đăng xuất</span></button>`
     : `<a class="btn btn-line btn-s" href="/dang-nhap?dang-ky=1">Đăng ký</a><a class="btn btn-primary btn-s" href="/dang-nhap">Đăng nhập</a>`;
   return `
   <header class="mast"><div class="wrap">

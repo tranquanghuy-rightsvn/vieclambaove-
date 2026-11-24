@@ -22,15 +22,17 @@ export default function ({ params: [id] }) {
   const trk = (type) => `data-track="${type}" data-job="${j.id}"`;
 
   const facts = [
-    ['Mức lương', `${pay(j)} triệu/tháng`, 'big'],
-    ['Ca làm', sh.name],
-    ['Số lượng', `${j.qty} người`],
-    ['Địa điểm', `${j.district}, ${p.short}`],
-    ['Độ tuổi', j.age],
-    ['Chiều cao', j.height],
-    ['Chỗ ở', j.housing ? 'Có, miễn phí' : 'Không'],
-    ['Bữa ăn', j.meals ? 'Có hỗ trợ' : 'Tự túc'],
-    [off ? 'Đã hết hạn' : 'Hạn nộp', off ? `${-j.daysLeft} ngày trước` : `${dateIn(j.daysLeft)} (còn ${j.daysLeft} ngày)`]
+    // [nhãn, giá trị, class, icon]
+    ['Mức lương', `${pay(j)} triệu/tháng`, 'big', 'money'],
+    ['Ca làm', sh.name, '', 'clock'],
+    ['Số lượng', `${j.qty} người`, '', 'users'],
+    ['Địa điểm', `${j.district}, ${p.short}`, '', 'pin'],
+    ['Độ tuổi', j.age, '', 'user'],
+    ['Chiều cao', j.height, '', 'ruler'],
+    ['Chỗ ở', j.housing ? 'Có, miễn phí' : 'Không', '', 'bed'],
+    ['Bữa ăn', j.meals ? 'Có hỗ trợ' : 'Tự túc', '', 'meal'],
+    ['Ngày đăng', j.postedAt ? new Date(j.postedAt).toLocaleDateString('vi-VN') + (j.posted <= 0 ? ' (hôm nay)' : ` (${j.posted} ngày trước)`) : '', '', 'calendar'],
+    [off ? 'Đã hết hạn' : 'Hạn nộp', off ? `${-j.daysLeft} ngày trước` : `${dateIn(j.daysLeft)} (còn ${j.daysLeft} ngày)`, '', 'alert']
   ];
 
   const desc = [
@@ -45,13 +47,10 @@ export default function ({ params: [id] }) {
     <div class="box box-ink">
       <div class="apply-pay">${pay(j)} triệu<small>mỗi tháng · ${esc(sh.name.toLowerCase())}</small></div>
       <div class="apply-btns">
-        ${digits ? `<a class="btn btn-call btn-l" href="${tel}" ${trk('call')}>${icon('phone')}Gọi ${esc(phone)}</a>` : ''}
-        <div class="duo">
-          ${digits ? `<a class="btn btn-zalo" href="${zalo}" target="_blank" rel="noopener" ${trk('zalo')}>${icon('chat')}Zalo</a>` : ''}
-          <button class="btn btn-quiet" type="button" data-save="${j.id}" data-label aria-pressed="${isSaved(j.id)}">${icon('bookmark')} ${isSaved(j.id) ? 'Đã lưu' : 'Lưu tin'}</button>
-        </div>
-        <button class="btn btn-primary btn-l" type="button" data-apply="${j.id}">Ứng tuyển nhanh</button>
-        ${src ? `<a class="btn btn-quiet" href="${esc(src.url)}" target="_blank" rel="nofollow noopener">Xem tin gốc</a>` : ''}
+        <button class="btn btn-quick btn-l btn-block apply-main" type="button" data-apply="${j.id}">${icon('bolt')}Ứng tuyển ngay</button>
+        ${digits ? `<a class="btn btn-call btn-block" href="${tel}" ${trk('call')}>${icon('phone')}Gọi ${esc(phone)}</a>` : ''}
+        ${digits ? `<a class="btn btn-zalo btn-block" href="${zalo}" target="_blank" rel="noopener" ${trk('zalo')}>${icon('chat')}Nhắn Zalo</a>` : ''}
+        <button class="btn btn-quiet btn-block" type="button" data-save="${j.id}" data-label aria-pressed="${isSaved(j.id)}">${icon('bookmark')} ${isSaved(j.id) ? 'Đã lưu' : 'Lưu tin'}</button>
       </div>
       <p class="apply-note">Khi gọi, hãy nói bạn thấy tin trên Việc Làm Bảo Vệ.</p>
     </div>`;
@@ -81,7 +80,7 @@ export default function ({ params: [id] }) {
         ${c.verified ? `<span class="verified">${icon('check')}Đã xác thực giấy phép</span>` : '<span class="mute">Chưa xác thực</span>'}</div>
       </div>
       ${(j.images || []).length ? `<div class="d-gallery n${j.images.length}">${j.images.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="${esc(j.title)} - ảnh ${i + 1}" loading="${i ? 'lazy' : 'eager'}"></a>`).join('')}</div>` : ''}
-      <dl class="facts">${facts.filter(([, v]) => v).map(([k, v, cls]) => `<div class="${cls || ''}"><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+      <dl class="facts">${facts.filter(([, v]) => v).map(([k, v, cls, ic]) => `<div class="${cls || ''}"><dt>${icon(ic, 'ico-s')}${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
 
       ${j.desc
         ? `<section class="d-sec"><h2>Mô tả công việc</h2><p class="d-desc">${esc(j.desc)}</p></section>`

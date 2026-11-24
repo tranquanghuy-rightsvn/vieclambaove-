@@ -1704,3 +1704,19 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 .src-note { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: var(--txt-2); background: #f5f7ff; border-radius: 8px; padding: 10px 12px; margin: 10px 0 0; }
 .src-note .ico { flex: none; margin-top: 3px; color: #3538cd; }
 .src-note a { color: #3538cd; font-weight: 600; }
+
+/* Trang tin: icon cho từng mục thông tin */
+.facts dt { display: flex; align-items: center; gap: 6px; }
+.facts dt .ico { width: 15px; height: 15px; color: var(--brand); flex: none; }
+.facts .big dt .ico { color: var(--pay-c, #d9480f); }
+.apply-main { min-height: 54px; font-size: 17px; font-weight: 800; box-shadow: 0 6px 16px rgba(245, 158, 11, .35); }
+.apply-main .ico { width: 20px; height: 20px; fill: currentColor; }
+
+/* Nút đăng xuất: đầu trang (cạnh tài khoản) + cuối menu trang quản lý */
+.mast-logout { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 10px; border: 0; border-radius: 6px; background: transparent; color: var(--txt-2, #475467); font: 600 14px var(--f-body); cursor: pointer; white-space: nowrap; }
+.mast-logout:hover { background: #fef3f2; color: #b42318; }
+.mast-logout .ico { width: 18px; height: 18px; }
+@media (max-width: 1280px) { .mast-logout span { display: none; } }
+@media (max-width: 960px) { .mast-logout { display: none; } }
+.desk-nav .desk-logout { color: #b42318; margin-top: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
+.desk-nav .desk-logout .ico { color: #b42318; }
