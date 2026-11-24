@@ -70,7 +70,7 @@ export default function ({ query }) {
           <label class="field"><span>Quận/huyện</span><select class="select" name="quan" ${s.tinh ? '' : 'disabled'}>${districtOpts(s.tinh, s.quan)}</select></label>
         </div>
         <div class="field"><span>Mức lương mong muốn (triệu/tháng)</span>
-          <div class="sx-pay"><input class="input" name="luong-tu" type="number" min="0" step="0.5" inputmode="decimal" placeholder="Từ" value="${esc(s.tu)}"><span>-</span><input class="input" name="luong-den" type="number" min="0" step="0.5" inputmode="decimal" placeholder="Đến" value="${esc(s.den)}"></div>
+          <input type="hidden" name="luong-tu" value="${esc(s.tu)}"><input type="hidden" name="luong-den" value="${esc(s.den)}">
           <div class="sx-presets">${PAY_PRESETS.map(([a, b, l]) => `<button type="button" class="chip-btn ${s.tu === a && s.den === b ? 'on' : ''}" data-pay="${a}|${b}">${l}</button>`).join('')}</div>
         </div>
         <div class="field"><span>Loại mục tiêu</span><div class="pills">${V.targets.map((t) => chk('muc-tieu', t.id, t.name, s.mt.includes(t.id))).join('')}</div></div>
