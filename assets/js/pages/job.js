@@ -80,7 +80,7 @@ export default function ({ params: [id] }) {
         ${c.verified ? `<span class="verified">${icon('check')}Đã xác thực giấy phép</span>` : '<span class="mute">Chưa xác thực</span>'}</div>
       </div>
       ${(j.images || []).length ? `<div class="d-gallery n${j.images.length}">${j.images.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="${esc(j.title)} - ảnh ${i + 1}" loading="${i ? 'lazy' : 'eager'}"></a>`).join('')}</div>` : ''}
-      <dl class="facts">${facts.filter(([, v]) => v).map(([k, v, cls, ic]) => `<div class="${cls || ''}"><dt>${icon(ic, 'ico-s')}${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+      <dl class="facts facts-row">${facts.filter(([, v]) => v).map(([k, v, cls, ic]) => `<div class="${cls || ''}">${icon(ic, 'ico-s')}<dt>${k}:</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
 
       ${j.desc
         ? `<section class="d-sec"><h2>Mô tả công việc</h2><p class="d-desc">${esc(j.desc)}</p></section>`

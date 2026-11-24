@@ -1724,3 +1724,13 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 /* Nhà tuyển dụng đã đăng nhập: ẩn nút tạo hồ sơ xin việc (header, thanh dưới, trang chủ, danh sách) */
 .is-employer [data-quick], .is-employer .hero-cta { display: none !important; }
 @media (max-width: 720px) { .is-employer .tabbar { grid-template-columns: repeat(4, 1fr); } }
+
+/* Trang tin: mỗi mục 1 hàng "icon  Nhãn: Giá trị" */
+.facts.facts-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; border: 0; background: none; overflow: visible; }
+.facts.facts-row div { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border: 0 !important; border-radius: 8px; background: var(--fill, #f4f5f8); min-width: 0; }
+.facts.facts-row .ico { width: 18px; height: 18px; color: var(--brand); flex: none; }
+.facts.facts-row dt { display: inline; margin: 0; font-size: 14px; font-weight: 500; color: var(--txt-3, #667085); white-space: nowrap; }
+.facts.facts-row dd { margin: 0; font-size: 15px; font-weight: 700; color: var(--txt); min-width: 0; }
+.facts.facts-row .big .ico { color: var(--pay-c, #d9480f); }
+.facts.facts-row .big dd { font: 800 17px/1.2 var(--f-head); color: var(--pay-c, #d9480f); }
+@media (max-width: 720px) { .facts.facts-row { grid-template-columns: 1fr; } }
