@@ -1219,35 +1219,6 @@
  ],
  "jobs": [
   {
-   "id": 69,
-   "title": "TUYEN 5 BAO VE TAI Q1",
-   "company": "dat-viet",
-   "province": "tp-hcm",
-   "district": "Quận 1",
-   "address": "T",
-   "target": "toa-nha",
-   "shift": "12h",
-   "qty": 1,
-   "salaryMin": 1,
-   "salaryMax": 1.9,
-   "housing": false,
-   "meals": false,
-   "urgent": true,
-   "tier": "normal",
-   "age": "25",
-   "height": "145",
-   "desc": "RTHRTHT",
-   "phone": "0979886644",
-   "views": 0,
-   "calls": 0,
-   "images": [
-    "/images/jobs/69-6ab21675.jpg"
-   ],
-   "postedAt": 1795517862676,
-   "expiresAt": 1797937062676,
-   "updatedAt": 1795517862676
-  },
-  {
    "id": 65,
    "title": "Bảo Vệ Văn Phòng Công Ty 7h-19h; Bao Nhàn Mát Mẻ",
    "company": "song-hoa-long-group",
