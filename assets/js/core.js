@@ -271,16 +271,6 @@ export function jobRow(j) {
   </article>`;
 }
 
-export const adRow = (i = 0) => {
-  const ads = [
-    ['Đồng phục bảo vệ may sẵn', 'giao trong 48 giờ, đủ size, xuất hóa đơn cho công ty.', 'Xem mẫu'],
-    ['Bộ đàm Kenwood chính hãng', 'cho đội bảo vệ tòa nhà, bảo hành 24 tháng.', 'Nhận báo giá'],
-    ['Khóa huấn luyện nghiệp vụ bảo vệ', 'cấp chứng chỉ, học cuối tuần tại TP.HCM và Hà Nội.', 'Đăng ký']
-  ];
-  const [b, t, a] = ads[i % ads.length];
-  return `<aside class="jrow-ad" aria-label="Quảng cáo"><span class="adlabel">Quảng cáo</span><p><b>${b}</b> - ${t}</p><a href="/bang-gia#quang-cao">${a}</a></aside>`;
-};
-
 /* ---------- Toast, modal ---------- */
 export function toast(msg, ic = 'check') {
   let box = $('.toasts');

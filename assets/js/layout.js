@@ -21,7 +21,6 @@ export const ROUTES = [
   [/^\/tin-tuc$/, () => import('./pages/blog.js')],
   [/^\/tin-tuc\/([a-z0-9-]+)$/, () => import('./pages/post.js')],
   [/^\/video(?:\/([a-z0-9-]+))?$/, () => import('./pages/video.js')],
-  // Bảng giá tạm ẩn (Phase 1 đăng tin miễn phí). Bật lại: thêm dòng [/^\/bang-gia$/, () => import('./pages/pricing.js')]
   [/^\/dang-nhap$/, () => import('./pages/auth.js')],
   [/^\/ung-vien(?:\/([a-z-]+))?$/, () => import('./pages/candidate.js')],
   [/^\/trang-quan-ly-tuyen-dung(?:\/([a-z-]+))?$/, () => import('./pages/employer.js')],
