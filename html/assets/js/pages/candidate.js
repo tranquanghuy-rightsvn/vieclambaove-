@@ -1,4 +1,4 @@
-import { V, $, esc, icon, store, user, toast, deskNav, job, jobRow, url, province, modal, closeModal, api, busy } from '../core.js';
+import { V, $, esc, icon, store, user, toast, deskNav, job, jobRow, url, province, modal, closeModal, api, busy, hasLink } from '../core.js';
 import { go } from '../router.js';
 
 const EXP = ['Xuất ngũ', 'Công an nghĩa vụ', 'Chứng chỉ PCCC', 'Võ thuật', 'Đã làm bảo vệ', 'Có xe máy', 'Biết vi tính'];
@@ -40,6 +40,8 @@ export default async function ({ params: [tab = ''] }) {
           <label class="field"><span>Ca mong muốn</span><select class="select" name="shift"><option value="">Ca nào cũng được</option>${V.shifts.map((s) => `<option value="${s.id}" ${p.shift === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}</select></label>
         </div>
         <label class="check"><input type="checkbox" name="stay" ${p.stay ? 'checked' : ''}>Cần chỗ ở</label>
+        <label class="field" style="margin:12px 0"><span>Giới thiệu bản thân <small class="mute">(không bắt buộc)</small></span>
+          <textarea class="textarea" name="about" rows="4" maxlength="1000" placeholder="Vài dòng về kinh nghiệm, sức khỏe, thời gian có thể đi làm… (không ghi đường link)">${esc(p.about || '')}</textarea></label>
         <label class="check consent"><input type="checkbox" name="share" ${p.share ? 'checked' : ''}><span><b>Cho nhà tuyển dụng trên website tìm thấy hồ sơ của tôi</b> và gọi/nhắn Zalo khi có việc phù hợp. Tắt thì chỉ công ty bạn ứng tuyển mới thấy số điện thoại.</span></label>
         <div class="form-foot"><button class="btn btn-primary" type="submit">Lưu hồ sơ</button></div>
       </form>`,
@@ -81,6 +83,7 @@ export default async function ({ params: [tab = ''] }) {
     $('#pf', root)?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const f = new FormData(e.target);
+      if (hasLink(f.get('about'))) { toast('Giới thiệu bản thân không được chứa đường link.', 'alert'); return; }
       const stop = busy(e.submitter, 'Đang lưu…');
       try {
         const r = await api('/profile', { method: 'POST', body: { ...Object.fromEntries(f), exp: f.getAll('exp'), stay: !!f.get('stay'), share: !!f.get('share') } });

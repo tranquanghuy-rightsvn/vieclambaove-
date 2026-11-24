@@ -166,6 +166,7 @@ export default async function ({ params: [tab = ''], query }) {
         const digits = x.phone.replace(/\D/g, '');
         return `<div class="person">${mono({ initials: (x.name.trim().split(/\s+/).pop() || '?')[0].toUpperCase(), color: '#1e2a6e' })}
           <div><b>${esc(x.name)}</b><p>${[age(x.year), x.height && 'cao ' + esc(x.height) + (/^\d+$/.test(x.height) ? ' cm' : ''), pv && 'muốn làm ở ' + esc(pv.short), sh && esc(sh.name.toLowerCase()), x.stay && 'cần chỗ ở'].filter(Boolean).join(' · ')}</p>
+          ${x.about ? `<p class="cand-about">${esc(x.about)}</p>` : ''}
           <p class="mute">${x.exp.length ? x.exp.map(esc).join(', ') : 'Chưa ghi kinh nghiệm'} · cập nhật ${ago(x.updatedAt)}</p></div>
           <div class="acts"><a class="btn btn-call btn-s" href="tel:${digits}">${icon('phone')}${esc(x.phone)}</a><a class="btn btn-zalo btn-s" href="https://zalo.me/${digits}" target="_blank" rel="noopener">Zalo</a></div></div>`;
       }).join('')}</div>` : '<div class="empty"><h3>Chưa có ứng viên phù hợp</h3><p>Thử bỏ bớt điều kiện lọc, hoặc quay lại sau khi có thêm hồ sơ mới.</p></div>'}`;
