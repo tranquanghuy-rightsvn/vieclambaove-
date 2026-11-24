@@ -12,7 +12,7 @@ const PAGES = {
     <h2>Dữ liệu chúng tôi thu thập</h2><ul><li>Số điện thoại, họ tên, năm sinh, chiều cao, cân nặng, kinh nghiệm bạn tự khai.</li><li>Khu vực muốn làm việc. Vị trí GPS chỉ dùng khi bạn bấm "Gần tôi" và không được lưu.</li></ul>
     <h2>Ai được thấy</h2><p>Số điện thoại của ứng viên chỉ hiện với công ty khi ứng viên ứng tuyển, hoặc khi ứng viên bật "cho công ty tìm thấy" và công ty dùng điểm để mở.</p>
     <h2>Quyền của bạn</h2><ul><li>Xem, sửa, tải về toàn bộ dữ liệu trong mục Cài đặt.</li><li>Rút lại đồng ý và xóa tài khoản bất kỳ lúc nào. Dữ liệu bị xóa trong 30 ngày.</li></ul>
-    <h2>Lưu trữ</h2><p>Dữ liệu lưu tại máy chủ đặt ở Việt Nam, mã hóa khi truyền và khi lưu.</p>`],
+    <h2>Lưu trữ</h2><p>Dữ liệu được mã hóa khi truyền và khi lưu trữ, chỉ nhân sự được phân quyền mới truy cập được.</p>`],
   'quy-che': ['Quy chế đăng tin', `
     <p>Mọi tin đăng đều qua bộ lọc tự động. Tin có dấu hiệu rủi ro được kiểm duyệt thủ công trước khi hiển thị.</p>
     <h2>Tin bị từ chối nếu</h2><ul><li>Thu phí đồng phục, phí hồ sơ, phí đào tạo, đặt cọc dưới mọi hình thức.</li><li>Giữ CCCD, bằng cấp bản gốc của người lao động.</li><li>Lương ghi sai lệch so với thực tế hoặc thấp hơn lương tối thiểu vùng.</li><li>Không có địa chỉ mục tiêu cụ thể.</li><li>Trùng nội dung với tin đang hiển thị.</li></ul>

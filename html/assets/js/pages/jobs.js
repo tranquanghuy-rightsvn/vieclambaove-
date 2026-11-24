@@ -1,7 +1,7 @@
 import { V, $, $$, esc, icon, url, jobRow, adRow, activeJobs, province, shift, target, districtBySlug, crumbs, SITE, company } from '../core.js';
 import { go } from '../router.js';
 
-const PAY = [['', 'Mọi mức lương'], ['duoi-8', 'Dưới 8 triệu'], ['8-10', '8 – 10 triệu'], ['10-15', '10 – 15 triệu'], ['tren-15', 'Trên 15 triệu']];
+const PAY = [['', 'Mọi mức lương'], ['duoi-8', 'Dưới 8 triệu'], ['8-10', '8 - 10 triệu'], ['10-15', '10 - 15 triệu'], ['tren-15', 'Trên 15 triệu']];
 const payTest = { 'duoi-8': (j) => j.salaryMin < 8, '8-10': (j) => j.salaryMax >= 8 && j.salaryMin <= 10, '10-15': (j) => j.salaryMax >= 10 && j.salaryMin <= 15, 'tren-15': (j) => j.salaryMax > 15 };
 const SORT = [['moi', 'Mới nhất'], ['luong', 'Lương cao nhất'], ['han', 'Sắp hết hạn']];
 const PER = 8;
@@ -171,7 +171,7 @@ export default function ({ params: [ps, ds], query }) {
   const filtered = s.q || s.luong || s.ca.length > 1 || s.mt.length > 1 || s.cd.length || page > 1 || s.sx !== 'moi';
   return {
     nav: s.gap ? 'urgent' : 'jobs',
-    title: h1 + (page > 1 ? ` – Trang ${page}` : ''),
+    title: h1 + (page > 1 ? ` - Trang ${page}` : ''),
     desc: `${res.length} tin tuyển bảo vệ tại ${place}. Lương, ca làm, chỗ ở ghi rõ; công ty đã xác thực giấy phép. Ứng tuyển miễn phí.`,
     canonical: filtered ? url.area(s.tinh, s.quan) : undefined,
     noindex: !!s.q,
@@ -187,6 +187,6 @@ function seoIntro(p, d, jobs) {
   const byShift = V.shifts.map((x) => [x.name.toLowerCase(), jobs.filter((j) => j.shift === x.id).length]).filter((x) => x[1]).sort((a, b) => b[1] - a[1]);
   const housing = jobs.filter((j) => j.housing).length;
   const where = d ? `${d} (${p.name})` : p ? p.name : 'các tỉnh thành';
-  return `<p>Lương bảo vệ tại ${esc(where)} hiện dao động trung bình ${avgMin}–${avgMax} triệu đồng/tháng. Phổ biến nhất là ${byShift.slice(0, 2).map((x) => x[0]).join(' và ')}; ${housing} trên ${jobs.length} tin có hỗ trợ chỗ ở cho người ở xa.</p>
+  return `<p>Lương bảo vệ tại ${esc(where)} hiện dao động trung bình ${avgMin}-${avgMax} triệu đồng/tháng. Phổ biến nhất là ${byShift.slice(0, 2).map((x) => x[0]).join(' và ')}; ${housing} trên ${jobs.length} tin có hỗ trợ chỗ ở cho người ở xa.</p>
   <p>Trước khi nhận việc, hãy hỏi rõ ngày trả lương, có đóng BHXH không và ai cấp đồng phục. Công ty bảo vệ hợp pháp không thu tiền của người lao động dưới bất kỳ hình thức nào.</p>`;
 }

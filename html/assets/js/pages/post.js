@@ -5,13 +5,13 @@ const BODY = {
     <p>Lương bảo vệ phụ thuộc ba thứ: khu vực, độ dài ca và loại mục tiêu. Bảng dưới tổng hợp từ các tin đang tuyển trên trang trong tháng 11/2026.</p>
     <h2>Mức lương theo khu vực</h2>
     <table><thead><tr><th>Khu vực</th><th>Ca 8 tiếng</th><th>Ca 12 tiếng</th><th>Chỉ huy mục tiêu</th></tr></thead><tbody>
-      <tr><td>TP.HCM</td><td>7,5 – 8,5 triệu</td><td>8 – 9,5 triệu</td><td>11 – 13 triệu</td></tr>
-      <tr><td>Hà Nội</td><td>7,5 – 9 triệu</td><td>8,5 – 10 triệu</td><td>11 – 14 triệu</td></tr>
-      <tr><td>Bình Dương, Đồng Nai</td><td>7 – 8 triệu</td><td>8,5 – 10,5 triệu</td><td>10 – 12 triệu</td></tr>
-      <tr><td>Đà Nẵng</td><td>7 – 8 triệu</td><td>8 – 9 triệu</td><td>10 – 11 triệu</td></tr>
+      <tr><td>TP.HCM</td><td>7,5 - 8,5 triệu</td><td>8 - 9,5 triệu</td><td>11 - 13 triệu</td></tr>
+      <tr><td>Hà Nội</td><td>7,5 - 9 triệu</td><td>8,5 - 10 triệu</td><td>11 - 14 triệu</td></tr>
+      <tr><td>Bình Dương, Đồng Nai</td><td>7 - 8 triệu</td><td>8,5 - 10,5 triệu</td><td>10 - 12 triệu</td></tr>
+      <tr><td>Đà Nẵng</td><td>7 - 8 triệu</td><td>8 - 9 triệu</td><td>10 - 11 triệu</td></tr>
     </tbody></table>
     <h2>Các khoản cộng thêm</h2>
-    <ul><li>Phụ cấp ca đêm: tối thiểu 30% lương giờ làm đêm theo Bộ luật Lao động.</li><li>Chứng chỉ PCCC, võ thuật: thường cộng 300.000 – 800.000đ/tháng.</li><li>Bao ở, bao ăn: tương đương 1,5 – 2,5 triệu/tháng nếu tự lo.</li></ul>
+    <ul><li>Phụ cấp ca đêm: tối thiểu 30% lương giờ làm đêm theo Bộ luật Lao động.</li><li>Chứng chỉ PCCC, võ thuật: thường cộng 300.000 - 800.000đ/tháng.</li><li>Bao ở, bao ăn: tương đương 1,5 - 2,5 triệu/tháng nếu tự lo.</li></ul>
     <blockquote>Khi so sánh hai tin, hãy cộng cả chỗ ở và bữa ăn. Tin 8 triệu bao ở có thể lợi hơn tin 9,5 triệu tự túc.</blockquote>
     <h2>Lương có thấp hơn mức tối thiểu vùng được không?</h2>
     <p>Không. Lương cho ca 8 tiếng không được thấp hơn lương tối thiểu vùng. Ca 12 tiếng phải trả thêm giờ làm thêm hoặc quy đổi thành lương cao hơn tương ứng.</p>`,
@@ -19,7 +19,7 @@ const BODY = {
     <p>Mỗi tháng đội kiểm duyệt chặn hàng chục tin có dấu hiệu thu tiền người xin việc. Dưới đây là năm dấu hiệu thường gặp nhất.</p>
     <h2>1. Đòi tiền đồng phục, phí hồ sơ</h2><p>Công ty hợp pháp cấp đồng phục miễn phí hoặc trừ dần vào lương có thỏa thuận bằng văn bản, không thu tiền mặt trước khi nhận việc.</p>
     <h2>2. Giữ bằng, CCCD bản gốc</h2><p>Luật cấm người sử dụng lao động giữ giấy tờ tùy thân bản gốc của người lao động.</p>
-    <h2>3. Lương cao bất thường</h2><p>Tin bảo vệ phổ thông hứa 15 – 20 triệu mà không cần kinh nghiệm thường là mồi nhử.</p>
+    <h2>3. Lương cao bất thường</h2><p>Tin bảo vệ phổ thông hứa 15 - 20 triệu mà không cần kinh nghiệm thường là mồi nhử.</p>
     <h2>4. Không có địa chỉ mục tiêu cụ thể</h2><p>Hỏi rõ sẽ làm ở đâu. Nếu chỉ được hẹn "lên văn phòng rồi phân công", hãy cẩn thận.</p>
     <h2>5. Không tra được giấy phép</h2><p>Kinh doanh dịch vụ bảo vệ cần giấy chứng nhận đủ điều kiện về an ninh trật tự. Công ty có dấu "Đã xác thực" trên trang đã được đối chiếu.</p>
     <blockquote>Nếu đã lỡ chuyển tiền, hãy giữ lại tin nhắn, biên lai và báo cáo tin ngay trên trang để người khác không bị lừa.</blockquote>`
@@ -53,7 +53,7 @@ export default function ({ params: [id] }) {
         <ol>${urgent.map((j) => `<li><a href="${url.job(j)}"><span class="b-place">${esc(j.district)} · ${esc(province(j.province).short)}</span><span class="b-title">${esc(j.title)}</span><span class="b-pay">${pay(j)}<small>triệu</small></span></a></li>`).join('')}</ol>
         <div class="board-foot"><a class="more" href="/viec-lam?gap=1">Tất cả việc gấp ${icon('arrow', 'ico-s')}</a></div>
       </div>
-      <aside class="jrow-ad" aria-label="Quảng cáo"><span class="adlabel">Quảng cáo</span><p><b>Khóa PCCC cơ bản</b> – học 2 ngày cuối tuần, cấp chứng chỉ.</p></aside>
+      <aside class="jrow-ad" aria-label="Quảng cáo"><span class="adlabel">Quảng cáo</span><p><b>Khóa PCCC cơ bản</b> - học 2 ngày cuối tuần, cấp chứng chỉ.</p></aside>
     </aside>
   </div>`;
   return {

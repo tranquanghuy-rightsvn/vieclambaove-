@@ -6,7 +6,7 @@ const STAGES = [['new', 'Mới'], ['called', 'Đã gọi'], ['interview', 'Hẹn
 const STATUS = { draft: ['st-draft', 'Nháp'], pending: ['st-wait', 'Chờ duyệt'], live: ['st-live', 'Đang hiển thị'], soon: ['st-soon', 'Sắp hết hạn'], hidden: ['st-off', 'Đã ẩn'], rejected: ['st-soon', 'Bị từ chối'], removed: ['st-off', 'Bị gỡ'], expired: ['st-off', 'Hết hạn'] };
 const WEEKS = [1, 2, 3, 4];
 const tr = (n) => String(n).replace('.', ',');
-const pay = (j) => (j.salaryMin === j.salaryMax ? tr(j.salaryMin) : `${tr(j.salaryMin)}–${tr(j.salaryMax)}`);
+const pay = (j) => (j.salaryMin === j.salaryMax ? tr(j.salaryMin) : `${tr(j.salaryMin)}-${tr(j.salaryMax)}`);
 const daysLeft = (j) => (j.expiresAt ? Math.floor((j.expiresAt - Date.now()) / DAY) : null);
 const shown = (j) => (j.status === 'live' && daysLeft(j) !== null && daysLeft(j) <= 3 ? 'soon' : j.status);
 const ago = (ms) => { const m = Math.floor((Date.now() - ms) / 60000); return m < 60 ? `${Math.max(1, m)} phút trước` : m < 1440 ? `${Math.floor(m / 60)} giờ trước` : new Date(ms).toLocaleDateString('vi-VN'); };
@@ -17,7 +17,7 @@ function riskCheck(f) {
   const out = [];
   if (/(phí|đóng tiền|nộp tiền|thu tiền).{0,20}(đồng phục|hồ sơ|đào tạo)|đồng phục.{0,12}(phí|\d+ ?k|\d{3}\.?000)/.test(text)) out.push('Có nội dung thu phí đồng phục hoặc hồ sơ. Quy chế cấm thu tiền người xin việc.');
   if (/(đặt )?cọc|giữ (bằng|cccd|căn cước)/.test(text)) out.push('Có nội dung đặt cọc hoặc giữ giấy tờ gốc.');
-  if (Number(f.salaryMax) > 25) out.push(`Lương ${f.salaryMax} triệu cao bất thường so với mặt bằng (7 – 14 triệu).`);
+  if (Number(f.salaryMax) > 25) out.push(`Lương ${f.salaryMax} triệu cao bất thường so với mặt bằng (7 - 14 triệu).`);
   if (!f.address || f.address.length < 8) out.push('Thiếu địa chỉ mục tiêu cụ thể.');
   return out;
 }
@@ -86,7 +86,7 @@ export default async function ({ params: [tab = ''], query }) {
           <label class="field"><span>Đến (triệu/tháng)</span><input class="input" name="salaryMax" type="number" step="0.1" min="1" required value="${f.salaryMax ?? ''}"></label>
         </div>
         <div class="grid3">
-          <label class="field"><span>Độ tuổi</span><input class="input" name="age" maxlength="60" value="${esc(f.age || '')}" placeholder="Nam 20–50 tuổi"></label>
+          <label class="field"><span>Độ tuổi</span><input class="input" name="age" maxlength="60" value="${esc(f.age || '')}" placeholder="Nam 20-50 tuổi"></label>
           <label class="field"><span>Chiều cao</span><input class="input" name="height" maxlength="60" value="${esc(f.height || '')}" placeholder="Từ 1m65"></label>
           <label class="field"><span>SĐT liên hệ (Gọi/Zalo)</span><input class="input" name="phone" inputmode="tel" maxlength="20" value="${esc(f.phone || '')}" placeholder="0909 123 456"></label>
         </div>
@@ -110,7 +110,7 @@ export default async function ({ params: [tab = ''], query }) {
         const isLive = j.status === 'live' && d >= 0;
         return `<tr><td>${isLive ? `<a href="${url.job(j)}"><b>${esc(j.title)}</b></a>` : `<b>${esc(j.title)}</b>`}<br><small class="mute">${esc(j.district || '')}${j.salaryMin ? ' · ' + pay(j) + ' triệu' : ''}</small></td>
         <td>${statusCell(j)}</td><td class="num">${num(j.views || 0)}</td><td class="num">${num((j.calls || 0) + (j.zalos || 0))}</td>
-        <td class="num">${['live', 'hidden'].includes(j.status) && d !== null ? (d < 0 ? '–' : d + ' ngày') : '–'}</td>
+        <td class="num">${['live', 'hidden'].includes(j.status) && d !== null ? (d < 0 ? '-' : d + ' ngày') : '-'}</td>
         <td><div class="acts">
           ${j.status !== 'removed' ? `<a class="btn btn-quiet btn-s" href="/nha-tuyen-dung/dang-tin?sua=${j.id}" title="Sửa">${icon('edit')}<span class="sr">Sửa</span></a>` : ''}
           ${['live', 'hidden', 'expired'].includes(j.status) ? `<button class="btn btn-quiet btn-s" type="button" data-renew="${j.id}" title="Gia hạn">${icon('refresh')}<span class="sr">Gia hạn</span></button>` : ''}
@@ -118,7 +118,7 @@ export default async function ({ params: [tab = ''], query }) {
           ${j.status === 'hidden' ? `<button class="btn btn-quiet btn-s" type="button" data-hide="${j.id}" data-on="" title="Hiện lại">${icon('eye')}<span class="sr">Hiện lại</span></button>` : ''}
         </div></td></tr>`;
       }).join('')}
-      </tbody></table></div>` : '<div class="empty"><h3>Chưa có tin nào</h3><p>Đăng tin miễn phí, hiển thị 1 – 4 tuần.</p><a class="btn btn-primary" href="/nha-tuyen-dung/dang-tin">Đăng tin đầu tiên</a></div>'}`,
+      </tbody></table></div>` : '<div class="empty"><h3>Chưa có tin nào</h3><p>Đăng tin miễn phí, hiển thị 1 - 4 tuần.</p><a class="btn btn-primary" href="/nha-tuyen-dung/dang-tin">Đăng tin đầu tiên</a></div>'}`,
 
     'ung-vien': () => {
       const only = query.get('tin');
@@ -307,7 +307,7 @@ export default async function ({ params: [tab = ''], query }) {
     });
   }
 
-  return { nav: 'employer', html, mount, title: tabs.find((t) => t[0] === tab)[1] + ' – Nhà tuyển dụng', noindex: true };
+  return { nav: 'employer', html, mount, title: tabs.find((t) => t[0] === tab)[1] + ' - Nhà tuyển dụng', noindex: true };
 }
 
 function onboarding(u) {

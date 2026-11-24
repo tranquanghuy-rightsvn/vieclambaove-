@@ -51,7 +51,7 @@ export default async function ({ params: [tab = ''] }) {
           const st = open ? ST[a.status] || ST.new : ['st-off', 'Tin đã đóng'];
           const title = `<b>${esc(a.title || 'Tin đã bị xoá')}</b>`;
           return `<tr><td>${j ? `<a href="${url.job(j)}">${title}</a>` : title}<br><small class="mute">${esc(a.district || '')}${a.province ? ', ' + esc(province(a.province)?.short || '') : ''}</small></td>
-            <td>${a.salary_min ? `<b>${tr(a.salary_min)}${a.salary_max !== a.salary_min ? '–' + tr(a.salary_max) : ''}</b> tr` : '–'}</td><td>${new Date(a.created_at).toLocaleDateString('vi-VN')}</td><td class="${st[0]}"><b>${st[1]}</b></td></tr>`;
+            <td>${a.salary_min ? `<b>${tr(a.salary_min)}${a.salary_max !== a.salary_min ? '-' + tr(a.salary_max) : ''}</b> tr` : '-'}</td><td>${new Date(a.created_at).toLocaleDateString('vi-VN')}</td><td class="${st[0]}"><b>${st[1]}</b></td></tr>`;
         }).join('')}
       </tbody></table></div>` : empty('Bạn chưa ứng tuyển việc nào', 'Bấm "Ứng tuyển nhanh" ở tin bất kỳ, hồ sơ sẽ gửi tới công ty.')}`,
     'da-luu': () => {

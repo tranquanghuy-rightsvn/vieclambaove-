@@ -76,7 +76,7 @@ export default function ({ params: [id] }) {
         <div><a href="${url.company(c)}">${esc(c.name)}</a><br>
         ${c.verified ? `<span class="verified">${icon('check')}Đã xác thực giấy phép</span>` : '<span class="mute">Chưa xác thực</span>'}</div>
       </div>
-      ${(j.images || []).length ? `<div class="d-gallery n${j.images.length}">${j.images.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="${esc(j.title)} – ảnh ${i + 1}" loading="${i ? 'lazy' : 'eager'}"></a>`).join('')}</div>` : ''}
+      ${(j.images || []).length ? `<div class="d-gallery n${j.images.length}">${j.images.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="${esc(j.title)} - ảnh ${i + 1}" loading="${i ? 'lazy' : 'eager'}"></a>`).join('')}</div>` : ''}
       <dl class="facts">${facts.filter(([, v]) => v).map(([k, v, cls]) => `<div class="${cls || ''}"><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
 
       ${j.desc
@@ -126,7 +126,7 @@ export default function ({ params: [id] }) {
   const until = new Date(); until.setDate(until.getDate() + j.daysLeft);
   return {
     nav: 'jobs', mbar: !off, html, mount,
-    title: off ? `[Hết hạn] ${j.title}` : `${j.title} – ${pay(j)} triệu`,
+    title: off ? `[Hết hạn] ${j.title}` : `${j.title} - ${pay(j)} triệu`,
     desc: `${c.short} tuyển ${j.qty} bảo vệ tại ${j.district}, ${p.short}. Lương ${pay(j)} triệu/tháng, ${sh.name.toLowerCase()}${j.housing ? ', bao ở' : ''}.`,
     canonical, noindex: off,
     ld: off ? [] : {

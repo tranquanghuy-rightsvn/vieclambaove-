@@ -17,7 +17,7 @@ export default async function ({ query }) {
 
   const side = {
     candidate: ['Tìm việc bảo vệ gần nhà', 'Đăng nhập bằng số điện thoại để lưu tin, xem lại các việc đã ứng tuyển và sửa hồ sơ bất cứ lúc nào.', ['Ứng tuyển 1 chạm, không cần CV', 'Số điện thoại chỉ hiện với công ty bạn ứng tuyển', 'Hoàn toàn miễn phí']],
-    employer: ['Tuyển bảo vệ nhanh, miễn phí', 'Đăng tin miễn phí trong giai đoạn ra mắt. Tin hiển thị 1 – 4 tuần tuỳ bạn chọn, nhận hồ sơ ứng viên ngay trong tài khoản.', ['Đăng nhập bằng email công ty hoặc Gmail', 'Xác thực giấy phép để được gắn dấu tin cậy', 'Theo dõi lượt xem, lượt gọi từng tin']]
+    employer: ['Tuyển bảo vệ nhanh, miễn phí', 'Đăng tin miễn phí trong giai đoạn ra mắt. Tin hiển thị 1 - 4 tuần tuỳ bạn chọn, nhận hồ sơ ứng viên ngay trong tài khoản.', ['Đăng nhập bằng email công ty hoặc Gmail', 'Xác thực giấy phép để được gắn dấu tin cậy', 'Theo dõi lượt xem, lượt gọi từng tin']]
   };
 
   const html = `

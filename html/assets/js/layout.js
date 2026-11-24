@@ -3,7 +3,7 @@
 import { icon, esc, user } from './core.js';
 
 export const SITE_NAME = 'Việc Làm Bảo Vệ';
-export const DEFAULT_TITLE = 'Việc Làm Bảo Vệ – Tuyển dụng bảo vệ, vệ sĩ toàn quốc';
+export const DEFAULT_TITLE = 'Việc Làm Bảo Vệ - Tuyển dụng bảo vệ, vệ sĩ toàn quốc';
 export const DEFAULT_DESC = 'Chuyên trang việc làm ngành bảo vệ: lương, ca làm, chỗ ở ghi rõ trong từng tin.';
 export const docTitle = (page) => (page.title ? `${page.title} | ${SITE_NAME}` : DEFAULT_TITLE);
 
@@ -45,7 +45,7 @@ function acctLink(u) {
 }
 
 // Logo theo mẫu "Cổng thông tin tuyển dụng bảo vệ": ô vàng gradient + khiên, chữ vieclam·baove·.vn
-const brand = () => `<a class="brand logo" href="/" aria-label="vieclambaove.vn – Trang chủ">
+const brand = () => `<a class="brand logo" href="/" aria-label="vieclambaove.vn - Trang chủ">
       <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.2 4.2 5.3v5.9c0 4.9 3.3 9.2 7.8 10.6 4.5-1.4 7.8-5.7 7.8-10.6V5.3z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M12 2.2v19.6c-4.5-1.4-7.8-5.7-7.8-10.6V5.3z" fill="currentColor"/></svg></span>
       <span class="logo-text"><span class="logo-name">vieclam<b>baove</b>.vn</span><small>Tuyển dụng bảo vệ toàn quốc</small></span>
     </a>`;
@@ -106,7 +106,7 @@ export function footerHtml(path) {
         ${brand()}
         <p class="foot-note">Chuyên trang tuyển dụng ngành bảo vệ, vệ sĩ. Tin được kiểm duyệt trước khi hiển thị, công ty được xác thực giấy phép.</p>
         <ul class="foot-contact">
-          <li>${icon('phone', 'ico-s')}Hotline: <a href="tel:19006868">1900 6868</a> (8:00 – 21:00)</li>
+          <li>${icon('phone', 'ico-s')}Hotline: <a href="tel:19006868">1900 6868</a> (8:00 - 21:00)</li>
           <li>${icon('chat', 'ico-s')}Email: <a href="mailto:hotro@vieclambaove.vn">hotro@vieclambaove.vn</a></li>
           <li>${icon('pin', 'ico-s')}Tầng 5, 123 Nguyễn Văn Linh, Quận 7, TP.HCM</li>
         </ul>

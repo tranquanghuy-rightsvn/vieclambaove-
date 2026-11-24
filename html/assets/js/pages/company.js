@@ -37,7 +37,7 @@ export default function ({ params: [id] }) {
   </div>`;
   return {
     nav: 'jobs', html,
-    title: `${c.name} – tuyển dụng bảo vệ`,
+    title: `${c.name} - tuyển dụng bảo vệ`,
     desc: `${c.name}: ${jobs.length} vị trí bảo vệ đang tuyển. ${c.size}, thành lập ${c.founded}.`,
     ld: { '@context': 'https://schema.org', '@type': 'Organization', name: c.name, url: SITE + url.company(c), address: c.address, taxID: c.mst }
   };

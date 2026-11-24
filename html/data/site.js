@@ -1,4 +1,4 @@
-/* Sinh bởi scripts/build.mjs từ data/site.json – không sửa tay */
+/* Sinh bởi scripts/build.mjs từ data/site.json - không sửa tay */
 (function (V, d) {
   var t = Date.now(), D = 864e5;
   d.jobs = d.jobs.map(function (j) {
