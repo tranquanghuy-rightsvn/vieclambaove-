@@ -1,12 +1,5 @@
-/* Nội dung tĩnh: bài tin tức.
-   Tin tuyển dụng, công ty, danh mục nằm ở /data/site.js (Worker sinh từ cơ sở dữ liệu). */
+/* Dữ liệu công khai (tin tuyển dụng, công ty, danh mục, video, bài tin tức) nằm ở /data/site.js:
+   quản trị soạn trong trang quản trị, website tự cập nhật. Nội dung từng bài tin tức ở
+   /assets/content/tin-tuc/<slug>.html. File này chỉ khởi tạo giá trị mặc định. */
 window.VLBV = window.VLBV || {};
-
-VLBV.posts = [
-  { id: 'bang-luong-bao-ve-2026', img: '/assets/img/photos/blog-luong.jpg', cat: 'Bảng lương', title: 'Lương bảo vệ 2026: bảng lương theo khu vực, ca trực và cách tính', excerpt: 'Lương bảo vệ 2026 theo khu vực, loại mục tiêu, ca 8 và 12 tiếng từ tin đang tuyển; lương tối thiểu vùng, phụ cấp làm đêm, làm thêm giờ và cách so sánh tin.', read: 10, views: 18420, date: '12/11/2026' },
-  { id: 'dau-hieu-cong-ty-bao-ve-lua-dao', img: '/assets/img/photos/blog-lua-dao.jpg', cat: 'Cảnh báo lừa đảo', title: 'Công ty bảo vệ lừa đảo: 7 dấu hiệu nhận biết và cách xử lý', excerpt: 'Nhận biết công ty bảo vệ lừa đảo: thu phí đồng phục, giữ giấy tờ gốc, lương cao bất thường. Quy định pháp luật, cách kiểm tra công ty, cách xử lý khi bị lừa.', read: 9, views: 42190, date: '08/11/2026' },
-  { id: 'quy-trinh-tuan-tra-pccc', img: '/assets/img/photos/blog-tuan-tra.jpg', cat: 'Nghiệp vụ', title: 'Quy trình tuần tra bảo vệ tòa nhà, chung cư và xử lý khi có cháy', excerpt: 'Quy trình tuần tra bảo vệ trước ca, trong ca, giao ca, ghi sổ; các điểm cần kiểm tra, cách xử lý khi phát hiện cháy, gọi 114 và nghĩa vụ PCCC theo luật mới.', read: 11, views: 12850, date: '02/11/2026' },
-  { id: 'kinh-nghiem-phong-van-bao-ve', img: '/assets/img/photos/blog-phong-van.jpg', cat: 'Phỏng vấn', title: 'Kinh nghiệm phỏng vấn bảo vệ: hồ sơ, 10 câu hỏi và cách trả lời', excerpt: 'Kinh nghiệm phỏng vấn bảo vệ: hồ sơ cần mang, trang phục, 10 câu hỏi thường gặp kèm gợi ý trả lời, câu nên hỏi lại về lương, ca, BHXH và dấu hiệu lừa đảo.', read: 9, views: 9310, date: '28/10/2026' },
-  { id: 'ca-12-tieng-co-dung-luat', img: '/assets/img/photos/blog-ca-12.jpg', cat: 'Pháp lý', title: 'Ca 12 tiếng bảo vệ có đúng luật? Giờ làm thêm, lương đêm 2026', excerpt: 'Ca 12 tiếng bảo vệ có đúng luật không? Giới hạn làm thêm 40 giờ/tháng, 200 giờ/năm, tiền tăng ca 150-300%, làm đêm cộng 30% và ví dụ tính lương dễ hiểu.', read: 12, views: 7640, date: '20/10/2026' },
-  { id: 'chung-chi-bao-ve-can-co', img: '/assets/img/photos/blog-chung-chi.jpg', cat: 'Nghề nghiệp', title: 'Chứng chỉ bảo vệ cần có gì? Nghiệp vụ, PCCC, sơ cứu, võ thuật', excerpt: 'Chứng chỉ bảo vệ theo Nghị định 96/2016 sửa đổi: ai bắt buộc phải có, học nghiệp vụ ở đâu, chứng nhận PCCC, sơ cấp cứu, võ thuật và lợi ích về lương.', read: 10, views: 5120, date: '14/10/2026' }
-];
+VLBV.posts = VLBV.posts || [];
