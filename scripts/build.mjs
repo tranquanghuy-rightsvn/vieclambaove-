@@ -102,7 +102,7 @@ write('/data/site.js', `/* Sinh bởi scripts/build.mjs từ data/site.json - kh
 
 const pub = [];          // [path, lastmod] cho sitemap
 const add = (path, lastmod = BUILT) => pub.push([path, lastmod]);
-add('/'); add('/viec-lam'); add('/tin-tuc'); add('/video');
+add('/'); add('/viec-lam'); add('/tin-tuc'); add('/video'); add('/cong-ty');
 ['dieu-khoan', 'bao-mat', 'quy-che', 'lien-he'].forEach((s) => add('/chinh-sach/' + s));
 const withJobs = new Set(V.jobs.map((j) => j.province + '|' + j.district));
 V.provinces.forEach((p) => {
