@@ -12,10 +12,6 @@ export const TOPICS = [
     intro: 'Bảo vệ ngân hàng làm giờ hành chính, môi trường sạch, yêu cầu ngoại hình gọn gàng, thái độ lịch sự và tuân thủ quy trình an ninh chặt chẽ.' },
   { slug: 'truong-hoc-benh-vien', name: 'bảo vệ trường học, bệnh viện', short: 'Bảo vệ trường học, bệnh viện', test: (j) => j.target === 'truong-hoc',
     intro: 'Bảo vệ trường học, bệnh viện giữ trật tự cổng, bãi xe, hướng dẫn phụ huynh, người nhà bệnh nhân. Công việc ổn định, ít di chuyển.' },
-  { slug: 'su-kien', name: 'bảo vệ sự kiện', short: 'Bảo vệ sự kiện', test: (j) => j.target === 'su-kien' || has(j, 'sự kiện'),
-    intro: 'Bảo vệ sự kiện làm theo buổi hoặc theo ngày tại hội chợ, triển lãm, ca nhạc. Phù hợp người muốn làm thêm cuối tuần, thường trả lương theo ngày.' },
-  { slug: 've-si', name: 'vệ sĩ', short: 'Vệ sĩ', test: (j) => j.target === 've-si' || has(j, 'vệ sĩ'),
-    intro: 'Vệ sĩ bảo vệ yếu nhân, áp tải hàng hóa, đòi hỏi thể lực tốt, có võ thuật và kỹ năng xử lý tình huống. Lương cao hơn bảo vệ mục tiêu thông thường.' },
   { slug: 'ca-dem', name: 'bảo vệ ca đêm', short: 'Bảo vệ ca đêm', test: (j) => j.shift === 'dem' || has(j, 'ca đêm', 'trực đêm'),
     intro: 'Việc bảo vệ ca đêm thường từ 18h hoặc 22h đến sáng. Theo Bộ luật Lao động 2019, giờ làm từ 22h đến 6h được trả thêm ít nhất 30% so với giờ làm ban ngày.' },
   { slug: 'ca-12-tieng', name: 'bảo vệ ca 12 tiếng', short: 'Bảo vệ ca 12 tiếng', test: (j) => j.shift === '12h' || has(j, '12 tiếng', '12h'),
@@ -29,7 +25,11 @@ export const TOPICS = [
   { slug: 'tuyen-gap', name: 'bảo vệ tuyển gấp', short: 'Bảo vệ tuyển gấp', test: (j) => j.urgent || has(j, 'gấp'),
     intro: 'Các vị trí cần người ngay, thường nhận việc trong 1 đến 3 ngày. Dù gấp, công ty hợp pháp không thu tiền đồng phục hay phí hồ sơ.' },
   { slug: 'khong-can-kinh-nghiem', name: 'bảo vệ không cần kinh nghiệm', short: 'Không cần kinh nghiệm', test: (j) => has(j, 'không cần kinh nghiệm', 'chưa có kinh nghiệm', 'đào tạo'),
-    intro: 'Việc bảo vệ nhận người mới, được đào tạo nghiệp vụ trước khi nhận mục tiêu. Phù hợp người lần đầu làm nghề bảo vệ.' }
+    intro: 'Việc bảo vệ nhận người mới, được đào tạo nghiệp vụ trước khi nhận mục tiêu. Phù hợp người lần đầu làm nghề bảo vệ.' },
+  { slug: 'su-kien', name: 'bảo vệ sự kiện', short: 'Bảo vệ sự kiện', test: (j) => j.target === 'su-kien' || has(j, 'sự kiện'),
+    intro: 'Bảo vệ sự kiện làm theo buổi hoặc theo ngày tại hội chợ, triển lãm, ca nhạc. Phù hợp người muốn làm thêm cuối tuần, thường trả lương theo ngày.' },
+  { slug: 've-si', name: 'vệ sĩ', short: 'Vệ sĩ', test: (j) => j.target === 've-si' || has(j, 'vệ sĩ'),
+    intro: 'Vệ sĩ bảo vệ yếu nhân, áp tải hàng hóa, đòi hỏi thể lực tốt, có võ thuật và kỹ năng xử lý tình huống. Lương cao hơn bảo vệ mục tiêu thông thường.' }
 ];
 
 const MIN_JOBS = 2; // trang tỉnh + chủ đề chỉ dựng tĩnh khi có từ 2 tin

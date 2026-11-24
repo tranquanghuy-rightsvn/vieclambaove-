@@ -1,5 +1,4 @@
 import { V, $, $$, esc, icon, url, mono, jobRow, activeJobs, pagerHtml, company, province, SITE } from '../core.js';
-import { topicPages, topicPath } from '../topics.js';
 import { companyList, coBox } from './companies.js';
 import { go } from '../router.js';
 
@@ -13,9 +12,9 @@ export default function () {
   const quick = [
     ['Bảo vệ tòa nhà', '/viec-lam?muc-tieu=toa-nha'],
     ['Bảo vệ KCN Bình Dương', '/viec-lam/binh-duong?muc-tieu=kcn'],
-    ['Vệ sĩ', '/viec-lam?muc-tieu=ve-si'],
     ['Bảo vệ ca đêm', '/viec-lam?ca=dem'],
-    ['Có chỗ ở', '/viec-lam?che-do=o']
+    ['Có chỗ ở', '/viec-lam?che-do=o'],
+    ['Vệ sĩ', '/viec-lam?muc-tieu=ve-si']
   ];
 
 
@@ -25,9 +24,13 @@ export default function () {
   const hotCo = hot && company(hot.company);
   const pr = (n) => String(n).replace('.', ',');
 
-  const tiles = [...V.targets.map((t) => [t.name, '/viec-lam?muc-tieu=' + t.id, t.icon, count((j) => j.target === t.id)]),
+  // Sự kiện, Vệ sĩ ít người tìm → xếp cuối
+  const RARE = ['su-kien', 've-si'];
+  const tile = (t) => [t.name, '/viec-lam?muc-tieu=' + t.id, t.icon, count((j) => j.target === t.id)];
+  const tiles = [...V.targets.filter((t) => !RARE.includes(t.id)).map(tile),
     ['Bảo vệ ca đêm', '/viec-lam?ca=dem', 'moon', count((j) => j.shift === 'dem')],
-    ['Có chỗ ở miễn phí', '/viec-lam?che-do=o', 'bed', count((j) => j.housing)]];
+    ['Có chỗ ở miễn phí', '/viec-lam?che-do=o', 'bed', count((j) => j.housing)],
+    ...RARE.map((id) => V.targets.find((t) => t.id === id)).filter(Boolean).map(tile)];
 
   const html = `
   <section class="hero">
@@ -105,11 +108,6 @@ export default function () {
         </div>
       </section>
     </div>
-
-    <section class="panel-box" aria-labelledby="popH">
-      <div class="pb-head"><h2 id="popH">Tìm kiếm nhiều</h2></div>
-      <div class="chip-links pop-links">${topicPages().filter((x) => !x.pv).map((x) => `<a class="chip-link" href="${topicPath(x.t)}">${esc(x.t.short)}<em>${x.n}</em></a>`).join('')}${topicPages().filter((x) => x.pv).slice(0, 12).map((x) => `<a class="chip-link" href="${topicPath(x.t, x.pv)}">${esc(x.t.short)} ${esc(x.pv.short)}<em>${x.n}</em></a>`).join('')}</div>
-    </section>
 
     <section class="panel-box" aria-labelledby="blogH">
       <div class="pb-head"><h2 id="blogH">Tin tức nghề bảo vệ</h2><a class="more" href="/tin-tuc">Xem tất cả ${icon('arrow', 'ico-s')}</a></div>
