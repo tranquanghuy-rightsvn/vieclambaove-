@@ -15,7 +15,7 @@ export const ROUTES = [
   [/^\/tin-tuc$/, () => import('./pages/blog.js')],
   [/^\/tin-tuc\/([a-z0-9-]+)$/, () => import('./pages/post.js')],
   [/^\/video(?:\/([a-z0-9-]+))?$/, () => import('./pages/video.js')],
-  [/^\/bang-gia$/, () => import('./pages/pricing.js')],
+  // Bảng giá tạm ẩn (Phase 1 đăng tin miễn phí). Bật lại: thêm dòng [/^\/bang-gia$/, () => import('./pages/pricing.js')]
   [/^\/dang-nhap$/, () => import('./pages/auth.js')],
   [/^\/ung-vien(?:\/([a-z-]+))?$/, () => import('./pages/candidate.js')],
   [/^\/nha-tuyen-dung(?:\/([a-z-]+))?$/, () => import('./pages/employer.js')],
@@ -34,8 +34,7 @@ export function match(path) {
 export const NAV = [
   ['jobs', '/viec-lam', 'Việc làm'],
   ['blog', '/tin-tuc', 'Tin tức'],
-  ['video', '/video', 'Video'],
-  ['pricing', '/bang-gia', 'Bảng giá']
+  ['video', '/video', 'Video']
 ];
 
 function acctLink(u) {
@@ -126,7 +125,6 @@ export function footerHtml(path) {
       </ul></div>
       <div><h4>Dành cho nhà tuyển dụng</h4><ul>
         <li><a href="/nha-tuyen-dung/dang-tin">Đăng tin tuyển dụng</a></li>
-        <li><a href="/bang-gia">Bảng giá dịch vụ</a></li>
         <li><a href="/nha-tuyen-dung/xac-thuc">Xác thực công ty</a></li>
       </ul></div>
       <div><h4>Việc làm theo tỉnh</h4><ul>${V.provinces.map((p) => `<li><a href="/viec-lam/${p.slug}">Bảo vệ ${p.short}</a></li>`).join('')}</ul></div>
