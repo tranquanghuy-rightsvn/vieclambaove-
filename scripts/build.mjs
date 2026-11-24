@@ -50,7 +50,7 @@ const escAttr = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/"/g, '&qu
 function htmlPage(path, page, { status } = {}) {
   const title = layout.docTitle(page);
   const desc = page.desc || layout.DEFAULT_DESC;
-  const canonical = SITE + layout.withSlash(page.canonical || path);
+  const canonical = SITE + layout.noSlash(page.canonical || path);
   const ld = [].concat(page.ld || []).map((o) => `<script type="application/ld+json" data-ld>${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`).join('');
   const head = `<meta property="og:title" content="${escAttr(title)}"><meta property="og:description" content="${escAttr(desc)}"><meta property="og:url" content="${escAttr(canonical)}"><meta property="og:type" content="website">${page.noindex ? '<meta name="robots" content="noindex, follow">' : ''}${ld}`;
   const cls = [page.mbar && 'has-mbar', page.tabbar !== false && 'has-tabbar'].filter(Boolean).join(' ');
@@ -60,9 +60,9 @@ function htmlPage(path, page, { status } = {}) {
     .replace(/<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${escAttr(canonical)}">`)
     .replace('</head>', head + '\n</head>')
     .replace('<body>', cls ? `<body class="${cls}">` : '<body>')
-    .replace('<div id="header"></div>', `<div id="header">${layout.slashLinks(layout.headerHtml(page.nav))}</div>`)
-    .replace('<main id="main" tabindex="-1"></main>', `<main id="main" tabindex="-1">${layout.slashLinks(page.html)}</main>`)
-    .replace('<div id="footer"></div>', `<div id="footer">${layout.slashLinks(layout.footerHtml(path.replace(/\/+$/, '') || '/'))}</div>`);
+    .replace('<div id="header"></div>', `<div id="header">${layout.cleanLinks(layout.headerHtml(page.nav))}</div>`)
+    .replace('<main id="main" tabindex="-1"></main>', `<main id="main" tabindex="-1">${layout.cleanLinks(page.html)}</main>`)
+    .replace('<div id="footer"></div>', `<div id="footer">${layout.cleanLinks(layout.footerHtml(layout.noSlash(path)))}</div>`);
 }
 
 function write(path, html) {
@@ -102,8 +102,8 @@ write('/data/site.js', `/* Sinh bởi scripts/build.mjs từ data/site.json - kh
 
 const pub = [];          // [path, lastmod] cho sitemap
 const add = (path, lastmod = BUILT) => pub.push([path, lastmod]);
-add('/'); add('/viec-lam/'); add('/tin-tuc/'); add('/video/');
-['dieu-khoan', 'bao-mat', 'quy-che', 'lien-he'].forEach((s) => add('/chinh-sach/' + s + '/'));
+add('/'); add('/viec-lam'); add('/tin-tuc'); add('/video');
+['dieu-khoan', 'bao-mat', 'quy-che', 'lien-he'].forEach((s) => add('/chinh-sach/' + s));
 const withJobs = new Set(V.jobs.map((j) => j.province + '|' + j.district));
 V.provinces.forEach((p) => {
   add(core.url.area(p.slug));
@@ -113,7 +113,7 @@ V.provinces.forEach((p) => {
 V.jobs.forEach((j) => add(core.url.job(j), j.updatedAt || j.postedAt));
 V.companies.forEach((c) => add(core.url.company(c)));
 V.posts.forEach((p) => add(core.url.post(p)));
-(V.videos || []).forEach((v) => add('/video/' + v.slug + '/', v.updatedAt || v.date));
+(V.videos || []).forEach((v) => add('/video/' + v.slug, v.updatedAt || v.date));
 
 let n = 0;
 for (const [path] of pub) {
@@ -136,10 +136,10 @@ for (const [path, title] of Object.entries(PRIVATE)) {
   write(path, htmlPage(path, { title, noindex: true, html: loading, nav: path.startsWith('/nha-tuyen-dung') ? 'employer' : '', tabbar: path !== '/dang-nhap' }));
 }
 // Khung trống: Worker trả cho nội dung vừa duyệt chưa kịp build (JS vẽ từ dữ liệu trực tiếp)
-write('/_shell/', htmlPage('/', { title: '', noindex: true, html: loading }).replace('<link rel="canonical" href="' + SITE + '/">', '<link rel="canonical" href="/">'));
+write('/_shell', htmlPage('/', { title: '', noindex: true, html: loading }).replace('<link rel="canonical" href="' + SITE + '/">', '<link rel="canonical" href="/">'));
 // 404: vẫn là khung app - đường dẫn hợp lệ nhưng chưa có trang tĩnh (vd quận chưa có tin) JS sẽ vẽ đúng trang
 write('/404.html', htmlPage('/404', layout.notFoundPage()));
-write('/_404/', htmlPage('/404', layout.notFoundPage()));
+write('/_404', htmlPage('/404', layout.notFoundPage()));
 
 const day = (ms) => new Date(ms).toISOString().slice(0, 10);
 write('/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pub.map(([u, d]) => `  <url><loc>${escAttr(SITE + u)}</loc><lastmod>${day(d)}</lastmod></url>`).join('\n')}\n</urlset>\n`);

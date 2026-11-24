@@ -56,16 +56,20 @@ export default {
     }
     if (url.pathname === '/robots.txt') return robots(url);
     if (url.pathname === '/data/site.js') return serveLive(env, req);
+    // Toàn site thống nhất KHÔNG có / cuối: /slug/ → /slug (301, giữ query)
+    if (url.pathname.length > 1 && url.pathname.endsWith('/')) {
+      return Response.redirect(url.origin + url.pathname.replace(/\/+$/, '') + url.search, 301);
+    }
     // Tới đây nghĩa là KHÔNG có file tĩnh cho đường dẫn này (file tĩnh được phục vụ trước khi vào Worker).
     if (url.pathname.startsWith('/images/')) {
       const img = await liveImage(env, decodeURIComponent(url.pathname.slice(8)));
       if (img) return img;
     } else if (req.method === 'GET' && (await existsLive(env, url.pathname))) {
       // Nội dung vừa duyệt chưa kịp build: trả khung trang (200) để JS vẽ ngay từ dữ liệu trực tiếp
-      const shell = await env.ASSETS.fetch(new Request(url.origin + '/_shell/'));
+      const shell = await env.ASSETS.fetch(new Request(url.origin + '/_shell'));
       return new Response(shell.body, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-cache' } });
     }
-    const nf = await env.ASSETS.fetch(new Request(url.origin + '/_404/'));
+    const nf = await env.ASSETS.fetch(new Request(url.origin + '/_404'));
     return new Response(nf.body, { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 };

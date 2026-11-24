@@ -44,12 +44,12 @@ export default function ({ params: [ps, ds], query }) {
   let near = false;
   if (query.get('gan-toi') && !ps) { ps = 'tp-hcm'; near = true; }
   const qs = query.toString() ? '?' + query.toString() : '';
-  // Dạng cũ 2 cấp /viec-lam/<tỉnh>/<quận>/ → dạng mới /viec-lam/<quận>-<tỉnh>/
-  if (ds) { const pv = province(ps); const dd = districtBySlug(pv, ds); return { redirect: (dd ? url.area(ps, dd) : pv ? url.area(ps) : '/viec-lam/') + qs }; }
+  // Dạng cũ 2 cấp /viec-lam/<tỉnh>/<quận> → dạng mới /viec-lam/<quận>-<tỉnh>
+  if (ds) { const pv = province(ps); const dd = districtBySlug(pv, ds); return { redirect: (dd ? url.area(ps, dd) : pv ? url.area(ps) : '/viec-lam') + qs }; }
   let d = null;
   if (ps && !province(ps)) {
     const sp = splitArea(ps);
-    if (!sp) return { redirect: '/viec-lam/' };
+    if (!sp) return { redirect: '/viec-lam' };
     [ps, d] = sp;
   }
   const p = ps ? province(ps) : null;
