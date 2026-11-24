@@ -20,7 +20,7 @@
     { "binding": "FILES", "bucket_name": "vieclambaove-files" }
   ],
   // Không dùng cron Cloudflare: xuất bản ngay khi có thay đổi, hết hạn do GAS gọi lúc 0h (GAS.md)
-  "triggers": { "crons": [] },
+  "triggers": { "crons": ["0 23 * * *"] }, // 23h UTC = 6h sáng giờ VN: cào tin (worker/crawl.js)
   "vars": { "GITHUB_REPO": "tranquanghuy-rightsvn/vieclambaove-", "GITHUB_BRANCH": "main" },
   "observability": { "enabled": true }
   // Secret (đặt bằng `wrangler secret put`): ADMIN_API_KEY, GITHUB_TOKEN, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET

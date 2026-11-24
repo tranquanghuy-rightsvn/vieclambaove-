@@ -10,6 +10,7 @@ export const json = (data, status = 200, headers = {}) =>
 
 export const now = () => Date.now();
 export const DAY = 86400000;
+export const MAX_LIFE = 30 * DAY; // mỗi tin tồn tại tối đa 30 ngày (kể cả gia hạn)
 
 /* ---------- Đọc body: chỉ nhận JSON (chặn form chéo trang) ---------- */
 export async function body(req) {

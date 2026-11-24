@@ -1,8 +1,70 @@
 // API quản trị: chỉ trang admin GAS gọi, xác thực bằng khoá bí mật ADMIN_API_KEY
 // (header Authorization: Bearer <key>). Không dùng cookie, không mở cho trình duyệt.
-import { fail, json, now, DAY, body, str, sha256, slugify, hasLink, normPhone } from './lib.js';
+import { fail, json, now, DAY, MAX_LIFE, body, str, sha256, slugify, hasLink, normPhone } from './lib.js';
 import { createCompany, putImage } from './api.js';
 import { markDirty, getKv, setKv, categories, publish, publishStatus, buildData } from './publish.js';
+import { crawl, statsText } from './crawl.js';
+
+/* ---------- Nhập tin tổng hợp (dùng cho /import-jobs, /crawl và cron hằng ngày) ---------- */
+export async function importJobs(env, items) {
+  const t = now();
+  const cats = await categories(env);
+  const created = [], skipped = [];
+  let provincesChanged = false;
+  for (const it of items) {
+    const why = (r) => skipped.push({ title: str(it.title, 90), source: str(it.sourceUrl, 300), reason: r });
+    const pv = cats.provinces.find((x) => x.slug === it.province);
+    if (!pv) { why('Tỉnh không hợp lệ'); continue; }
+    if (!cats.targets.some((x) => x.id === it.target)) { why('Loại mục tiêu không hợp lệ'); continue; }
+    const shiftId = cats.shifts.some((x) => x.id === it.shift) ? it.shift : '';
+    const sMin = Number(it.salaryMin), sMax = Number(it.salaryMax) || Number(it.salaryMin);
+    if (!(sMin >= 1 && sMin <= 100) || sMax < sMin) { why('Không có mức lương rõ ràng'); continue; }
+    const title = str(it.title, 150), descr = str(it.desc, 3000), company = str(it.company, 150);
+    if (!title || !company) { why('Thiếu tiêu đề hoặc tên công ty'); continue; }
+    if ([title, descr, it.address, it.age, it.height].some(hasLink)) { why('Nội dung có đường link'); continue; }
+    const url = str(it.sourceUrl, 500);
+    if (!/^https?:\/\//.test(url)) { why('Thiếu link nguồn'); continue; }
+    if (await env.DB.prepare('SELECT 1 FROM jobs WHERE source_url = ?').bind(url).first()) { why('Đã nhập trước đó'); continue; }
+    const posted = Date.parse(it.postedAt) || t;
+    const deadline = it.deadline ? Date.parse(it.deadline) + DAY - 1 : 0;
+    const cap = Math.min(posted, t) + MAX_LIFE; // mỗi tin tồn tại tối đa 30 ngày kể từ ngày đăng gốc
+    const expires = Math.min(cap, deadline || cap);
+    if (expires <= t) { why('Tin gốc đã hết hạn'); continue; }
+    // Quận/huyện chưa có trong danh mục: thêm vào tỉnh (giữ đúng địa danh của tin gốc)
+    let district = str(it.district, 60) || pv.districts[0];
+    if (!pv.districts.includes(district)) { pv.districts.push(district); provincesChanged = true; }
+    const phone = normPhone(it.companyPhone) ? str(it.companyPhone, 20) : '';
+    let co = await env.DB.prepare('SELECT * FROM companies WHERE name = ?').bind(company).first();
+    if (!co) {
+      co = await createCompany(env, company, phone);
+      await env.DB.prepare('UPDATE companies SET aggregated = 1, about = ? WHERE id = ?').bind('Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.', co.id).run();
+    }
+    const r = await env.DB.prepare(`INSERT INTO jobs (company_id, title, province, district, address, target, shift, qty, salary_min, salary_max, housing, meals,
+        age, height, descr, contact_phone, status, weeks, posted_at, expires_at, source_name, source_url, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'live', 2, ?, ?, ?, ?, ?, ?) RETURNING id`)
+      .bind(co.id, title, pv.slug, district, str(it.address, 200), it.target, shiftId, Math.max(1, Math.min(999, Number(it.qty) || 1)), sMin, sMax,
+        it.housing ? 1 : 0, it.meals ? 1 : 0, str(it.age, 60), str(it.height, 60), descr, phone, Math.min(posted, t), expires,
+        str(it.sourceName, 80) || new URL(url).hostname, url, t, t).first();
+    created.push(r.id);
+  }
+  if (provincesChanged) await setKv(env, 'provinces', cats.provinces);
+  if (created.length) await markDirty(env);
+  return { created, skipped };
+}
+
+// Cào các trang việc làm công khai rồi nhập. Lưu link đã xử lý và kết quả lần chạy gần nhất.
+export async function crawlDaily(env, opts = {}) {
+  const started = now();
+  const cats = await categories(env);
+  const seen = await getKv(env, 'crawl_seen', {});
+  const { items, stats } = await crawl({ provinces: cats.provinces, seen, pages: opts.pages || 2, max: opts.max || 40 });
+  const { created, skipped } = items.length ? await importJobs(env, items) : { created: [], skipped: [] };
+  await setKv(env, 'crawl_seen', seen);
+  const why = {}; skipped.forEach((x) => (why[x.reason] = (why[x.reason] || 0) + 1));
+  const result = { at: started, seconds: Math.round((now() - started) / 1000), found: items.length, created: created.length, skipped: why, sources: statsText(stats) };
+  await setKv(env, 'crawl_last', result);
+  return result;
+}
 
 const enc = new TextEncoder();
 async function hmac(key, msg) {
@@ -245,53 +307,17 @@ async function adminRoute(req, env, url, p) {
   }
 
   /* ---------- Nhập tin tổng hợp từ nguồn công khai (seeding) ---------- */
-  // Mỗi tin giữ đúng công ty/lương/liên hệ như tin gốc, ghi nguồn; hạn hiển thị = hạn tin gốc, tối đa 14 ngày.
+  // Mỗi tin giữ đúng công ty/lương/liên hệ như tin gốc, ghi nguồn; hạn hiển thị = hạn tin gốc, tối đa 30 ngày kể từ ngày đăng gốc.
   if (p === '/import-jobs' && m === 'POST') {
     const b = await body(req);
     const items = Array.isArray(b.items) ? b.items.slice(0, 100) : fail(400, 'Thiếu danh sách tin.');
-    const cats = await categories(env);
-    const created = [], skipped = [];
-    const cap = t + 14 * DAY;
-    let provincesChanged = false;
-    for (const it of items) {
-      const why = (r) => skipped.push({ title: str(it.title, 90), source: str(it.sourceUrl, 300), reason: r });
-      const pv = cats.provinces.find((x) => x.slug === it.province);
-      if (!pv) { why('Tỉnh không hợp lệ'); continue; }
-      if (!cats.targets.some((x) => x.id === it.target)) { why('Loại mục tiêu không hợp lệ'); continue; }
-      const shiftId = cats.shifts.some((x) => x.id === it.shift) ? it.shift : '';
-      const sMin = Number(it.salaryMin), sMax = Number(it.salaryMax) || Number(it.salaryMin);
-      if (!(sMin >= 1 && sMin <= 100) || sMax < sMin) { why('Không có mức lương rõ ràng'); continue; }
-      const title = str(it.title, 150), descr = str(it.desc, 3000), company = str(it.company, 150);
-      if (!title || !company) { why('Thiếu tiêu đề hoặc tên công ty'); continue; }
-      if ([title, descr, it.address, it.age, it.height].some(hasLink)) { why('Nội dung có đường link'); continue; }
-      const url = str(it.sourceUrl, 500);
-      if (!/^https?:\/\//.test(url)) { why('Thiếu link nguồn'); continue; }
-      if (await env.DB.prepare('SELECT 1 FROM jobs WHERE source_url = ?').bind(url).first()) { why('Đã nhập trước đó'); continue; }
-      const posted = Date.parse(it.postedAt) || t;
-      const deadline = it.deadline ? Date.parse(it.deadline) + DAY - 1 : 0;
-      const expires = Math.min(cap, deadline || cap);
-      if (expires <= t) { why('Tin gốc đã hết hạn'); continue; }
-      // Quận/huyện chưa có trong danh mục: thêm vào tỉnh (giữ đúng địa danh của tin gốc)
-      let district = str(it.district, 60) || pv.districts[0];
-      if (!pv.districts.includes(district)) { pv.districts.push(district); provincesChanged = true; }
-      const phone = normPhone(it.companyPhone) ? str(it.companyPhone, 20) : '';
-      let co = await env.DB.prepare('SELECT * FROM companies WHERE name = ?').bind(company).first();
-      if (!co) {
-        co = await createCompany(env, company, phone);
-        await env.DB.prepare('UPDATE companies SET aggregated = 1, about = ? WHERE id = ?').bind('Thông tin công ty được tổng hợp từ tin tuyển dụng công khai.', co.id).run();
-      }
-      const r = await env.DB.prepare(`INSERT INTO jobs (company_id, title, province, district, address, target, shift, qty, salary_min, salary_max, housing, meals,
-          age, height, descr, contact_phone, status, weeks, posted_at, expires_at, source_name, source_url, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'live', 2, ?, ?, ?, ?, ?, ?) RETURNING id`)
-        .bind(co.id, title, pv.slug, district, str(it.address, 200), it.target, shiftId, Math.max(1, Math.min(999, Number(it.qty) || 1)), sMin, sMax,
-          it.housing ? 1 : 0, it.meals ? 1 : 0, str(it.age, 60), str(it.height, 60), descr, phone, Math.min(posted, t), expires,
-          str(it.sourceName, 80) || new URL(url).hostname, url, t, t).first();
-      created.push(r.id);
-    }
-    if (provincesChanged) await setKv(env, 'provinces', cats.provinces);
-    if (created.length) await markDirty(env);
+    const { created, skipped } = await importJobs(env, items);
     return json({ ok: true, created: created.length, ids: created, skipped });
   }
+
+  /* ---------- Cào tin từ trang việc làm khác: cron 6h sáng tự chạy; quản trị xem kết quả / bấm chạy ngay ---------- */
+  if (p === '/crawl' && m === 'GET') return json({ ok: true, last: await getKv(env, 'crawl_last') });
+  if (p === '/crawl' && m === 'POST') return json({ ok: true, last: await crawlDaily(env) });
 
   /* ---------- Hết hạn: GAS gọi mỗi ngày lúc 0h ---------- */
   if (p === '/expire' && m === 'POST') {

@@ -101,21 +101,23 @@ write('/data/site.js', `/* Sinh bởi scripts/build.mjs từ data/site.json - kh
 })(window.VLBV = window.VLBV || {}, ${JSON.stringify(data).replace(/</g, '\\u003c')});
 `);
 
-const pub = [];          // [path, lastmod] cho sitemap
-const add = (path, lastmod = BUILT) => pub.push([path, lastmod]);
-add('/'); add('/viec-lam'); add('/tin-tuc'); add('/video'); add('/cong-ty-tuyen-dung');
+const pub = [];          // [path, lastmod, inSitemap]: trang dựng tĩnh; chỉ trang đang đăng và có nội dung mới vào sitemap
+const add = (path, lastmod = BUILT, map = true) => pub.push([path, lastmod, map]);
+const live = V.jobs.filter((j) => !j.expiresAt || j.expiresAt > BUILT); // tin còn hạn lúc dựng
+const newest = (jobs) => Math.max(0, ...jobs.map((j) => j.updatedAt || j.postedAt || 0)) || BUILT;
+add('/', newest(live)); add('/viec-lam', newest(live)); add('/tin-tuc'); add('/video', (V.videos || []).length ? undefined : BUILT, !!(V.videos || []).length); add('/cong-ty-tuyen-dung');
 ['dieu-khoan', 'bao-mat', 'quy-che', 'lien-he'].forEach((s) => add('/chinh-sach/' + s));
-const withJobs = new Set(V.jobs.map((j) => j.province + '|' + j.district));
 V.provinces.forEach((p) => {
-  add(core.url.area(p.slug));
-  // Quận/huyện chỉ sinh trang khi có tin (tránh trang rỗng); quận chưa có tin vẫn xem được qua JS
-  p.districts.filter((d) => withJobs.has(p.slug + '|' + d)).forEach((d) => add(core.url.area(p.slug, d)));
+  const pj = live.filter((j) => j.province === p.slug);
+  add(core.url.area(p.slug), newest(pj), pj.length > 0); // tỉnh chưa có tin: vẫn dựng trang nhưng không đưa vào sitemap
+  // Quận/huyện chỉ dựng trang khi có tin (tránh trang rỗng); quận chưa có tin vẫn xem được qua JS
+  p.districts.forEach((d) => { const dj = pj.filter((j) => j.district === d); if (dj.length) add(core.url.area(p.slug, d), newest(dj)); });
 });
 const topics = await imp('assets/js/topics.js');
-topics.topicPages().forEach((x) => add(topics.topicPath(x.t, x.pv)));
-V.jobs.forEach((j) => add(core.url.job(j), j.updatedAt || j.postedAt));
-V.companies.forEach((c) => add(core.url.company(c)));
-V.posts.forEach((p) => add(core.url.post(p)));
+topics.topicPages().forEach((x) => add(topics.topicPath(x.t, x.pv), newest(live.filter((j) => x.t.test(j) && (!x.pv || j.province === x.pv.slug)))));
+V.jobs.forEach((j) => add(core.url.job(j), j.updatedAt || j.postedAt, live.includes(j)));
+V.companies.forEach((c) => { const cj = live.filter((j) => j.company === c.id); add(core.url.company(c), newest(cj), cj.length > 0); }); // công ty không còn tin: không vào sitemap
+V.posts.forEach((p) => add(core.url.post(p), Date.parse(p.date.split('/').reverse().join('-')) || BUILT));
 (V.videos || []).forEach((v) => add('/video/' + v.slug, v.updatedAt || v.date));
 
 let n = 0;
@@ -145,6 +147,6 @@ write('/404.html', htmlPage('/404', layout.notFoundPage()));
 write('/_404', htmlPage('/404', layout.notFoundPage()));
 
 const day = (ms) => new Date(ms).toISOString().slice(0, 10);
-write('/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pub.map(([u, d]) => `  <url><loc>${escAttr(SITE + u)}</loc><lastmod>${day(d)}</lastmod></url>`).join('\n')}\n</urlset>\n`);
+write('/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pub.filter((x) => x[2]).map(([u, d]) => `  <url><loc>${escAttr(SITE + u)}</loc><lastmod>${day(d)}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 
 console.log(`build: ${n} trang công khai, ${Object.keys(PRIVATE).length} khung trang tài khoản, ${V.jobs.length} tin, ${(V.videos || []).length} video → html/ (SITE_URL=${SITE})`);

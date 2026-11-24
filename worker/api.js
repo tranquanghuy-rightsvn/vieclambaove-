@@ -1,7 +1,7 @@
 // API của website: /api/*
 import {
   HttpError, fail, json, now, DAY, body, str, normPhone, normEmail, slugify, sha256, randomToken,
-  hashPassword, verifyPassword, checkPassword, createSession, destroySession, currentUser, publicUser,
+  MAX_LIFE, hashPassword, verifyPassword, checkPassword, createSession, destroySession, currentUser, publicUser,
   riskCheck, rateLimit, ipHash, getCookie, cookie, noLinks
 } from './lib.js';
 import { markDirty, getKv, categories, LIVE_SQL } from './publish.js';
@@ -425,7 +425,7 @@ async function employer(req, env, url, p) {
       // Tin còn hạn: cộng thêm từ ngày hết hạn hiện tại; tin đã hết hạn: tính từ hôm nay
       const from = j.status !== 'expired' && j.expires_at > t ? j.expires_at : t;
       await env.DB.prepare('UPDATE jobs SET status = CASE WHEN status = \'expired\' THEN \'live\' ELSE status END, expires_at = ?, weeks = ?, updated_at = ? WHERE id = ?')
-        .bind(from + weeks * WEEK, weeks, t, j.id).run();
+        .bind(Math.min(from + weeks * WEEK, t + MAX_LIFE), weeks, t, j.id).run(); // gia hạn cũng không quá 30 ngày tính từ hôm nay
       await markDirty(env);
       return json({ ok: true });
     }

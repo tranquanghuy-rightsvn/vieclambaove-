@@ -4,6 +4,7 @@ import { api } from './api.js';
 import { publish, serveLive, LIVE_SQL, categories, getKv } from './publish.js';
 import { slugify } from './lib.js';
 import { now } from './lib.js';
+import { crawlDaily } from './admin.js';
 
 const isTemporaryHost = (url) => url.hostname.endsWith('.workers.dev') || url.hostname === 'localhost' || url.hostname === '127.0.0.1';
 
@@ -77,6 +78,11 @@ export default {
     }
     const nf = await env.ASSETS.fetch(new Request(url.origin + '/_404'));
     return new Response(nf.body, { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
+  },
+
+  // Cron 6h sáng (giờ VN) mỗi ngày: cào tin bảo vệ từ các trang việc làm công khai, nhập rồi xuất bản
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(crawlDaily(env).then(() => publishIfDirty(env)).catch((e) => console.error('crawl', e)));
   }
 };
 
