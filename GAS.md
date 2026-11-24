@@ -92,6 +92,8 @@ banner/AdSense, danh sách đen, email báo việc mới.
 - Key localStorage (trừ token) mang hậu tố `CLIENT_BUILD` do server băm từ app.html + js.html.
 - Website cập nhật NGAY: Worker dựng lại `/data/site.js` trực tiếp từ D1 và trả khung trang cho nội dung chưa có file tĩnh; đồng thời commit data/site.json lên GitHub → Actions build HTML tĩnh đầy đủ (cho Google) sau vài phút. Thông báo kết quả: "Website đã cập nhật ngay."
 
+- Giao diện admin KHÔNG nhắc tên công nghệ/dịch vụ (GitHub, Cloudflare, Worker, commit, Sheet, trang tĩnh…), kể cả trong thông báo lỗi: Code.js lọc dữ liệu (`publishView_`, `wkParse_`) trước khi gửi xuống, chi tiết kỹ thuật chỉ ghi Logger.log. Dùng từ nghiệp vụ: "Cập nhật website", "trang tối ưu cho Google".
+
 ## VIII. Lưu trữ
 
 - Google Sheet `vieclambaove Admin` (tự tạo lần đầu), sheet `Users`: cột `email`, `role`
