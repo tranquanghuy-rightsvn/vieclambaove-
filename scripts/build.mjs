@@ -34,6 +34,7 @@ globalThis.history = { replaceState: noop, pushState: noop };
 globalThis.localStorage = { getItem: () => null, setItem: noop, removeItem: noop };
 globalThis.sessionStorage = globalThis.localStorage;
 globalThis.document = { addEventListener: noop, querySelector: () => null, querySelectorAll: () => [], dispatchEvent: noop };
+globalThis.__readContent = (f) => readFileSync(join(root, 'assets/content', f), 'utf8'); // nội dung bài tin tức
 globalThis.addEventListener = noop;
 vm.runInThisContext(readFileSync(join(root, 'assets/js/data.js'), 'utf8')); // bài tin tức
 Object.assign(globalThis.VLBV, withDays(data));
