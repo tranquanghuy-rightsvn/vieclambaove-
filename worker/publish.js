@@ -64,7 +64,7 @@ export async function markDirty(env) {
 /* ---------- /data/site.js trực tiếp từ D1 ---------- */
 export async function buildLive(env) {
   const data = await buildData(env);
-  const body = `/* Dữ liệu trực tiếp lúc ${new Date().toISOString()} – không sửa tay */
+  const body = `/* Dữ liệu trực tiếp lúc ${new Date().toISOString()} - không sửa tay */
 (function (V, d) {
   var t = Date.now(), D = 864e5;
   d.jobs = d.jobs.map(function (j) {

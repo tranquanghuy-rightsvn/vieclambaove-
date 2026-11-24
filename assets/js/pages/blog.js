@@ -32,5 +32,5 @@ export default function ({ query }) {
       <p class="meta">${p.date} · ${p.read} phút đọc</p>
     </article>`).join('')}</div>` : '<p class="mute">Chưa có bài khác trong chủ đề này.</p>'}
   </div>`;
-  return { nav: 'blog', html, title: cur ? `${cur} – Tin tức bảo vệ` : 'Tin tức nghề bảo vệ', desc: 'Bảng lương bảo vệ, quyền lợi theo luật, kinh nghiệm phỏng vấn và cảnh báo lừa đảo.', canonical: cur ? '/tin-tuc' : undefined };
+  return { nav: 'blog', html, title: cur ? `${cur} - Tin tức bảo vệ` : 'Tin tức nghề bảo vệ', desc: 'Bảng lương bảo vệ, quyền lợi theo luật, kinh nghiệm phỏng vấn và cảnh báo lừa đảo.', canonical: cur ? '/tin-tuc' : undefined };
 }

@@ -1,4 +1,4 @@
-/* Việc Làm Bảo Vệ — giao diện cổng tuyển dụng
+/* Việc Làm Bảo Vệ - giao diện cổng tuyển dụng
    Nền xám sáng, thẻ trắng, navy của logo làm màu chính, vàng đồng làm điểm nhấn. */
 
 :root {
@@ -460,7 +460,7 @@ main { min-height: 60vh; outline: none; }
 .faq summary { cursor: pointer; padding: 16px 0; font-weight: 600; font-size: 17px; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
 .faq summary::-webkit-details-marker { display: none; }
 .faq summary::after { content: '+'; font: 500 24px/1 var(--f-body); color: var(--mute); }
-.faq details[open] summary::after { content: '–'; }
+.faq details[open] summary::after { content: '−'; }
 .faq details p { color: var(--ink-2); margin: -4px 0 18px; max-width: 70ch; }
 
 /* ---------- Auth ---------- */
@@ -1064,7 +1064,7 @@ body * { border-color: transparent !important; }
 .detail .notes li:nth-child(odd) { background: var(--fill); }
 
 /* =========================================================
-   Bố cục v4 – tham khảo vieclam24h / vieclamtot
+   Bố cục v4 - tham khảo vieclam24h / vieclamtot
    Khối trắng bo 12px trên nền xám xanh, đổ bóng rất nhẹ, không viền.
    ========================================================= */
 :root { --bg: #f1f3f8; --card-sh: 0 1px 2px rgba(16, 24, 40, .05), 0 1px 3px rgba(16, 24, 40, .06); --card-sh-h: 0 6px 18px rgba(16, 24, 40, .10); --pay-c: #d9480f; --r-card: 12px; }

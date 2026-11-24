@@ -54,9 +54,9 @@ export default function () {
       <div class="hb-text">
         <span class="hb-co">${mono(hotCo)}${esc(hotCo.name)}</span>
         <strong>${esc(hot.title)}</strong>
-        <ul><li>Lương ${pr(hot.salaryMin)}${hot.salaryMax !== hot.salaryMin ? ' – ' + pr(hot.salaryMax) : ''} triệu/tháng</li><li>${esc(hot.district)}, ${esc(province(hot.province)?.short || '')}</li>${hot.housing || hot.meals ? `<li>${[hot.housing && 'Có chỗ ở', hot.meals && 'Hỗ trợ bữa ăn'].filter(Boolean).join(', ')}</li>` : ''}</ul>
+        <ul><li>Lương ${pr(hot.salaryMin)}${hot.salaryMax !== hot.salaryMin ? ' - ' + pr(hot.salaryMax) : ''} triệu/tháng</li><li>${esc(hot.district)}, ${esc(province(hot.province)?.short || '')}</li>${hot.housing || hot.meals ? `<li>${[hot.housing && 'Có chỗ ở', hot.meals && 'Hỗ trợ bữa ăn'].filter(Boolean).join(', ')}</li>` : ''}</ul>
       </div>
-      <div class="hb-cta"><b>${pr(hot.salaryMin)}${hot.salaryMax !== hot.salaryMin ? '–' + pr(hot.salaryMax) : ''}</b><span>triệu/tháng</span><span class="btn btn-gold">Ứng tuyển ngay</span></div>
+      <div class="hb-cta"><b>${pr(hot.salaryMin)}${hot.salaryMax !== hot.salaryMin ? '-' + pr(hot.salaryMax) : ''}</b><span>triệu/tháng</span><span class="btn btn-gold">Ứng tuyển ngay</span></div>
     </a>` : ''}
 
     <section class="panel-box" aria-labelledby="hotH">
@@ -100,7 +100,7 @@ export default function () {
         <img class="eb-img" src="/assets/img/photos/doi-bao-ve-toa-nha.webp" alt="Đội bảo vệ mặc đồng phục chào trước sảnh tòa nhà" loading="lazy" width="1100" height="825">
         <span class="kicker">Dành cho công ty bảo vệ</span>
         <h2>Tuyển đủ quân số trong 24 giờ</h2>
-        <p>Đăng tin miễn phí 1 – 4 tuần, nhận cuộc gọi từ ứng viên đã xuất ngũ, có chứng chỉ nghiệp vụ.</p>
+        <p>Đăng tin miễn phí 1 - 4 tuần, nhận cuộc gọi từ ứng viên đã xuất ngũ, có chứng chỉ nghiệp vụ.</p>
         <div class="eb-act">
           <a class="btn btn-gold" href="/nha-tuyen-dung/dang-tin">Đăng tin miễn phí</a>
           <a class="btn btn-ghost" href="/bang-gia">Xem bảng giá</a>

@@ -84,7 +84,7 @@ export const activeJobs = () => allJobs().filter((j) => !isExpired(j));
 export const num = (n) => Number(n).toLocaleString('vi-VN');
 export const money = (n) => (n === 0 ? '0đ' : num(n) + 'đ');
 const tr = (n) => String(n).replace('.', ',');
-export const pay = (j) => (j.salaryMin === j.salaryMax ? tr(j.salaryMin) : `${tr(j.salaryMin)}–${tr(j.salaryMax)}`);
+export const pay = (j) => (j.salaryMin === j.salaryMax ? tr(j.salaryMin) : `${tr(j.salaryMin)}-${tr(j.salaryMax)}`);
 export const ago = (d) => (d <= 0 ? 'Hôm nay' : d === 1 ? 'Hôm qua' : `${d} ngày trước`);
 export const dateIn = (days) => { const t = new Date(); t.setDate(t.getDate() + days); return t.toLocaleDateString('vi-VN'); };
 
@@ -267,7 +267,7 @@ export const adRow = (i = 0) => {
     ['Khóa huấn luyện nghiệp vụ bảo vệ', 'cấp chứng chỉ, học cuối tuần tại TP.HCM và Hà Nội.', 'Đăng ký']
   ];
   const [b, t, a] = ads[i % ads.length];
-  return `<aside class="jrow-ad" aria-label="Quảng cáo"><span class="adlabel">Quảng cáo</span><p><b>${b}</b> – ${t}</p><a href="/bang-gia#quang-cao">${a}</a></aside>`;
+  return `<aside class="jrow-ad" aria-label="Quảng cáo"><span class="adlabel">Quảng cáo</span><p><b>${b}</b> - ${t}</p><a href="/bang-gia#quang-cao">${a}</a></aside>`;
 };
 
 /* ---------- Toast, modal ---------- */
@@ -381,7 +381,7 @@ export function quickProfile() {
       <div class="field"><span>Kinh nghiệm (chọn nếu có)</span>
         <div class="pills">${QUICK_EXP.map((e) => `<label class="pill"><input type="checkbox" name="exp" value="${e}" ${(p.exp || []).includes(e) ? 'checked' : ''}><span>${e}</span></label>`).join('')}</div>
       </div>
-      <button class="btn btn-quick btn-l btn-block" type="submit">Gửi hồ sơ – nhận cuộc gọi tuyển dụng</button>
+      <button class="btn btn-quick btn-l btn-block" type="submit">Gửi hồ sơ - nhận cuộc gọi tuyển dụng</button>
       <p class="mute" style="margin:0;font-size:13.5px">Miễn phí hoàn toàn. Không công ty nào được thu phí đồng phục hay đặt cọc.${me ? '' : ' Muốn xem lại và sửa hồ sơ? <a href="/dang-nhap?dang-ky=1">Tạo tài khoản</a> bằng chính số điện thoại này.'}</p>
     </form>`);
   box.querySelector('#quickForm').addEventListener('submit', async (e) => {

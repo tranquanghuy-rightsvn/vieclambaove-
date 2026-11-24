@@ -1,7 +1,7 @@
 # Việc Làm Bảo Vệ (vieclambaove)
 
 Chuyên trang việc làm ngành bảo vệ. Phase 1: ứng viên (SĐT + mật khẩu), nhà tuyển dụng (email/Gmail),
-đăng tin miễn phí 1–4 tuần, ứng tuyển nhanh, báo cáo lừa đảo, xác thực công ty, mục Video YouTube,
+đăng tin miễn phí 1-4 tuần, ứng tuyển nhanh, báo cáo lừa đảo, xác thực công ty, mục Video YouTube,
 trang SEO + sitemap. Trang quản trị chạy trên Google Apps Script.
 
 ## Kiến trúc (site tĩnh theo playbook free-cms-static-site-pipeline)
@@ -19,7 +19,7 @@ GAS trigger 0h hằng ngày → /api/admin/expire → tin hết hạn bị gỡ 
 - `html/` là site tĩnh (lưu trên GitHub): trang chủ, khu vực (tỉnh/quận có tin), tin, công ty, tin tức, video,
   chính sách là HTML đầy đủ; trang tài khoản chỉ là khung, JS vẽ sau khi đăng nhập.
 - Đăng/duyệt xong là thấy NGAY: `/data/site.js` do Worker phục vụ trực tiếp từ D1; trang/ảnh chưa kịp build
-  được Worker trả tạm (khung trang 200, ảnh từ R2). HTML tĩnh đầy đủ có sau khoảng 2–3 phút.
+  được Worker trả tạm (khung trang 200, ảnh từ R2). HTML tĩnh đầy đủ có sau khoảng 2-3 phút.
 - Ảnh: mỗi tin tối đa 3 ảnh đại diện, công ty 1 logo (nén trên trình duyệt ≤1200px). Giấy tờ xác thực không lên GitHub.
 - Không cho chèn link vào tiêu đề/mô tả/địa chỉ tin, tên/giới thiệu công ty (chặn cả máy chủ lẫn trình duyệt).
 
@@ -55,7 +55,7 @@ Google OAuth redirect URI: `<tên miền>/api/auth/google/callback`. Trang quả
 
 ```
 index.html, quan-tri/     khung trang, trang nhúng admin GAS (nguồn; bản build nằm ở html/)
-html/                     site tĩnh đã build + html/images/ (ảnh Worker commit) — Cloudflare deploy thư mục này
+html/                     site tĩnh đã build + html/images/ (ảnh Worker commit) - Cloudflare deploy thư mục này
 assets/                   CSS, JS (core, router, pages/), ảnh; data.js = nội dung tĩnh (bài tin tức, bảng giá)
 worker/                   index.js (định tuyến + cron), api.js, admin.js, publish.js (xuất bản lên GitHub), lib.js
 migrations/               schema D1

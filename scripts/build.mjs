@@ -88,7 +88,7 @@ cpSync(join(root, 'assets'), join(out, 'assets'), { recursive: true, filter: (s)
 cpSync(join(root, 'quan-tri'), join(out, 'quan-tri'), { recursive: true });
 
 // Dữ liệu cho tìm kiếm/lọc phía trình duyệt (cùng nguồn với HTML vừa sinh)
-write('/data/site.js', `/* Sinh bởi scripts/build.mjs từ data/site.json – không sửa tay */
+write('/data/site.js', `/* Sinh bởi scripts/build.mjs từ data/site.json - không sửa tay */
 (function (V, d) {
   var t = Date.now(), D = 864e5;
   d.jobs = d.jobs.map(function (j) {
@@ -137,7 +137,7 @@ for (const [path, title] of Object.entries(PRIVATE)) {
 }
 // Khung trống: Worker trả cho nội dung vừa duyệt chưa kịp build (JS vẽ từ dữ liệu trực tiếp)
 write('/_shell.html', htmlPage('/', { title: '', html: loading }).replace('<link rel="canonical" href="' + SITE + '/">', '<link rel="canonical" href="/">'));
-// 404: vẫn là khung app — đường dẫn hợp lệ nhưng chưa có trang tĩnh (vd quận chưa có tin) JS sẽ vẽ đúng trang
+// 404: vẫn là khung app - đường dẫn hợp lệ nhưng chưa có trang tĩnh (vd quận chưa có tin) JS sẽ vẽ đúng trang
 write('/404.html', htmlPage('/404', layout.notFoundPage()));
 
 const day = (ms) => new Date(ms).toISOString().slice(0, 10);

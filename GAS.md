@@ -1,4 +1,4 @@
-# GAS.md — Trang quản trị vieclambaove (Google Apps Script)
+# GAS.md - Trang quản trị vieclambaove (Google Apps Script)
 
 Nguồn quyết định CHỐT cho mọi code trong `gas/`. Đọc toàn bộ trước khi sửa `gas/*`.
 Theo playbook `free-cms-static-site-pipeline`, mẫu gốc: xevip. Khác playbook ở 1 điểm lớn
@@ -109,7 +109,7 @@ banner/AdSense, danh sách đen, email báo việc mới.
 
 ## X. Script Properties (tên cố định)
 
-- `WORKER_URL` — gốc website, vd `https://vieclambaove.web100-vn.workers.dev` (không có `/` cuối).
-- `ADMIN_API_KEY` — trùng secret `ADMIN_API_KEY` của Worker (`wrangler secret put ADMIN_API_KEY`).
-- `SPREADSHEET_ID` — KHÔNG cần điền, tự tạo lần đầu.
-- Trigger: chạy tay `installTriggers()` 1 lần để cài trigger `dailyExpire` 0h–1h mỗi ngày (giờ VN).
+- `WORKER_URL` - gốc website, vd `https://vieclambaove.web100-vn.workers.dev` (không có `/` cuối).
+- `ADMIN_API_KEY` - trùng secret `ADMIN_API_KEY` của Worker (`wrangler secret put ADMIN_API_KEY`).
+- `SPREADSHEET_ID` - KHÔNG cần điền, tự tạo lần đầu.
+- Trigger: chạy tay `installTriggers()` 1 lần để cài trigger `dailyExpire` 0h-1h mỗi ngày (giờ VN).
