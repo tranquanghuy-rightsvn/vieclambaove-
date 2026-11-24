@@ -168,7 +168,7 @@ export const mono = (c, cls = '') => c.logo
   : `<span class="mono ${cls}" style="background:${c.color}" aria-hidden="true">${c.initials}</span>`;
 
 // Ảnh đại diện của tin: ảnh đầu tiên NTD tải lên, không có thì logo công ty
-const jobThumb = (j, c) => (j.images && j.images[0]
+export const jobThumb = (j, c) => (j.images && j.images[0]
   ? `<span class="mono mono-img mono-photo" aria-hidden="true"><img src="${esc(j.images[0])}" alt="" loading="lazy"></span>`
   : mono(c));
 

@@ -111,6 +111,8 @@ V.provinces.forEach((p) => {
   // Quận/huyện chỉ sinh trang khi có tin (tránh trang rỗng); quận chưa có tin vẫn xem được qua JS
   p.districts.filter((d) => withJobs.has(p.slug + '|' + d)).forEach((d) => add(core.url.area(p.slug, d)));
 });
+const topics = await imp('assets/js/topics.js');
+topics.topicPages().forEach((x) => add(topics.topicPath(x.t, x.pv)));
 V.jobs.forEach((j) => add(core.url.job(j), j.updatedAt || j.postedAt));
 V.companies.forEach((c) => add(core.url.company(c)));
 V.posts.forEach((p) => add(core.url.post(p)));

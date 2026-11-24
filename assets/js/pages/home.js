@@ -1,4 +1,5 @@
 import { V, $, $$, esc, icon, url, mono, jobRow, activeJobs, pagerHtml, company, province, SITE } from '../core.js';
+import { topicPages, topicPath } from '../topics.js';
 import { companyList, coBox } from './companies.js';
 import { go } from '../router.js';
 
@@ -104,6 +105,11 @@ export default function () {
         </div>
       </section>
     </div>
+
+    <section class="panel-box" aria-labelledby="popH">
+      <div class="pb-head"><h2 id="popH">Tìm kiếm nhiều</h2></div>
+      <div class="chip-links pop-links">${topicPages().filter((x) => !x.pv).map((x) => `<a class="chip-link" href="${topicPath(x.t)}">${esc(x.t.short)}<em>${x.n}</em></a>`).join('')}${topicPages().filter((x) => x.pv).slice(0, 12).map((x) => `<a class="chip-link" href="${topicPath(x.t, x.pv)}">${esc(x.t.short)} ${esc(x.pv.short)}<em>${x.n}</em></a>`).join('')}</div>
+    </section>
 
     <section class="panel-box" aria-labelledby="blogH">
       <div class="pb-head"><h2 id="blogH">Tin tức nghề bảo vệ</h2><a class="more" href="/tin-tuc">Xem tất cả ${icon('arrow', 'ico-s')}</a></div>

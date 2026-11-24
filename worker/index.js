@@ -24,6 +24,9 @@ async function existsLive(env, path) {
   if (m) return !!(await env.DB.prepare('SELECT 1 FROM companies WHERE id = ? AND locked = 0').bind(m[1]).first());
   m = path.match(/^\/video\/([a-z0-9-]+)$/);
   if (m) return !!(await env.DB.prepare('SELECT 1 FROM videos WHERE slug = ? AND published = 1').bind(m[1]).first());
+  // Trang tìm kiếm phổ biến (assets/js/topics.js) chưa kịp dựng tĩnh: trả khung để JS vẽ
+  m = path.match(/^\/viec-lam-bao-ve-(chung-cu|khu-cong-nghiep|ngan-hang|truong-hoc-benh-vien|su-kien|ve-si|ca-dem|ca-12-tieng|ca-8-tieng|bao-an-o|luong-cao|tuyen-gap|khong-can-kinh-nghiem)(?:-([a-z0-9-]+))?$/);
+  if (m) return !m[2] || (await categories(env)).provinces.some((x) => x.slug === m[2]);
   m = path.match(/^\/viec-lam\/([a-z0-9-]+)(?:\/([a-z0-9-]+))?$/);
   if (m) {
     const provinces = (await categories(env)).provinces;
