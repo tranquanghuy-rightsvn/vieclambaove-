@@ -71,7 +71,9 @@ document.addEventListener('click', (e) => {
       b.setAttribute('aria-pressed', on);
       if (b.dataset.label) b.lastChild.textContent = on ? ' Đã lưu' : ' Lưu tin';
     });
-    toast(on ? 'Đã lưu tin. Xem lại trong mục Đã lưu.' : 'Đã bỏ lưu tin.', 'bookmark');
+    const badge = document.querySelector('.mast-saved');
+    if (badge) { const n = store.get('saved', []).length; badge.querySelector('em')?.remove(); if (n) badge.insertAdjacentHTML('beforeend', `<em>${n}</em>`); }
+    toast(on ? 'Đã lưu tin. Xem lại ở mục Đã lưu (biểu tượng trái tim).' : 'Đã bỏ lưu tin.', 'bookmark');
     return;
   }
   if (t.closest('[data-quick]')) { e.preventDefault(); quickProfile(); return; }

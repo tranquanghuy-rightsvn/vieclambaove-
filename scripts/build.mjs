@@ -127,7 +127,7 @@ write('/chinh-sach', htmlPage('/chinh-sach', await render('/chinh-sach/dieu-khoa
 // Trang cần tài khoản: chỉ khung (JS vẽ sau khi biết đăng nhập), không cho lập chỉ mục
 const PRIVATE = {
   '/dang-nhap': 'Đăng nhập',
-  '/ung-vien': 'Hồ sơ của tôi', '/ung-vien/da-ung-tuyen': 'Đã ứng tuyển', '/ung-vien/da-luu': 'Việc đã lưu', '/ung-vien/cai-dat': 'Cài đặt',
+  '/ung-vien': 'Hồ sơ của tôi', '/ung-vien/da-ung-tuyen': 'Đã ứng tuyển', '/ung-vien/da-luu': 'Việc đã lưu', '/ung-vien/cai-dat': 'Cài đặt', '/viec-da-luu': 'Việc đã lưu',
   '/trang-quan-ly-tuyen-dung': 'Nhà tuyển dụng', '/trang-quan-ly-tuyen-dung/dang-tin': 'Đăng tin', '/trang-quan-ly-tuyen-dung/tin-dang': 'Tin đã đăng', '/trang-quan-ly-tuyen-dung/ung-vien': 'Ứng viên', '/trang-quan-ly-tuyen-dung/tim-ung-vien': 'Tìm ứng viên',
   '/trang-quan-ly-tuyen-dung/xac-thuc': 'Xác thực công ty', '/trang-quan-ly-tuyen-dung/cong-ty': 'Thông tin công ty'
 };

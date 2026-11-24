@@ -7,7 +7,7 @@ const tr = (n) => String(n).replace('.', ',');
 
 export default async function ({ params: [tab = ''] }) {
   const u = user();
-  if (!u) return { redirect: '/dang-nhap?tiep=/ung-vien' };
+  if (!u) return { redirect: tab === 'da-luu' ? '/viec-da-luu' : '/dang-nhap?tiep=/ung-vien' };
   if (u.role === 'employer') return { redirect: '/trang-quan-ly-tuyen-dung' };
   const p = { exp: [], ...store.get('profile', {}), phone: u.phone, name: store.get('profile', {}).name || u.name };
   const saved = store.get('saved', []);
