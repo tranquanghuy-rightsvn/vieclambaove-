@@ -1678,3 +1678,9 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 /* Nút "Tạo hồ sơ xin việc nhanh" ở đầu trang: màn hình hẹp hiện chữ ngắn để không tràn */
 .mast-quick .q-short { display: none; }
 @media (max-width: 1280px) { .mast-quick .q-full { display: none; } .mast-quick .q-short { display: inline; } }
+
+/* Form đăng ký/đăng nhập: ô nhập luôn có viền rõ (không đợi bấm vào), kể cả ô số điện thoại */
+.auth-form .phone, .auth-form .input { border: 1px solid #c9ced8 !important; background-color: #fff; }
+.auth-form .phone span { background: var(--fill-2, #eceef3); border-right: 1px solid #c9ced8 !important; border-radius: 0; }
+.auth-form .phone:hover, .auth-form .input:hover { border-color: #98a2b3 !important; }
+.auth-form .phone:focus-within, .auth-form .input:focus { border-color: var(--brand) !important; outline: 1px solid var(--brand); outline-offset: 0; }
