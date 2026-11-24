@@ -531,7 +531,7 @@ async function saveJob(env, req, co, old) {
 
 // Ảnh công khai (đã được trình duyệt nén ≤1200px): lưu R2 "img/<base>-<băm>.<đuôi>", trả tên file
 const IMG_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
-async function putImage(env, req, base) {
+export async function putImage(env, req, base) {
   await rateLimit(req, 'img', 60, 3600);
   const form = await req.formData().catch(() => fail(400, 'Không đọc được ảnh.'));
   const file = form.get('file');

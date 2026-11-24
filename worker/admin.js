@@ -1,7 +1,7 @@
 // API quản trị: chỉ trang admin GAS gọi, xác thực bằng khoá bí mật ADMIN_API_KEY
 // (header Authorization: Bearer <key>). Không dùng cookie, không mở cho trình duyệt.
 import { fail, json, now, DAY, body, str, sha256, slugify, hasLink, normPhone } from './lib.js';
-import { createCompany } from './api.js';
+import { createCompany, putImage } from './api.js';
 import { markDirty, getKv, setKv, categories, publish, publishStatus, buildData } from './publish.js';
 
 const enc = new TextEncoder();
@@ -125,6 +125,17 @@ async function adminRoute(req, env, url, p) {
       ...c, docs: await Promise.all(JSON.parse(c.docs || '[]').map(async (d) => ({ name: d.name, type: d.type, url: await signedUrl(env, url, d.key) })))
     })));
     return json({ items });
+  }
+  // Gắn logo cho công ty (vd công ty của tin tổng hợp, chưa có tài khoản)
+  const lm = p.match(/^\/companies\/([a-z0-9-]+)\/logo$/);
+  if (lm && m === 'POST') {
+    const c = await env.DB.prepare('SELECT * FROM companies WHERE id = ?').bind(lm[1]).first();
+    if (!c) fail(404, 'Không tìm thấy công ty.');
+    const name = await putImage(env, req, `companies/${c.id}`);
+    if (c.logo?.startsWith('/images/')) await env.FILES.delete('img/' + c.logo.slice(8));
+    await env.DB.prepare('UPDATE companies SET logo = ? WHERE id = ?').bind('/images/' + name, c.id).run();
+    await markDirty(env);
+    return json({ ok: true, logo: '/images/' + name });
   }
   const cm = p.match(/^\/companies\/([a-z0-9-]+)$/);
   if (cm && m === 'POST') {
