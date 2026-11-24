@@ -529,6 +529,22 @@
    "aggregated": true
   },
   {
+   "id": "web100",
+   "name": "Công ty TNHH WEB100",
+   "short": "WEB100",
+   "initials": "W",
+   "color": "#8a4b0b",
+   "phone": "0964074043",
+   "about": "",
+   "size": "",
+   "founded": "",
+   "rating": null,
+   "reviews": 0,
+   "mst": "",
+   "license": "",
+   "verified": false
+  },
+  {
    "id": "lighthouse-corporation",
    "name": "LIGHTHOUSE Corporation",
    "short": "LIGHTHOUSE Corporation",
