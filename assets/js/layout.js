@@ -47,7 +47,7 @@ function acctLink(u) {
 // Logo theo mẫu "Cổng thông tin tuyển dụng bảo vệ": ô vàng gradient + khiên, chữ vieclam·baove·.vn
 const brand = () => `<a class="brand logo" href="/" aria-label="vieclambaove.vn – Trang chủ">
       <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.2 4.2 5.3v5.9c0 4.9 3.3 9.2 7.8 10.6 4.5-1.4 7.8-5.7 7.8-10.6V5.3z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M12 2.2v19.6c-4.5-1.4-7.8-5.7-7.8-10.6V5.3z" fill="currentColor"/></svg></span>
-      <span class="logo-text"><span class="logo-name">vieclam<b>baove</b>.vn</span><small>AI Recruitment &amp; Auto-SEO</small></span>
+      <span class="logo-text"><span class="logo-name">vieclam<b>baove</b>.vn</span><small>Tuyển dụng bảo vệ toàn quốc</small></span>
     </a>`;
 
 export function headerHtml(navKey) {
