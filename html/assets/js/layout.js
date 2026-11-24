@@ -1,7 +1,7 @@
 // Phần dùng chung giữa trình duyệt (main.js) và script sinh trang tĩnh (scripts/build.mjs):
 // bảng tuyến, đầu trang, chân trang, tiêu đề trang. Sửa ở đây thì cả hai cùng đổi.
 import { icon, esc, user, store } from './core.js';
-import { topicPages, topicPath, topicTitle } from './topics.js';
+import { topicPages, topicPath } from './topics.js';
 
 export const SITE_NAME = 'Việc Làm Bảo Vệ';
 export const DEFAULT_TITLE = 'Việc Làm Bảo Vệ - Tuyển dụng bảo vệ, vệ sĩ toàn quốc';
@@ -139,7 +139,7 @@ export function footerHtml(path) {
       </ul></div>
       <div><h4>Việc làm theo tỉnh</h4><ul>${V.provinces.map((p) => `<li><a href="/viec-lam/${p.slug}">Bảo vệ ${p.short}</a></li>`).join('')}</ul></div>
     </div>
-    <div class="foot-tags"><h4>Tìm kiếm nhiều</h4><p>${topicPages().map((x) => `<a href="${topicPath(x.t, x.pv)}">${esc(topicTitle(x.t, x.pv).replace(/^Việc làm /, ''))}</a>`).join('')}</p></div>
+    <div class="foot-tags"><h4>Tìm kiếm nhiều</h4><p>${topicPages().map((x) => `<a href="${topicPath(x.t, x.pv)}">${esc(x.t.short + (x.pv ? ' ' + x.pv.short : ''))}</a>`).join('')}</p></div>
     <div class="foot-base">
       <p><b>Công ty Cổ phần Việc Làm Bảo Vệ</b> (dữ liệu mẫu) · Giấy chứng nhận ĐKKD số 03xxxxxxxx do Sở KH&amp;ĐT TP.HCM cấp · Người chịu trách nhiệm nội dung: Ban biên tập.</p>
       <p class="foot-copy">© 2026 vieclambaove.vn - Chuyên trang tuyển dụng bảo vệ, vệ sĩ. Bảo lưu mọi quyền.</p>
