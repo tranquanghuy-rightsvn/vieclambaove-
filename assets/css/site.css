@@ -1785,3 +1785,9 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 @media (max-width: 1080px) { .foot-top { grid-template-columns: repeat(2, 1fr); } .foot-top > div:first-child { grid-column: 1 / -1; } }
 @media (max-width: 560px) { .foot-top { grid-template-columns: 1fr 1fr; gap: 24px 16px; padding: 36px 0 24px; } }
 .foot .foot-base { background: #01030f; border-top: 1px solid #1e293b !important; }
+
+/* Trang Việc làm: cột phải luôn cố định ngay dưới đầu trang; cao hơn màn hình thì cuộn bên trong */
+@media (min-width: 961px) {
+  .laside { position: sticky; top: 84px; max-height: calc(100vh - 100px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-bottom: 4px; }
+  .laside::-webkit-scrollbar { width: 6px; } .laside::-webkit-scrollbar-thumb { background: #cfd6e4; border-radius: 3px; }
+}
