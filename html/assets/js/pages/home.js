@@ -39,7 +39,7 @@ export default function () {
       <label class="hs-sel">${icon('clock')}<span class="sr">Ca làm</span><select name="ca"><option value="">Ca làm</option>${V.shifts.map((x) => `<option value="${x.id}">${x.name}</option>`).join('')}</select></label>
       <button class="btn btn-gold" type="submit">Tìm việc</button>
     </form>
-    <p class="hero-cta"><button class="btn btn-quick" type="button" data-quick>${icon('bolt')}Tạo hồ sơ 1 chạm</button><span>Để lại tên và số điện thoại, công ty bảo vệ gần bạn sẽ gọi lại.</span></p>
+    <p class="hero-cta"><button class="btn btn-quick" type="button" data-quick>${icon('bolt')}Tạo hồ sơ xin việc nhanh</button><span>Để lại tên và số điện thoại, công ty bảo vệ gần bạn sẽ gọi lại.</span></p>
     <p class="hquick"><span>Tìm nhiều:</span>${quick.map(([t, h]) => `<a href="${h}">${t}</a>`).join('')}</p>
   </div></section>
 
@@ -85,7 +85,7 @@ export default function () {
       <div>${icon('shield')}<b>Tin được kiểm duyệt</b><p>Mỗi tin được duyệt trước khi hiển thị. Tin thu phí đồng phục, đặt cọc bị gỡ ngay.</p></div>
       <div>${icon('check')}<b>Công ty có giấy phép</b><p>Đối chiếu mã số thuế và giấy phép kinh doanh dịch vụ bảo vệ của Bộ Công an.</p></div>
       <div>${icon('phone')}<b>Gọi thẳng, không qua trung gian</b><p>Bấm gọi hoặc nhắn Zalo cho người tuyển. Ứng viên không mất bất kỳ khoản phí nào.</p></div>
-      <div>${icon('flag')}<b>Báo cáo trong 1 chạm</b><p>Thấy dấu hiệu lừa đảo? Bấm báo cáo, đội kiểm duyệt xử lý trong 24 giờ.</p></div>
+      <div>${icon('flag')}<b>Báo cáo nhanh</b><p>Thấy dấu hiệu lừa đảo? Bấm báo cáo, đội kiểm duyệt xử lý trong 24 giờ.</p></div>
     </section>
 
     <div class="home-two">

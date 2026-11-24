@@ -181,7 +181,7 @@ export default function ({ params: [ps, ds], query }) {
 }
 
 function seoIntro(p, d, jobs) {
-  if (!jobs.length) return `<p>Hiện chưa có tin tuyển dụng ở khu vực này. <button class="linkbtn" type="button" data-quick>Tạo hồ sơ 1 chạm</button> để công ty bảo vệ gần bạn liên hệ khi có việc mới.</p>`;
+  if (!jobs.length) return `<p>Hiện chưa có tin tuyển dụng ở khu vực này. <button class="linkbtn" type="button" data-quick>Tạo hồ sơ xin việc nhanh</button> để công ty bảo vệ gần bạn liên hệ khi có việc mới.</p>`;
   const avgMin = (jobs.reduce((a, j) => a + j.salaryMin, 0) / jobs.length).toFixed(1).replace('.', ',');
   const avgMax = (jobs.reduce((a, j) => a + j.salaryMax, 0) / jobs.length).toFixed(1).replace('.', ',');
   const byShift = V.shifts.map((x) => [x.name.toLowerCase(), jobs.filter((j) => j.shift === x.id).length]).filter((x) => x[1]).sort((a, b) => b[1] - a[1]);
