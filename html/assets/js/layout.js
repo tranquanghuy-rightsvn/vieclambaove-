@@ -5,10 +5,10 @@ import { icon, esc, user } from './core.js';
 export const SITE_NAME = 'Việc Làm Bảo Vệ';
 export const DEFAULT_TITLE = 'Việc Làm Bảo Vệ - Tuyển dụng bảo vệ, vệ sĩ toàn quốc';
 export const DEFAULT_DESC = 'Chuyên trang việc làm ngành bảo vệ: lương, ca làm, chỗ ở ghi rõ trong từng tin.';
-// Mọi link tới trang trong HTML đều dạng /slug/ (bỏ qua file có đuôi, /api/, /assets/, /images/, /data/)
-const LINK_RE = /href="(\/(?!api\/|assets\/|images\/|data\/)[^"?#]*[^/"?#])((?:[?#][^"]*)?)"/g;
-export const slashLinks = (html) => String(html || '').replace(LINK_RE, (m, p, q) => (/\.[a-z0-9]{2,5}$/i.test(p) ? m : `href="${p}/${q}"`));
-export const withSlash = (p) => (p === '/' || p.endsWith('/') || /\.[a-z0-9]{2,5}$/i.test(p) ? p : p + '/');
+// Mọi link tới trang trong HTML đều dạng /slug, KHÔNG có / cuối (trừ trang chủ "/")
+const LINK_RE = /href="(\/[^"?#]*?)\/+((?:[?#][^"]*)?)"/g;
+export const cleanLinks = (html) => String(html || '').replace(LINK_RE, (m, p, q) => `href="${p || '/'}${q}"`);
+export const noSlash = (p) => (p.length > 1 ? p.replace(/\/+$/, '') : p);
 
 export const docTitle = (page) => (page.title ? `${page.title} | ${SITE_NAME}` : DEFAULT_TITLE);
 
