@@ -6,7 +6,7 @@ Việc Làm Bảo Vệ là nền tảng đăng tin tuyển dụng độc lập, 
 
 ## Trang chính
 - [Trang chủ](https://vieclambaove.web100-vn.workers.dev/): tin bảo vệ mới nhất và tuyển gấp
-- [Việc làm bảo vệ](https://vieclambaove.web100-vn.workers.dev/viec-lam): toàn bộ 79 tin đang tuyển, lọc theo tỉnh, ca làm, mức lương
+- [Việc làm bảo vệ](https://vieclambaove.web100-vn.workers.dev/viec-lam): toàn bộ 87 tin đang tuyển, lọc theo tỉnh, ca làm, mức lương
 - [Nhà tuyển dụng](https://vieclambaove.web100-vn.workers.dev/cong-ty-tuyen-dung): danh sách công ty đang tuyển
 - [Tin tức nghề bảo vệ](https://vieclambaove.web100-vn.workers.dev/tin-tuc)
 - [Cảnh báo lừa đảo](https://vieclambaove.web100-vn.workers.dev/tin-tuc/dau-hieu-cong-ty-bao-ve-lua-dao): dấu hiệu công ty bảo vệ lừa đảo người tìm việc
