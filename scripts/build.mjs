@@ -67,7 +67,7 @@ function htmlPage(path, page, { status } = {}) {
 }
 
 function write(path, html) {
-  const file = path === '/' ? join(out, 'index.html') : path.endsWith('.html') || path.endsWith('.xml') || path.endsWith('.js') ? join(out, path) : join(out, path, 'index.html');
+  const file = path === '/' ? join(out, 'index.html') : path.endsWith('.html') || path.endsWith('.xml') || path.endsWith('.js') || path.endsWith('.txt') ? join(out, path) : join(out, path, 'index.html');
   mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, html);
 }
@@ -148,5 +148,41 @@ write('/_404', htmlPage('/404', layout.notFoundPage()));
 
 const day = (ms) => new Date(ms).toISOString().slice(0, 10);
 write('/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pub.filter((x) => x[2]).map(([u, d]) => `  <url><loc>${escAttr(SITE + u)}</loc><lastmod>${day(d)}</lastmod></url>`).join('\n')}\n</urlset>\n`);
+
+// llms.txt: giới thiệu website cho công cụ AI (ChatGPT, Perplexity…), cùng nguồn dữ liệu với sitemap
+const L = (t, u, note = '') => `- [${t}](${SITE + u})${note ? ': ' + note : ''}`;
+write('/llms.txt', [
+  '# Việc Làm Bảo Vệ',
+  '',
+  '> Việc Làm Bảo Vệ là chuyên trang tuyển dụng ngành bảo vệ, vệ sĩ tại Việt Nam. Mỗi tin ghi rõ mức lương, ca làm, khu vực và chế độ chỗ ở; tin được kiểm duyệt trước khi hiển thị, ứng viên không mất phí.',
+  '',
+  'Việc Làm Bảo Vệ là nền tảng đăng tin tuyển dụng độc lập, không phải công ty dịch vụ bảo vệ và không trực tiếp tuyển người. Mỗi tin tuyển dụng thuộc về nhà tuyển dụng đứng tên trong tin; một số tin được tổng hợp từ nguồn công khai và có ghi rõ nguồn.',
+  '',
+  '## Trang chính',
+  L('Trang chủ', '/', 'tin bảo vệ mới nhất và tuyển gấp'),
+  L('Việc làm bảo vệ', '/viec-lam', `toàn bộ ${live.length} tin đang tuyển, lọc theo tỉnh, ca làm, mức lương`),
+  L('Nhà tuyển dụng', '/cong-ty-tuyen-dung', 'danh sách công ty đang tuyển'),
+  L('Tin tức nghề bảo vệ', '/tin-tuc'),
+  L('Cảnh báo lừa đảo', '/tin-tuc/dau-hieu-cong-ty-bao-ve-lua-dao', 'dấu hiệu công ty bảo vệ lừa đảo người tìm việc'),
+  '',
+  '## Việc làm theo tỉnh',
+  ...V.provinces.map((p) => L('Việc làm bảo vệ ' + p.name, core.url.area(p.slug))),
+  '',
+  '## Việc làm theo nhu cầu',
+  ...topics.topicPages().filter((x) => !x.pv).map((x) => L(x.t.short, topics.topicPath(x.t))),
+  '',
+  '## Bài viết',
+  ...V.posts.map((p) => L(p.title, core.url.post(p), p.excerpt)),
+  '',
+  '## Chính sách',
+  L('Điều khoản sử dụng', '/chinh-sach/dieu-khoan'),
+  L('Chính sách bảo mật', '/chinh-sach/bao-mat'),
+  L('Quy chế hoạt động', '/chinh-sach/quy-che'),
+  L('Liên hệ', '/chinh-sach/lien-he'),
+  '',
+  '## Optional',
+  L('Sitemap', '/sitemap.xml', 'danh sách đầy đủ các trang tin tuyển dụng'),
+  ''
+].join('\n'));
 
 console.log(`build: ${n} trang công khai, ${Object.keys(PRIVATE).length} khung trang tài khoản, ${V.jobs.length} tin, ${(V.videos || []).length} video, ${V.posts.length} bài viết → html/ (SITE_URL=${SITE})`);
