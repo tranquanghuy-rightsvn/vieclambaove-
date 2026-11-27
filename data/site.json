@@ -296,6 +296,23 @@
    "aggregated": true
   },
   {
+   "id": "dat-viet",
+   "name": "CÔNG TY TNHH DỊCH VỤ BẢO VỆ ĐẤT VIỆT",
+   "short": "đất việt.",
+   "initials": "Đ",
+   "color": "#5b3a8a",
+   "logo": "/images/companies/dat-viet-c8fee241.jpg",
+   "phone": "0908899278",
+   "about": "Thành lập từ năm 2003, Công ty bảo vệ Đất Việt chuyên cung cấp dịch vụ bảo vệ uy tín. Với bề dày kinh nghiệm về đào tạo nghiệp vụ bảo vệ và quản lý lí chặt chẽ nguồn nhân lực đầu vào đáp ứng những nhu cầu bảo vệ khắt khe nhất, đảm bảo an ninh và an toàn tài sản, tính mạng của Quý khách hàng …\n\nĐội ngũ nhân viên bảo vệ Đất Việt trẻ, khoẻ, được đào tạo nghiệp vụ bảo vệ chuyên nghiệp, trong đó chủ yếu là các cựu sĩ quan và quân nhân lực lượng vũ trang Việt Nam giàu kiến thức chuyên môn và có bề dày kinh nghiệm.\n\nTrong quản lý điều hành công ty bảo vệ Đất Việt luôn chú trọng việc ứng dụng công nghệ vào quản lý điều hành và giám sát chất lượng dịch vụ thông qua hệ thống camera giám sát và các phần mềm quản lý. Chúng tôi kiên định mục tiêu phấn đấu: năng động trong quản lý điều hành, hợp tác và chia sẻ với khách hàng. Với nhân viên, lắng nghe và tôn trọng.\n\nCông ty bảo vệ Đất Việt luôn lắng nghe và tiếp thu ý kiến đóng góp quý khách hàng nhằm hoàn thiện và nâng cao chất lượng dịch vụ công ty. Chúng tôi chân thành cám ơn quý Doanh nghiệp đã tin tưởng sử dụng dịch vụ bảo vệ Đất Việt trong thời gian qua và hy vọng được tiếp tục phục vụ quý Doanh nghiệp trong thời gian tới.\n\nXin chân thành cảm ơn.",
+   "size": "2000 nhân viên",
+   "founded": 2003,
+   "rating": null,
+   "reviews": 0,
+   "mst": "0302866564",
+   "license": "Số 47/GXN cấp ngày 23/07/2010",
+   "verified": false
+  },
+  {
    "id": "4-oranges-co-ltd",
    "name": "Công Ty 4 Oranges Co.,ltd",
    "short": "4 Oranges Co.,ltd",
@@ -1479,22 +1496,6 @@
    "aggregated": true
   },
   {
-   "id": "viec-lam-bao-ve",
-   "name": "Việc Làm Bảo Vệ",
-   "short": "Việc Làm Bảo Vệ",
-   "initials": "V",
-   "color": "#5b3a8a",
-   "phone": "",
-   "about": "Việc Làm Bảo Vệ là chuyên trang tuyển dụng ngành bảo vệ, vệ sĩ. Tin tuyển dụng được kiểm duyệt trước khi hiển thị, giúp người lao động tìm việc bảo vệ uy tín theo khu vực, ca làm và mức lương.",
-   "size": "",
-   "founded": "",
-   "rating": null,
-   "reviews": 0,
-   "mst": "",
-   "license": "",
-   "verified": false
-  },
-  {
    "id": "xuong-gom-su-viet-long",
    "name": "Xưởng gốm sứ Việt Long",
    "short": "Xưởng gốm sứ Việt Long",
@@ -1567,7 +1568,7 @@
   {
    "id": 95,
    "title": "Cần gấp 05 nhân viên bảo vệ nhà máy làm việc tại khu công nghệ cao Tp.HCM (Quận 9 cũ)",
-   "company": "viec-lam-bao-ve",
+   "company": "dat-viet",
    "province": "tp-hcm",
    "district": "Thủ Đức",
    "address": "Khu công nghệ cao Tp.HCM (Quận 9 cũ)",
@@ -1583,7 +1584,7 @@
    "age": "",
    "height": "",
    "desc": "Nhiệm vụ kiểm soát an ninh cổng chính và tuần tra xung quanh nhà máy",
-   "phone": "",
+   "phone": "0908899278",
    "views": 0,
    "calls": 0,
    "images": [
@@ -2166,7 +2167,7 @@
   {
    "id": 69,
    "title": "TUYEN 5 BAO VE TAI Q1",
-   "company": "viec-lam-bao-ve",
+   "company": "dat-viet",
    "province": "tp-hcm",
    "district": "Quận 1",
    "address": "T",
