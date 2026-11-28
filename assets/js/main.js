@@ -1,6 +1,7 @@
 // Điểm vào: khai báo tuyến, vẽ khung trang, xử lý sự kiện chung
 import { $, icon, esc, user, store, toggleSave, applyJob, reportJob, quickProfile, toast, SITE, api, syncMe } from './core.js';
 import { onRender, clean, go } from './router.js';
+import { SITE_LOCKED } from './site-config.js';
 import { match, headerHtml, footerHtml, notFoundPage, docTitle, DEFAULT_DESC, cleanLinks, noSlash } from './layout.js';
 
 function setMeta(name, content, attr = 'name') {
@@ -33,7 +34,7 @@ async function render({ keepScroll = false } = {}) {
   main.innerHTML = cleanLinks(page.html);
   document.title = docTitle(page);
   setMeta('description', page.desc || DEFAULT_DESC);
-  setMeta('robots', page.noindex ? 'noindex, follow' : '');
+  setMeta('robots', SITE_LOCKED ? 'noindex, nofollow' : page.noindex ? 'noindex, follow' : '');
   setMeta('og:title', document.title, 'property');
   document.head.querySelector('link[rel=canonical]').href = SITE + noSlash(page.canonical || path);
   document.head.querySelectorAll('script[data-ld]').forEach((s) => s.remove());

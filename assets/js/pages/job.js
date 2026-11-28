@@ -2,7 +2,7 @@ import { api, esc, icon, url, pay, jobRow, activeJobs, job as getJob, company, p
 
 export default function ({ params: [id] }) {
   const j = getJob(id);
-  if (!j) return { redirect: '/viec-lam' };
+  if (!j) return { redirect: '/viec-lam-bao-ve' };
   const c = company(j.company);
   const p = province(j.province);
   const sh = shift(j.shift);

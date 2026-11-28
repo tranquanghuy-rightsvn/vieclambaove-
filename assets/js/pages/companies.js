@@ -16,7 +16,7 @@ export default function () {
   const list = companyList();
   const html = `<div class="wrap" style="padding-top:20px">
     ${crumbs([['Trang chủ', '/'], ['Nhà tuyển dụng', null]])}
-    <h1 class="page-h">Nhà tuyển dụng ngành bảo vệ</h1>
+    <h1 class="page-h">Công ty bảo vệ, dịch vụ bảo vệ đang tuyển dụng</h1>
     <section class="panel-box">
       <div class="pb-head"><label class="field" style="max-width:360px;width:100%;margin:0"><span class="sr">Tìm công ty</span><input class="input" id="coQ" placeholder="Tìm tên công ty…"></label><span class="mute">${list.length} công ty</span></div>
       <div class="cogrid" id="coAll">${list.map(coBox).join('')}</div>
@@ -29,5 +29,5 @@ export default function () {
     $$('#coAll .cobox', root).forEach((a) => { const ok = !q || a.dataset.name.includes(q); a.hidden = !ok; shown += ok; });
     $('#coNone', root).hidden = shown > 0;
   });
-  return { nav: '', html, mount, title: 'Nhà tuyển dụng ngành bảo vệ', desc: `Danh sách ${list.length} công ty bảo vệ đang tuyển dụng trên Việc Làm Bảo Vệ.` };
+  return { nav: '', html, mount, title: 'Công ty bảo vệ, dịch vụ bảo vệ đang tuyển dụng', desc: `Danh sách ${list.length} công ty bảo vệ, công ty dịch vụ bảo vệ đang tuyển nhân viên bảo vệ trên Việc Làm Bảo Vệ.` };
 }

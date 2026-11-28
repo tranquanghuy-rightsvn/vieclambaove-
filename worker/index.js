@@ -5,6 +5,7 @@ import { publish, serveLive, LIVE_SQL, categories, getKv } from './publish.js';
 import { slugify } from './lib.js';
 import { now } from './lib.js';
 import { crawlDaily } from './admin.js';
+import { SITE_LOCKED } from '../assets/js/site-config.js';
 
 const isTemporaryHost = (url) => url.hostname.endsWith('.workers.dev') || url.hostname === 'localhost' || url.hostname === '127.0.0.1';
 
@@ -28,9 +29,9 @@ async function existsLive(env, path) {
   m = path.match(/^\/video\/([a-z0-9-]+)$/);
   if (m) return !!(await env.DB.prepare('SELECT 1 FROM videos WHERE slug = ? AND published = 1').bind(m[1]).first());
   // Trang tìm kiếm phổ biến (assets/js/topics.js) chưa kịp dựng tĩnh: trả khung để JS vẽ
-  m = path.match(/^\/viec-lam-bao-ve-(chung-cu|khu-cong-nghiep|ngan-hang|truong-hoc-benh-vien|su-kien|ve-si|ca-dem|ca-12-tieng|ca-8-tieng|bao-an-o|luong-cao|tuyen-gap|khong-can-kinh-nghiem)(?:-([a-z0-9-]+))?$/);
+  m = path.match(/^\/viec-lam-bao-ve-(chung-cu|khu-cong-nghiep|ngan-hang|truong-hoc-benh-vien|su-kien|ve-si|ca-dem|ca-12-tieng|ca-8-tieng|bao-an-o|luong-cao|tuyen-gap|khong-can-kinh-nghiem|noi-bo|giu-xe|sieu-thi|thoi-vu|lon-tuoi)(?:-([a-z0-9-]+))?$/);
   if (m) return !m[2] || (await categories(env)).provinces.some((x) => x.slug === m[2]);
-  m = path.match(/^\/viec-lam\/([a-z0-9-]+)(?:\/([a-z0-9-]+))?$/);
+  m = path.match(/^\/viec-lam-bao-ve\/([a-z0-9-]+)(?:\/([a-z0-9-]+))?$/);
   if (m) {
     const provinces = (await categories(env)).provinces;
     if (m[2]) { const p = provinces.find((x) => x.slug === m[1]); return !!p && p.districts.some((d) => slugify(d) === m[2]); } // dạng cũ, JS chuyển hướng
@@ -72,6 +73,8 @@ export default {
     if (url.pathname.startsWith('/assets/')) return env.ASSETS.fetch(req);
     // Đường dẫn cũ đã đổi tên → 301 sang đường dẫn mới
     if (/^\/nha-tuyen-dung(\/|$)/.test(url.pathname)) return Response.redirect(url.origin + url.pathname.replace(/^\/nha-tuyen-dung/, '/trang-quan-ly-tuyen-dung').replace(/\/+$/, '') + url.search, 301);
+    // Danh sách việc làm đổi sang URL chuẩn /viec-lam-bao-ve (/viec-lam/tp-hcm → /viec-lam-bao-ve/tp-hcm)
+    if (/^\/viec-lam(\/|$)/.test(url.pathname)) return Response.redirect(url.origin + url.pathname.replace(/^\/viec-lam/, '/viec-lam-bao-ve').replace(/\/+$/, '') + url.search, 301);
     if (/^\/cong-ty\/?$/.test(url.pathname)) return Response.redirect(url.origin + '/cong-ty-tuyen-dung' + url.search, 301);
     // Toàn site thống nhất KHÔNG có / cuối: /slug/ → /slug (301, giữ query)
     if (url.pathname.length > 1 && url.pathname.endsWith('/')) {
@@ -84,7 +87,7 @@ export default {
     } else if (req.method === 'GET' && (await existsLive(env, url.pathname))) {
       // Nội dung vừa duyệt chưa kịp build: trả khung trang (200) để JS vẽ ngay từ dữ liệu trực tiếp
       const shell = await env.ASSETS.fetch(new Request(url.origin + '/_shell'));
-      return new Response(shell.body, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-cache' } });
+      return new Response(shell.body, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-cache', ...(SITE_LOCKED ? { 'x-robots-tag': 'noindex, nofollow' } : {}) } });
     }
     const nf = await env.ASSETS.fetch(new Request(url.origin + '/_404'));
     return new Response(nf.body, { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });

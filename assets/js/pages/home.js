@@ -1,6 +1,7 @@
 import { V, $, $$, esc, icon, url, mono, jobRow, activeJobs, pagerHtml, company, province, SITE } from '../core.js';
 import { companyList, coBox } from './companies.js';
 import { go } from '../router.js';
+import { attachSuggest, findNear } from '../suggest.js';
 
 const PER = 6;
 
@@ -10,11 +11,11 @@ export default function () {
   const posts = V.posts.slice(0, 4);
 
   const quick = [
-    ['Bảo vệ tòa nhà', '/viec-lam?muc-tieu=toa-nha'],
-    ['Bảo vệ KCN Bình Dương', '/viec-lam/binh-duong?muc-tieu=kcn'],
-    ['Bảo vệ ca đêm', '/viec-lam?ca=dem'],
-    ['Có chỗ ở', '/viec-lam?che-do=o'],
-    ['Vệ sĩ', '/viec-lam?muc-tieu=ve-si']
+    ['Bảo vệ tòa nhà', '/viec-lam-bao-ve?muc-tieu=toa-nha'],
+    ['Bảo vệ KCN Bình Dương', '/viec-lam-bao-ve/binh-duong?muc-tieu=kcn'],
+    ['Bảo vệ ca đêm', '/viec-lam-bao-ve?ca=dem'],
+    ['Có chỗ ở', '/viec-lam-bao-ve?che-do=o'],
+    ['Vệ sĩ', '/viec-lam-bao-ve?muc-tieu=ve-si']
   ];
 
 
@@ -26,17 +27,17 @@ export default function () {
 
   // Sự kiện, Vệ sĩ ít người tìm → xếp cuối
   const RARE = ['su-kien', 've-si'];
-  const tile = (t) => [t.name, '/viec-lam?muc-tieu=' + t.id, t.icon, count((j) => j.target === t.id)];
+  const tile = (t) => [t.name, '/viec-lam-bao-ve?muc-tieu=' + t.id, t.icon, count((j) => j.target === t.id)];
   const tiles = [...V.targets.filter((t) => !RARE.includes(t.id)).map(tile),
-    ['Bảo vệ ca đêm', '/viec-lam?ca=dem', 'moon', count((j) => j.shift === 'dem')],
-    ['Có chỗ ở miễn phí', '/viec-lam?che-do=o', 'bed', count((j) => j.housing)],
+    ['Bảo vệ ca đêm', '/viec-lam-bao-ve?ca=dem', 'moon', count((j) => j.shift === 'dem')],
+    ['Có chỗ ở miễn phí', '/viec-lam-bao-ve?che-do=o', 'bed', count((j) => j.housing)],
     ...RARE.map((id) => V.targets.find((t) => t.id === id)).filter(Boolean).map(tile)];
 
   const html = `
   <section class="hero">
     <img class="hero-img" src="/assets/img/photos/hero-doi-bao-ve.webp" alt="" width="1600" height="1260" fetchpriority="high" decoding="async" onload="this.classList.add('is-in')">
     <div class="wrap">
-    <h1>Việc bảo vệ uy tín, đi làm ngay!</h1>
+    <h1>Việc làm bảo vệ uy tín, đi làm ngay!</h1>
     <p class="hero-sub">${jobs.length} tin đang tuyển từ ${V.companies.filter((c) => c.verified).length} công ty đã xác thực giấy phép · Ứng tuyển miễn phí</p>
     <form class="hsearch" id="finder" role="search">
       <label class="hs-q">${icon('search')}<span class="sr">Từ khóa</span><input name="q" type="search" placeholder="Tìm việc bảo vệ, tên công ty, khu công nghiệp…" autocomplete="off"></label>
@@ -45,6 +46,7 @@ export default function () {
       <button class="btn btn-gold" type="submit">Tìm việc</button>
     </form>
     <p class="hero-cta hero-search"><a class="btn btn-quick" href="/tim-kiem">${icon('filter')}Tìm kiếm chi tiết</a><span>Tìm kiếm theo quận huyện, mức lương mong muốn, công việc cụ thể và nhiều hơn thế.</span></p>
+    <p class="hfast"><a href="/viec-lam-bao-ve?gap=1">${icon('bolt')}Việc đi làm ngay</a><a href="/viec-lam-bao-ve-khong-can-kinh-nghiem">${icon('check')}Không cần kinh nghiệm</a><button type="button" data-near>${icon('locate')}<span>Tìm việc gần tôi</span></button></p>
     <p class="hquick"><span>Tìm nhiều:</span>${quick.map(([t, h]) => `<a href="${h}">${t}</a>`).join('')}</p>
   </div></section>
 
@@ -67,7 +69,7 @@ export default function () {
     <section class="panel-box" aria-labelledby="hotH">
       <div class="pb-head">
         <h2 id="hotH">Việc làm bảo vệ mới nhất</h2>
-        <a class="more" href="/viec-lam">Xem tất cả ${icon('arrow', 'ico-s')}</a>
+        <a class="more" href="/viec-lam-bao-ve">Xem tất cả ${icon('arrow', 'ico-s')}</a>
       </div>
       <div class="pills-row" role="tablist" aria-label="Lọc theo tỉnh thành">
         <button class="on" role="tab" aria-selected="true" data-p="">Tất cả</button>
@@ -78,7 +80,7 @@ export default function () {
     </section>
 
     <section class="panel-box" aria-labelledby="coH">
-      <div class="pb-head"><h2 id="coH">Nhà tuyển dụng tiêu biểu</h2>${tops.length > 18 ? `<a class="more" href="/cong-ty-tuyen-dung">Xem tất cả ${tops.length} công ty ${icon('arrow', 'ico-s')}</a>` : ''}</div>
+      <div class="pb-head"><h2 id="coH">Công ty bảo vệ tuyển dụng tiêu biểu</h2>${tops.length > 18 ? `<a class="more" href="/cong-ty-tuyen-dung">Xem tất cả ${tops.length} công ty ${icon('arrow', 'ico-s')}</a>` : ''}</div>
       <div class="cogrid">${tops.slice(0, 18).map(coBox).join('')}</div>
     </section>
 
@@ -99,7 +101,7 @@ export default function () {
       </section>
       <section class="empband">
         <img class="eb-img" src="/assets/img/photos/doi-bao-ve-toa-nha.webp" alt="Đội bảo vệ mặc đồng phục chào trước sảnh tòa nhà" loading="lazy" width="1100" height="825">
-        <span class="kicker">Dành cho công ty bảo vệ</span>
+        <span class="kicker">Dành cho công ty dịch vụ bảo vệ</span>
         <h2>Tuyển đủ quân số trong 24 giờ</h2>
         <p>Đăng tin miễn phí 1 - 4 tuần, nhận cuộc gọi từ ứng viên đã xuất ngũ, có chứng chỉ nghiệp vụ.</p>
         <div class="eb-act">
@@ -117,6 +119,14 @@ export default function () {
         <p class="meta">${p.date} · ${p.read} phút đọc</p>
       </article>`).join('')}</div>
     </section>
+
+    <section class="panel-box seo-intro" aria-labelledby="seoH">
+      <h2 id="seoH">Việc làm bảo vệ - Chuyên trang tuyển dụng bảo vệ uy tín trên toàn quốc</h2>
+      <p>Chào mừng bạn đến với hệ thống kết nối <b>việc làm bảo vệ</b> hàng đầu Việt Nam. Chúng tôi là chuyên trang <b>tuyển dụng bảo vệ</b> uy tín, cập nhật liên tục hàng trăm vị trí trực an ninh tại tòa nhà, chung cư, siêu thị, ngân hàng và khu công nghiệp trên toàn quốc. Cam kết thông tin minh bạch, tuyển trực tiếp, không qua trung gian và không thu bất kỳ khoản phí nào của người lao động.</p>
+      <p>Tin được đăng trực tiếp bởi các <a href="/cong-ty-tuyen-dung">công ty bảo vệ, công ty dịch vụ bảo vệ</a> và doanh nghiệp tuyển <a href="/viec-lam-bao-ve-noi-bo">bảo vệ nội bộ</a>, ghi rõ lương, ca làm, chỗ ở và được kiểm duyệt trước khi hiển thị.</p>
+      <p>Bạn có thể tìm việc theo mục tiêu: <a href="/viec-lam-bao-ve?muc-tieu=toa-nha">bảo vệ tòa nhà, chung cư</a>, <a href="/viec-lam-bao-ve?muc-tieu=ngan-hang">bảo vệ ngân hàng</a>, <a href="/viec-lam-bao-ve-giu-xe">bảo vệ giữ xe</a>, <a href="/viec-lam-bao-ve-sieu-thi">bảo vệ siêu thị, cửa hàng</a>, <a href="/viec-lam-bao-ve?muc-tieu=truong-hoc">bảo vệ trường học, bệnh viện</a>, <a href="/viec-lam-bao-ve?muc-tieu=kcn">bảo vệ khu công nghiệp, nhà máy</a>; theo ca làm và chế độ: <a href="/viec-lam-bao-ve?ca=dem">bảo vệ ca đêm</a>, <a href="/viec-lam-bao-ve-ca-8-tieng">ca 8 tiếng</a>, <a href="/viec-lam-bao-ve-ca-12-tieng">ca 12 tiếng</a>, trực 24h, <a href="/viec-lam-bao-ve?che-do=o">bảo vệ bao ăn ở</a>, <a href="/viec-lam-bao-ve?gap=1">tuyển bảo vệ đi làm ngay</a>, <a href="/viec-lam-bao-ve-khong-can-kinh-nghiem">không cần kinh nghiệm</a>, <a href="/viec-lam-bao-ve-lon-tuoi">nhận người lớn tuổi</a>; hoặc theo khu vực: ${V.provinces.map((p) => `<a href="${url.area(p.slug)}">việc làm bảo vệ ${esc(p.short)}</a>`).join(', ')}.</p>
+      <p>Ứng viên ứng tuyển miễn phí, gọi thẳng cho người tuyển. Công ty bảo vệ và đơn vị cung cấp dịch vụ bảo vệ có thể <a href="/trang-quan-ly-tuyen-dung/dang-tin">đăng tin tuyển dụng bảo vệ</a> miễn phí và tìm ứng viên phù hợp.</p>
+    </section>
   </div>`;
 
   function mount(root) {
@@ -130,7 +140,7 @@ export default function () {
       page = Math.min(page, pages);
       list.innerHTML = rows.length
         ? rows.slice((page - 1) * PER, page * PER).map(jobRow).join('')
-        : `<div class="empty"><h3>Chưa có tin ở khu vực này</h3><p class="mute"><a href="/viec-lam">Xem việc ở khu vực khác</a></p></div>`;
+        : `<div class="empty"><h3>Chưa có tin ở khu vực này</h3><p class="mute"><a href="/viec-lam-bao-ve">Xem việc ở khu vực khác</a></p></div>`;
       pg.innerHTML = pagerHtml(page, pages);
     };
     draw();
@@ -143,6 +153,8 @@ export default function () {
       prov = b.dataset.p; page = 1; draw();
     }));
 
+    attachSuggest($('#finder', root));
+    $('[data-near]', root)?.addEventListener('click', (e) => findNear(e.currentTarget));
     $('#finder', root).addEventListener('submit', (e) => {
       e.preventDefault();
       const f = new FormData(e.target);
@@ -156,6 +168,6 @@ export default function () {
 
   return {
     nav: 'home', html, mount,
-    ld: [{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Việc Làm Bảo Vệ', url: SITE, potentialAction: { '@type': 'SearchAction', target: SITE + '/viec-lam?q={q}', 'query-input': 'required name=q' } }]
+    ld: [{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Việc Làm Bảo Vệ', url: SITE, potentialAction: { '@type': 'SearchAction', target: SITE + '/viec-lam-bao-ve?q={q}', 'query-input': 'required name=q' } }]
   };
 }

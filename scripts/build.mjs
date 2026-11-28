@@ -8,6 +8,7 @@ import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync, existsSync, rea
 import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import vm from 'node:vm';
+import { SITE_LOCKED } from '../assets/js/site-config.js';
 
 const root = new URL('..', import.meta.url).pathname;
 const out = join(root, 'html');
@@ -53,7 +54,7 @@ function htmlPage(path, page, { status } = {}) {
   const desc = page.desc || layout.DEFAULT_DESC;
   const canonical = SITE + layout.noSlash(page.canonical || path);
   const ld = [].concat(page.ld || []).map((o) => `<script type="application/ld+json" data-ld>${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`).join('');
-  const head = `<meta property="og:title" content="${escAttr(title)}"><meta property="og:description" content="${escAttr(desc)}"><meta property="og:url" content="${escAttr(canonical)}"><meta property="og:type" content="website">${page.noindex ? '<meta name="robots" content="noindex, follow">' : ''}${ld}`;
+  const head = `<meta property="og:title" content="${escAttr(title)}"><meta property="og:description" content="${escAttr(desc)}"><meta property="og:url" content="${escAttr(canonical)}"><meta property="og:type" content="website">${SITE_LOCKED ? '<meta name="robots" content="noindex, nofollow">' : page.noindex ? '<meta name="robots" content="noindex, follow">' : ''}${ld}`;
   const cls = [page.mbar && 'has-mbar', page.tabbar !== false && 'has-tabbar'].filter(Boolean).join(' ');
   return shell
     .replace(/<title>[^<]*<\/title>/, `<title>${escAttr(title)}</title>`)
@@ -105,7 +106,7 @@ const pub = [];          // [path, lastmod, inSitemap]: trang dựng tĩnh; ch�
 const add = (path, lastmod = BUILT, map = true) => pub.push([path, lastmod, map]);
 const live = V.jobs.filter((j) => !j.expiresAt || j.expiresAt > BUILT); // tin còn hạn lúc dựng
 const newest = (jobs) => Math.max(0, ...jobs.map((j) => j.updatedAt || j.postedAt || 0)) || BUILT;
-add('/', newest(live)); add('/viec-lam', newest(live)); add('/tin-tuc'); add('/video', (V.videos || []).length ? undefined : BUILT, !!(V.videos || []).length); add('/cong-ty-tuyen-dung');
+add('/', newest(live)); add('/viec-lam-bao-ve', newest(live)); add('/tin-tuc'); add('/video', (V.videos || []).length ? undefined : BUILT, !!(V.videos || []).length); add('/cong-ty-tuyen-dung');
 ['dieu-khoan', 'bao-mat', 'quy-che', 'lien-he'].forEach((s) => add('/chinh-sach/' + s));
 V.provinces.forEach((p) => {
   const pj = live.filter((j) => j.province === p.slug);
@@ -141,6 +142,8 @@ for (const [path, title] of Object.entries(PRIVATE)) {
   write(path, htmlPage(path, { title, noindex: true, html: loading, nav: path.startsWith('/trang-quan-ly-tuyen-dung') ? 'employer' : '', tabbar: path !== '/dang-nhap' }));
 }
 // Khung trống: Worker trả cho nội dung vừa duyệt chưa kịp build (JS vẽ từ dữ liệu trực tiếp)
+// Đang tạm chặn Google: thêm header X-Robots-Tag cho mọi file tĩnh (Cloudflare đọc html/_headers)
+writeFileSync(join(out, '_headers'), SITE_LOCKED ? '/*\n  X-Robots-Tag: noindex, nofollow\n' : '');
 write('/_shell', htmlPage('/', { title: '', noindex: true, html: loading }).replace('<link rel="canonical" href="' + SITE + '/">', '<link rel="canonical" href="/">'));
 // 404: vẫn là khung app - đường dẫn hợp lệ nhưng chưa có trang tĩnh (vd quận chưa có tin) JS sẽ vẽ đúng trang
 write('/404.html', htmlPage('/404', layout.notFoundPage()));
@@ -154,13 +157,13 @@ const L = (t, u, note = '') => `- [${t}](${SITE + u})${note ? ': ' + note : ''}`
 write('/llms.txt', [
   '# Việc Làm Bảo Vệ',
   '',
-  '> Việc Làm Bảo Vệ là chuyên trang tuyển dụng ngành bảo vệ, vệ sĩ tại Việt Nam. Mỗi tin ghi rõ mức lương, ca làm, khu vực và chế độ chỗ ở; tin được kiểm duyệt trước khi hiển thị, ứng viên không mất phí.',
+  '> Việc Làm Bảo Vệ là chuyên trang việc làm bảo vệ, tuyển dụng bảo vệ uy tín trên toàn quốc. Tin đăng trực tiếp từ công ty bảo vệ, công ty dịch vụ bảo vệ và doanh nghiệp tuyển bảo vệ nội bộ; mỗi tin ghi rõ mức lương, ca làm, khu vực, chế độ ăn ở, được kiểm duyệt trước khi hiển thị, người lao động không mất phí.',
   '',
   'Việc Làm Bảo Vệ là nền tảng đăng tin tuyển dụng độc lập, không phải công ty dịch vụ bảo vệ và không trực tiếp tuyển người. Mỗi tin tuyển dụng thuộc về nhà tuyển dụng đứng tên trong tin; một số tin được tổng hợp từ nguồn công khai và có ghi rõ nguồn.',
   '',
   '## Trang chính',
   L('Trang chủ', '/', 'tin bảo vệ mới nhất và tuyển gấp'),
-  L('Việc làm bảo vệ', '/viec-lam', `toàn bộ ${live.length} tin đang tuyển, lọc theo tỉnh, ca làm, mức lương`),
+  L('Việc làm bảo vệ', '/viec-lam-bao-ve', `toàn bộ ${live.length} tin đang tuyển, lọc theo tỉnh, ca làm, mức lương`),
   L('Nhà tuyển dụng', '/cong-ty-tuyen-dung', 'danh sách công ty đang tuyển'),
   L('Tin tức nghề bảo vệ', '/tin-tuc'),
   L('Cảnh báo lừa đảo', '/tin-tuc/dau-hieu-cong-ty-bao-ve-lua-dao', 'dấu hiệu công ty bảo vệ lừa đảo người tìm việc'),

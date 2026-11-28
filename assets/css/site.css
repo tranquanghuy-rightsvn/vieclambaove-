@@ -680,6 +680,10 @@ a { text-underline-offset: 2px; }
 .foot-contact { list-style: none; }
 .foot-contact li { display: flex; gap: 6px; align-items: flex-start; }
 .foot-contact .ico { flex: none; margin-top: 3px; }
+.foot-social { display: flex; gap: 10px; margin-top: 14px; }
+.foot-social a { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--brand-wash); color: var(--brand); transition: background .15s, color .15s; }
+.foot-social a:hover { background: var(--brand); color: #fff; }
+.foot-social svg { width: 20px; height: 20px; }
 .foot-contact .ico { color: var(--txt-3); }
 .foot-base { display: block; border-top: 1px solid var(--line); padding: 16px 0 24px; font-size: 13px; color: var(--txt-3); }
 .foot-base p { margin: 0 0 4px; }
@@ -1519,7 +1523,7 @@ body { background: var(--bg); }
   .hero-img { width: 48%; object-position: 50% 30%; -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 35%); mask-image: linear-gradient(90deg, transparent 0%, #000 35%); }
 }
 @media (min-width: 961px) {
-  .hero h1, .hero-sub { max-width: 660px; }
+  .hero h1, .hero-sub { max-width: 760px; }
   .hero-img { -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.6) 30%, #000 60%); mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.6) 30%, #000 60%); }
 }
 .bc-thumb img, .bl-img img, .post-hero img { object-fit: cover; object-position: 50% 22%; }
@@ -1551,16 +1555,15 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 
 /* ---------- Logo theo mẫu Cổng thông tin vieclambaove.vn ---------- */
 .logo { gap: 10px; }
-.logo-mark { width: 40px; height: 40px; flex: none; border-radius: 12px; background: linear-gradient(135deg, #fbbf24, #d97706); color: #020617; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(217, 119, 6, .35); transition: transform .15s; }
+.logo-mark { height: 44px; flex: none; display: flex; align-items: center; transition: transform .15s; }
+.logo-mark img { height: 100%; width: auto; display: block; filter: drop-shadow(0 1px 2px rgba(15, 23, 42, .18)); }
 .logo:hover .logo-mark { transform: scale(1.05); }
-.logo-mark svg { width: 22px; height: 22px; }
 .logo-text { display: flex; flex-direction: column; line-height: 1; }
 .logo-name { font: 900 21px/1 var(--f-head); letter-spacing: -.02em; color: #0f172a; }
 .logo-name b { font-weight: 900; color: #d97706; }
 .logo-text small { margin-top: 4px; font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #64748b; }
 @media (max-width: 720px) {
-  .logo-mark { width: 36px; height: 36px; border-radius: 10px; }
-  .logo-mark svg { width: 20px; height: 20px; }
+  .logo-mark { height: 38px; }
   .logo-name { font-size: 19px; }
 }
 
@@ -1869,3 +1872,36 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 .foot-tags a:hover { background: #f59e0b; border-color: #f59e0b !important; color: #111827 !important; text-decoration: none !important; }
 /* Cột phải KHÔNG bám theo khi cuộn: nằm yên một vị trí trong trang (yêu cầu của chủ site) */
 .aside, .laside, .post-aside, .topic-side { position: static !important; top: auto !important; max-height: none !important; overflow: visible !important; }
+
+/* ---------- Đoạn giới thiệu cuối trang chủ (từ khóa chính) ---------- */
+.seo-intro h2 { font-size: 20px; margin-bottom: 10px; }
+.seo-intro p { color: var(--txt-2); font-size: 15px; line-height: 1.65; margin-top: 8px; }
+.seo-intro a { color: var(--brand); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- Gợi ý tìm kiếm (tham khảo vieclam24h) ---------- */
+.sg { position: fixed; z-index: 60; background: #fff; border-radius: 12px; box-shadow: 0 12px 32px rgba(16, 24, 40, .18); border: 1px solid var(--line); padding: 8px; overflow-y: auto; text-align: left; color: var(--txt); }
+.sg[hidden] { display: none; }
+.sg-it { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border: 0; background: none; border-radius: 8px; font: inherit; font-size: 14.5px; color: var(--txt); text-decoration: none; text-align: left; cursor: pointer; }
+.sg-it span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sg-it .ico { flex: none; color: var(--txt-3); }
+.sg-it small { flex: none; font-size: 12px; color: var(--txt-3); background: var(--fill, #f2f4f7); padding: 2px 8px; border-radius: 10px; }
+.sg-it:hover, .sg-it.on { background: var(--brand-wash); color: var(--brand); }
+.sg-near { color: var(--brand); font-weight: 600; }
+.sg-near .ico, .sg-all .ico { color: var(--brand); }
+.sg-all { border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; margin-top: 4px; }
+.sg-h { display: flex; justify-content: space-between; align-items: center; padding: 10px 10px 4px; font-size: 12.5px; font-weight: 700; color: var(--txt-3); text-transform: uppercase; letter-spacing: .04em; }
+.sg-h button { border: 0; background: none; color: var(--brand); font-size: 12.5px; cursor: pointer; text-transform: none; letter-spacing: 0; }
+.sg-tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 10px 8px; }
+.sg-tags a { padding: 5px 12px; border-radius: 16px; background: var(--brand-wash); color: var(--brand); font-size: 13.5px; text-decoration: none; }
+.sg-tags a:hover { background: var(--brand); color: #fff; }
+
+/* Nút nhanh dưới ô tìm kiếm trang chủ: Việc đi làm ngay, Không cần kinh nghiệm, Tìm việc gần tôi */
+.hfast { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; }
+.hfast a, .hfast button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 24px; background: #fff; color: var(--brand); font: inherit; font-size: 15px; font-weight: 700; text-decoration: none; border: 0; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, .12); transition: transform .15s; }
+.hfast a:first-child { color: #c2410c; }
+.hfast a:hover, .hfast button:hover { transform: translateY(-1px); }
+.hfast .ico { width: 18px; height: 18px; }
+@media (max-width: 720px) {
+  .hfast { gap: 8px; justify-content: center; }
+  .hfast a, .hfast button { padding: 8px 14px; font-size: 14px; }
+}

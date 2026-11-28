@@ -1,5 +1,6 @@
 import { V, $, $$, esc, icon, url, jobRow, activeJobs, pagerHtml, province, shift, target, districtBySlug, splitArea, crumbs, SITE, company } from '../core.js';
 import { go } from '../router.js';
+import { attachSuggest, matchQ } from '../suggest.js';
 
 const PAY = [['', 'Mọi mức lương'], ['duoi-8', 'Dưới 8 triệu'], ['8-10', '8 - 10 triệu'], ['10-15', '10 - 15 triệu'], ['tren-15', 'Trên 15 triệu']];
 const payTest = { 'duoi-8': (j) => j.salaryMin < 8, '8-10': (j) => j.salaryMax >= 8 && j.salaryMin <= 10, '10-15': (j) => j.salaryMax >= 10 && j.salaryMin <= 15, 'tren-15': (j) => j.salaryMax > 15 };
@@ -17,7 +18,7 @@ function filterJobs(all, s) {
     (!s.cd.includes('o') || j.housing) &&
     (!s.cd.includes('an') || j.meals) &&
     (!s.gap || j.urgent) &&
-    (!s.q || (j.title + ' ' + j.district + ' ' + company(j.company).name).toLowerCase().includes(s.q.toLowerCase()))
+    (!s.q || matchQ(j.title + ' ' + j.district + ' ' + (j.address || '') + ' ' + (company(j.company)?.name || ''), s.q))
   );
   const vip = (j) => (j.tier === 'vip' ? 0 : 1);
   if (s.sx === 'luong') r.sort((a, b) => b.salaryMax - a.salaryMax);
@@ -44,12 +45,12 @@ export default function ({ params: [ps, ds], query }) {
   let near = false;
   if (query.get('gan-toi') && !ps) { ps = 'tp-hcm'; near = true; }
   const qs = query.toString() ? '?' + query.toString() : '';
-  // Dạng cũ 2 cấp /viec-lam/<tỉnh>/<quận> → dạng mới /viec-lam/<quận>-<tỉnh>
-  if (ds) { const pv = province(ps); const dd = districtBySlug(pv, ds); return { redirect: (dd ? url.area(ps, dd) : pv ? url.area(ps) : '/viec-lam') + qs }; }
+  // Dạng cũ 2 cấp /viec-lam-bao-ve/<tỉnh>/<quận> → dạng mới /viec-lam-bao-ve/<quận>-<tỉnh>
+  if (ds) { const pv = province(ps); const dd = districtBySlug(pv, ds); return { redirect: (dd ? url.area(ps, dd) : pv ? url.area(ps) : '/viec-lam-bao-ve') + qs }; }
   let d = null;
   if (ps && !province(ps)) {
     const sp = splitArea(ps);
-    if (!sp) return { redirect: '/viec-lam' };
+    if (!sp) return { redirect: '/viec-lam-bao-ve' };
     [ps, d] = sp;
   }
   const p = ps ? province(ps) : null;
@@ -77,7 +78,7 @@ export default function ({ params: [ps, ds], query }) {
   if (s.cd.includes('an')) chips.push(['cd:an', 'Bao ăn']);
   if (s.gap) chips.push(['gap', 'Tuyển gấp']);
 
-  const crumb = [['Trang chủ', '/'], ['Việc làm', p ? '/viec-lam' : null]];
+  const crumb = [['Trang chủ', '/'], ['Việc làm', p ? '/viec-lam-bao-ve' : null]];
   if (p) crumb.push([p.name, d ? url.area(p.slug) : null]);
   if (d) crumb.push([d, null]);
 
@@ -147,6 +148,7 @@ export default function ({ params: [ps, ds], query }) {
   </div>`;
 
   function mount(root) {
+    attachSuggest($('#lsearch', root));
     const goTo = (n) => go(buildHref(n), { replace: true, keepScroll: true });
     $('#lsearch', root).addEventListener('submit', (e) => {
       e.preventDefault();

@@ -4,13 +4,15 @@ let render = null;
 export const onRender = (fn) => { render = fn; };
 
 // Chuẩn hóa URL: bỏ .html, bỏ index, bỏ dấu / cuối
-const LEGACY = { 'chi-tiet': '/viec-lam', 'bai-viet': '/tin-tuc' };
+const LEGACY = { 'chi-tiet': '/viec-lam-bao-ve', 'bai-viet': '/tin-tuc' };
 export function clean(href) {
   const u = new URL(href, location.origin);
   let p = u.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
   if (p.length > 1) p = p.replace(/\/+$/, '');
   // "Cẩm nang" đã đổi thành "Tin tức": link cũ /cam-nang chuyển sang /tin-tuc
   if (/^\/cam-nang(\/|$)/.test(p)) p = p.replace(/^\/cam-nang/, '/tin-tuc');
+  // Danh sách việc làm đã đổi từ /viec-lam sang URL chuẩn /viec-lam-bao-ve (giữ phần tỉnh/quận phía sau)
+  if (/^\/viec-lam(\/|$)/.test(p)) p = p.replace(/^\/viec-lam/, '/viec-lam-bao-ve');
   // Đường dẫn cũ: /nha-tuyen-dung → /trang-quan-ly-tuyen-dung, /cong-ty (danh sách) → /cong-ty-tuyen-dung
   if (/^\/nha-tuyen-dung(\/|$)/.test(p)) p = p.replace(/^\/nha-tuyen-dung/, '/trang-quan-ly-tuyen-dung');
   if (p === '/cong-ty' && !u.searchParams.get('id')) p = '/cong-ty-tuyen-dung';

@@ -27,10 +27,10 @@ export default function ({ params: [slug = 'dieu-khoan'] }) {
   const body = slug === 'lien-he' ? `
     <p>Phản hồi trong giờ hành chính, thường trong 4 giờ.</p>
     <ul class="kv" style="margin:16px 0 28px">
-      <li><span>Hotline</span><b><a href="tel:19006868">1900 6868</a></b></li>
-      <li><span>Zalo</span><b>0909 000 868</b></li>
-      <li><span>Email</span><b>hotro@vieclambaove.vn</b></li>
-      <li><span>Địa chỉ</span><b>Tầng 5, 12 Nguyễn Thị Minh Khai, Quận 1, TP.HCM</b></li>
+      <li><span>Hotline</span><b><a href="tel:0986864878">09 86 86 48 78</a></b></li>
+      <li><span>Zalo</span><b><a href="https://zalo.me/0986864878" target="_blank" rel="noopener">09 86 86 48 78</a></b></li>
+      <li><span>Email</span><b><a href="mailto:vieclambaove@gmail.com">vieclambaove@gmail.com</a></b></li>
+      <li><span>Địa chỉ</span><b>Tầng 5, 123 Nguyễn Văn Linh, Quận 7, TP.HCM</b></li>
     </ul>
     <form class="formcard" id="ct" style="font-size:16px">
       <div class="grid2"><label class="field"><span>Họ tên</span><input class="input" name="name" required autocomplete="name"></label><label class="field"><span>Số điện thoại</span><input class="input" name="phone" required inputmode="tel" autocomplete="tel"></label></div>

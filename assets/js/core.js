@@ -100,8 +100,8 @@ export const dateIn = (days) => { const t = new Date(); t.setDate(t.getDate() + 
 /* ---------- URL sạch ---------- */
 export const url = {
   job: (j) => `/tin/${slug(j.title)}-${j.id}`,
-  // Khu vực 1 cấp: /viec-lam/<tỉnh> và /viec-lam/<quận>-<tỉnh> (vd /viec-lam/hai-chau-da-nang)
-  area: (p, d) => '/viec-lam' + (p ? '/' + (d ? slug(d) + '-' : '') + p : ''),
+  // Khu vực 1 cấp: /viec-lam-bao-ve/<tỉnh> và /viec-lam-bao-ve/<quận>-<tỉnh> (vd /viec-lam-bao-ve/hai-chau-da-nang)
+  area: (p, d) => '/viec-lam-bao-ve' + (p ? '/' + (d ? slug(d) + '-' : '') + p : ''),
   company: (c) => `/cong-ty/${c.id}`,
   post: (p) => `/tin-tuc/${p.id}`
 };
