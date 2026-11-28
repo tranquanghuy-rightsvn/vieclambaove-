@@ -1905,3 +1905,7 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
   .hfast { gap: 8px; justify-content: center; }
   .hfast a, .hfast button { padding: 8px 14px; font-size: 14px; }
 }
+.sg-smart { background: var(--brand-wash); color: var(--brand); margin-bottom: 4px; }
+.sg-smart span { white-space: normal; }
+.sg-smart .ico { color: var(--brand); }
+.empty-opts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }

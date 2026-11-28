@@ -3,10 +3,10 @@
 import { V, esc, icon, url, store, activeJobs } from './core.js';
 import { TOPICS, topicPath, topicJobs } from './topics.js';
 import { go } from './router.js';
+import { parseQuery, hasFilters, describe } from './smart-search.js';
 
-// Bỏ dấu tiếng Việt để so khớp: "Bảo vệ Đồng Nai" → "bao ve dong nai"
-export const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/\s+/g, ' ').trim();
-export const matchQ = (text, q) => { const t = norm(text); return norm(q).split(' ').every((w) => t.includes(w)); };
+import { norm, matchQ } from './smart-search.js';
+export { norm, matchQ };
 
 const RECENT = 'recentSearch';
 export const saveRecent = (q) => {
@@ -58,7 +58,11 @@ export function attachSuggest(form) {
     active = -1;
     if (q) {
       const list = suggestions(q);
-      dd.innerHTML = `${list.map(item).join('')}<button class="sg-it sg-all" type="submit" data-i="${list.length}">${icon('search', 'ico-s')}<span>Tìm tất cả việc có "<b>${esc(q)}</b>"</span></button>`;
+      // Câu tìm hiểu được thành bộ lọc → dòng đầu tiên cho biết sẽ tìm theo điều kiện gì
+      const f = parseQuery(q);
+      const smart = hasFilters(f) ? `<button class="sg-it sg-smart" type="submit" data-i="0">${icon('filter', 'ico-s')}<span>${describe(f).map((x) => `<b>${esc(x)}</b>`).join(' · ')}</span></button>` : '';
+      const all = smart ? '' : `<button class="sg-it sg-all" type="submit" data-i="${list.length}">${icon('search', 'ico-s')}<span>Tìm tất cả việc có "<b>${esc(q)}</b>"</span></button>`;
+      dd.innerHTML = smart + list.map(item).join('') + all;
     } else {
       const recent = store.get(RECENT, []);
       const popular = TOPICS.filter((t) => topicJobs(t).length).slice(0, 8);

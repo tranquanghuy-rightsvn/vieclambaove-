@@ -1,6 +1,7 @@
 import { V, $, $$, esc, icon, url, jobRow, activeJobs, pagerHtml, province, shift, target, districtBySlug, splitArea, crumbs, SITE, company } from '../core.js';
 import { go } from '../router.js';
-import { attachSuggest, matchQ } from '../suggest.js';
+import { attachSuggest } from '../suggest.js';
+import { parseQuery, hasFilters, mergeFilters, filterHref, payLabel, matchQ } from '../smart-search.js';
 
 const PAY = [['', 'Mọi mức lương'], ['duoi-8', 'Dưới 8 triệu'], ['8-10', '8 - 10 triệu'], ['10-15', '10 - 15 triệu'], ['tren-15', 'Trên 15 triệu']];
 const payTest = { 'duoi-8': (j) => j.salaryMin < 8, '8-10': (j) => j.salaryMax >= 8 && j.salaryMin <= 10, '10-15': (j) => j.salaryMax >= 10 && j.salaryMin <= 15, 'tren-15': (j) => j.salaryMax > 15 };
@@ -13,12 +14,14 @@ function filterJobs(all, s) {
     (!s.tinh || j.province === s.tinh) &&
     (!s.quan || j.district === s.quan) &&
     (!s.luong || payTest[s.luong]?.(j)) &&
+    (!s.min || j.salaryMax >= s.min) &&
+    (!s.max || j.salaryMin <= s.max) &&
     (!s.ca.length || s.ca.includes(j.shift)) &&
     (!s.mt.length || s.mt.includes(j.target)) &&
     (!s.cd.includes('o') || j.housing) &&
     (!s.cd.includes('an') || j.meals) &&
     (!s.gap || j.urgent) &&
-    (!s.q || matchQ(j.title + ' ' + j.district + ' ' + (j.address || '') + ' ' + (company(j.company)?.name || ''), s.q))
+    (!s.text || matchQ(`${j.title} ${j.district} ${j.address || ''} ${j.desc || ''} ${company(j.company)?.name || ''} ${company(j.company)?.short || ''}`, s.text))
   );
   const vip = (j) => (j.tier === 'vip' ? 0 : 1);
   if (s.sx === 'luong') r.sort((a, b) => b.salaryMax - a.salaryMax);
@@ -27,19 +30,7 @@ function filterJobs(all, s) {
   return r;
 }
 
-function buildHref(s, page = 1) {
-  const q = new URLSearchParams();
-  if (s.q) q.set('q', s.q);
-  if (s.luong) q.set('luong', s.luong);
-  if (s.ca.length) q.set('ca', s.ca.join(','));
-  if (s.mt.length) q.set('muc-tieu', s.mt.join(','));
-  if (s.cd.length) q.set('che-do', s.cd.join(','));
-  if (s.gap) q.set('gap', '1');
-  if (s.sx && s.sx !== 'moi') q.set('sap-xep', s.sx);
-  if (page > 1) q.set('trang', page);
-  const qs = q.toString().replace(/%2C/g, ',');
-  return url.area(s.tinh, s.quan) + (qs ? '?' + qs : '');
-}
+const buildHref = filterHref;
 
 export default function ({ params: [ps, ds], query }) {
   let near = false;
@@ -55,7 +46,13 @@ export default function ({ params: [ps, ds], query }) {
   }
   const p = ps ? province(ps) : null;
 
-  const s = { tinh: p?.slug || '', quan: d || '', q: query.get('q') || '', luong: query.get('luong') || '', ca: list(query, 'ca'), mt: list(query, 'muc-tieu'), cd: list(query, 'che-do'), gap: query.get('gap') === '1', sx: query.get('sap-xep') || 'moi' };
+  const s = { tinh: p?.slug || '', quan: d || '', q: query.get('q') || '', luong: query.get('luong') || '', min: Number(query.get('luong-tu')) || 0, max: Number(query.get('luong-den')) || 0, ca: list(query, 'ca'), mt: list(query, 'muc-tieu'), cd: list(query, 'che-do'), gap: query.get('gap') === '1', sx: query.get('sap-xep') || 'moi' };
+  // Đọc hiểu câu tìm: "bảo vệ lương 8 triệu đồng nai" → chuyển sang /viec-lam-bao-ve/dong-nai?luong-tu=8 (bộ lọc hiện thành các ô bên dưới)
+  if (s.q) {
+    const f = parseQuery(s.q);
+    if (hasFilters(f)) return { redirect: buildHref(mergeFilters(s, f)) };
+    s.text = f.rest; // chỉ so phần chữ còn lại, bỏ chữ chung chung như "việc làm", "tuyển", "bảo vệ"
+  }
   const all = activeJobs();
   const res = filterJobs(all, s);
   const pages = Math.max(1, Math.ceil(res.length / PER));
@@ -72,6 +69,7 @@ export default function ({ params: [ps, ds], query }) {
   const chips = [];
   if (s.q) chips.push(['q', `"${s.q}"`]);
   if (s.luong) chips.push(['luong', PAY.find((x) => x[0] === s.luong)[1]]);
+  if (s.min || s.max) chips.push(['tien', payLabel(s.min, s.max)]);
   s.ca.forEach((c) => chips.push(['ca:' + c, shift(c).name]));
   s.mt.forEach((m) => chips.push(['mt:' + m, target(m).name]));
   if (s.cd.includes('o')) chips.push(['cd:o', 'Bao ở']);
@@ -119,7 +117,7 @@ export default function ({ params: [ps, ds], query }) {
     <div class="listing2">
       <div>
         <div class="jlist">
-          ${shown.length ? shown.map(jobRow).join('') : `<div class="empty"><h3>Không có tin phù hợp</h3><p class="mute">Bỏ bớt điều kiện lọc hoặc xem khu vực lân cận.</p><p><a class="btn btn-soft" href="${url.area(s.tinh)}">Bỏ bộ lọc</a></p></div>`}
+          ${shown.length ? shown.map(jobRow).join('') : emptyHtml(s, p, d)}
         </div>
         ${pagerHtml(page, pages, (n) => buildHref(s, n))}
         <section class="seo-text">
@@ -160,15 +158,17 @@ export default function ({ params: [ps, ds], query }) {
     $('#lfilter', root).addEventListener('change', (e) => {
       const f = new FormData(e.currentTarget);
       const cd = [f.get('o') ? 'o' : '', f.get('an') || ''].filter(Boolean);
-      goTo({ ...s, gap: !!f.get('gap'), luong: f.get('luong') || '', mt: f.get('mt') ? [f.get('mt')] : [], cd, sx: f.get('sx') || 'moi' });
+      const luong = f.get('luong') || '';
+      goTo({ ...s, gap: !!f.get('gap'), luong, ...(luong !== s.luong ? { min: 0, max: 0 } : {}), mt: f.get('mt') ? [f.get('mt')] : [], cd, sx: f.get('sx') || 'moi' });
     });
     root.addEventListener('click', (e) => {
       const u = e.target.closest('[data-unset]');
       if (!u) return;
       const k = u.dataset.unset;
       const n = { ...s, ca: [...s.ca], mt: [...s.mt], cd: [...s.cd] };
-      if (k === '*') Object.assign(n, { q: '', luong: '', ca: [], mt: [], cd: [], gap: false });
+      if (k === '*') Object.assign(n, { q: '', luong: '', min: 0, max: 0, ca: [], mt: [], cd: [], gap: false });
       else if (k === 'q' || k === 'luong') n[k] = '';
+      else if (k === 'tien') Object.assign(n, { min: 0, max: 0 });
       else if (k === 'gap') n.gap = false;
       else { const [g, v] = k.split(':'); n[g] = n[g].filter((x) => x !== v); }
       goTo(n);
@@ -176,7 +176,7 @@ export default function ({ params: [ps, ds], query }) {
   }
 
   const bc = crumb.map(([name, h], i) => ({ '@type': 'ListItem', position: i + 1, name, item: SITE + (h || url.area(s.tinh, s.quan)) }));
-  const filtered = s.q || s.luong || s.ca.length > 1 || s.mt.length > 1 || s.cd.length || page > 1 || s.sx !== 'moi';
+  const filtered = s.q || s.luong || s.min || s.max || s.ca.length > 1 || s.mt.length > 1 || s.cd.length || page > 1 || s.sx !== 'moi';
   return {
     nav: s.gap ? 'urgent' : 'jobs',
     title: h1 + (page > 1 ? ` - Trang ${page}` : ''),
@@ -197,4 +197,15 @@ function seoIntro(p, d, jobs) {
   const where = d ? `${d} (${p.name})` : p ? p.name : 'các tỉnh thành';
   return `<p>Lương bảo vệ tại ${esc(where)} hiện dao động trung bình ${avgMin}-${avgMax} triệu đồng/tháng. Phổ biến nhất là ${byShift.slice(0, 2).map((x) => x[0]).join(' và ')}; ${housing} trên ${jobs.length} tin có hỗ trợ chỗ ở cho người ở xa.</p>
   <p>Trước khi nhận việc, hãy hỏi rõ ngày trả lương, có đóng BHXH không và ai cấp đồng phục. Công ty bảo vệ hợp pháp không thu tiền của người lao động dưới bất kỳ hình thức nào.</p>`;
+}
+
+// Không có tin: gợi ý nới từng điều kiện (bỏ quận, bỏ mức lương, bỏ chữ tìm…)
+function emptyHtml(s, p, d) {
+  const opts = [];
+  if (d) opts.push([`Xem cả ${p.name}`, buildHref({ ...s, quan: '' })]);
+  if (s.min || s.max) opts.push(['Bỏ điều kiện lương', buildHref({ ...s, min: 0, max: 0 })]);
+  if (s.q) opts.push([`Bỏ chữ "${s.q}"`, buildHref({ ...s, q: '' })]);
+  if (s.ca.length || s.mt.length || s.cd.length || s.gap) opts.push(['Bỏ ca làm, mục tiêu, chế độ', buildHref({ ...s, ca: [], mt: [], cd: [], gap: false })]);
+  if (p) opts.push(['Xem toàn quốc', buildHref({ ...s, tinh: '', quan: '' })]);
+  return `<div class="empty"><h3>Không có tin phù hợp</h3><p class="mute">Thử nới bớt điều kiện:</p><p class="empty-opts">${opts.map(([t, h]) => `<a class="btn btn-soft" href="${h}">${esc(t)}</a>`).join(' ')}</p></div>`;
 }
