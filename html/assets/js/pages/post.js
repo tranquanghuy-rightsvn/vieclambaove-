@@ -37,7 +37,7 @@ export default async function ({ params: [id] }) {
       <div class="side-jobs">
         <h2>Việc làm bảo vệ mới nhất</h2>
         <ul>${latest.map((j) => { const c = company(j.company) || {}; return `<li><a href="${url.job(j)}"><span class="sj-logo">${jobThumb(j, c)}</span><span class="sj-body"><b>${esc(j.title)}</b><span class="sj-co">${esc(c.name || '')}</span><span class="sj-meta"><em>${pay(j)} triệu</em> · ${esc(j.district)}, ${esc(province(j.province).short)}</span></span></a></li>`; }).join('')}</ul>
-        <a class="btn btn-primary btn-block" href="/viec-lam">Xem tất cả việc làm</a>
+        <a class="btn btn-primary btn-block" href="/viec-lam-bao-ve">Xem tất cả việc làm</a>
       </div>
     </aside>
   </div>`;

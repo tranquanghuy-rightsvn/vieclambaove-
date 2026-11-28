@@ -117,4 +117,4 @@ export default async function ({ params: [tab = ''] }) {
   return { nav: '', html, mount, title: tabs.find((t) => t[0] === tab)[1], noindex: true };
 }
 
-const empty = (h, p) => `<div class="empty"><h3>${h}</h3><p>${p}</p><a class="btn btn-primary" href="/viec-lam">Tìm việc</a></div>`;
+const empty = (h, p) => `<div class="empty"><h3>${h}</h3><p>${p}</p><a class="btn btn-primary" href="/viec-lam-bao-ve">Tìm việc</a></div>`;

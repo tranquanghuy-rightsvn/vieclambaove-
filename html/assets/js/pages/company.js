@@ -2,11 +2,11 @@ import { esc, icon, url, jobRow, activeJobs, company, crumbs, mono, SITE } from 
 
 export default function ({ params: [id] }) {
   const c = company(id);
-  if (!c) return { redirect: '/viec-lam' };
+  if (!c) return { redirect: '/viec-lam-bao-ve' };
   const jobs = activeJobs().filter((j) => j.company === c.id);
   const html = `
   <div class="phead"><div class="wrap">
-    ${crumbs([['Trang chủ', '/'], ['Công ty bảo vệ', '/viec-lam'], [c.short, null]])}
+    ${crumbs([['Trang chủ', '/'], ['Công ty bảo vệ', '/viec-lam-bao-ve'], [c.short, null]])}
     <div class="co-head">${mono(c, 'mono-l')}<div>
       <h1>${esc(c.name)}</h1>
       <p>${c.verified ? `<span class="verified">${icon('check')}Đã xác thực giấy phép kinh doanh dịch vụ bảo vệ</span>` : '<span class="tag tag-off">Đang chờ xác thực</span>'}

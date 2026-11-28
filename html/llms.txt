@@ -1,23 +1,23 @@
 # Việc Làm Bảo Vệ
 
-> Việc Làm Bảo Vệ là chuyên trang tuyển dụng ngành bảo vệ, vệ sĩ tại Việt Nam. Mỗi tin ghi rõ mức lương, ca làm, khu vực và chế độ chỗ ở; tin được kiểm duyệt trước khi hiển thị, ứng viên không mất phí.
+> Việc Làm Bảo Vệ là chuyên trang việc làm bảo vệ, tuyển dụng bảo vệ uy tín trên toàn quốc. Tin đăng trực tiếp từ công ty bảo vệ, công ty dịch vụ bảo vệ và doanh nghiệp tuyển bảo vệ nội bộ; mỗi tin ghi rõ mức lương, ca làm, khu vực, chế độ ăn ở, được kiểm duyệt trước khi hiển thị, người lao động không mất phí.
 
 Việc Làm Bảo Vệ là nền tảng đăng tin tuyển dụng độc lập, không phải công ty dịch vụ bảo vệ và không trực tiếp tuyển người. Mỗi tin tuyển dụng thuộc về nhà tuyển dụng đứng tên trong tin; một số tin được tổng hợp từ nguồn công khai và có ghi rõ nguồn.
 
 ## Trang chính
 - [Trang chủ](https://vieclambaove.web100-vn.workers.dev/): tin bảo vệ mới nhất và tuyển gấp
-- [Việc làm bảo vệ](https://vieclambaove.web100-vn.workers.dev/viec-lam): toàn bộ 86 tin đang tuyển, lọc theo tỉnh, ca làm, mức lương
+- [Việc làm bảo vệ](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve): toàn bộ 86 tin đang tuyển, lọc theo tỉnh, ca làm, mức lương
 - [Nhà tuyển dụng](https://vieclambaove.web100-vn.workers.dev/cong-ty-tuyen-dung): danh sách công ty đang tuyển
 - [Tin tức nghề bảo vệ](https://vieclambaove.web100-vn.workers.dev/tin-tuc)
 - [Cảnh báo lừa đảo](https://vieclambaove.web100-vn.workers.dev/tin-tuc/dau-hieu-cong-ty-bao-ve-lua-dao): dấu hiệu công ty bảo vệ lừa đảo người tìm việc
 
 ## Việc làm theo tỉnh
-- [Việc làm bảo vệ TP. Hồ Chí Minh](https://vieclambaove.web100-vn.workers.dev/viec-lam/tp-hcm)
-- [Việc làm bảo vệ Hà Nội](https://vieclambaove.web100-vn.workers.dev/viec-lam/ha-noi)
-- [Việc làm bảo vệ Bình Dương](https://vieclambaove.web100-vn.workers.dev/viec-lam/binh-duong)
-- [Việc làm bảo vệ Đồng Nai](https://vieclambaove.web100-vn.workers.dev/viec-lam/dong-nai)
-- [Việc làm bảo vệ Bắc Ninh](https://vieclambaove.web100-vn.workers.dev/viec-lam/bac-ninh)
-- [Việc làm bảo vệ Đà Nẵng](https://vieclambaove.web100-vn.workers.dev/viec-lam/da-nang)
+- [Việc làm bảo vệ TP. Hồ Chí Minh](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve/tp-hcm)
+- [Việc làm bảo vệ Hà Nội](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve/ha-noi)
+- [Việc làm bảo vệ Bình Dương](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve/binh-duong)
+- [Việc làm bảo vệ Đồng Nai](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve/dong-nai)
+- [Việc làm bảo vệ Bắc Ninh](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve/bac-ninh)
+- [Việc làm bảo vệ Đà Nẵng](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve/da-nang)
 
 ## Việc làm theo nhu cầu
 - [Bảo vệ chung cư](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve-chung-cu)
@@ -31,6 +31,11 @@ Việc Làm Bảo Vệ là nền tảng đăng tin tuyển dụng độc lập, 
 - [Bảo vệ lương cao](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve-luong-cao)
 - [Bảo vệ tuyển gấp](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve-tuyen-gap)
 - [Không cần kinh nghiệm](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve-khong-can-kinh-nghiem)
+- [Bảo vệ nội bộ](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve-noi-bo)
+- [Bảo vệ giữ xe](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve-giu-xe)
+- [Bảo vệ siêu thị](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve-sieu-thi)
+- [Bảo vệ thời vụ](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve-thoi-vu)
+- [Bảo vệ lớn tuổi](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve-lon-tuoi)
 - [Bảo vệ sự kiện](https://vieclambaove.web100-vn.workers.dev/viec-lam-bao-ve-su-kien)
 
 ## Bài viết

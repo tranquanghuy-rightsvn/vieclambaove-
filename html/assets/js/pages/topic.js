@@ -7,7 +7,7 @@ const fmt = (n) => String(Math.round(n * 10) / 10).replace('.', ',');
 
 export default function ({ params: [rest], query }) {
   const hit = parseTopic(rest || '');
-  if (!hit) return { redirect: '/viec-lam' };
+  if (!hit) return { redirect: '/viec-lam-bao-ve' };
   const { t, pv } = hit;
   const jobs = topicJobs(t, pv).sort((a, b) => (a.tier === 'vip' ? 0 : 1) - (b.tier === 'vip' ? 0 : 1) || a.posted - b.posted);
   const pages = Math.max(1, Math.ceil(jobs.length / PER));
@@ -31,10 +31,10 @@ export default function ({ params: [rest], query }) {
   const samePlace = all.filter((x) => x.t !== t && x.pv === pv);
   const chip = (x) => `<a class="chip-link" href="${topicPath(x.t, x.pv)}">${esc(x.pv && x.t === t ? x.pv.name : x.t.short)}<em>${x.n}</em></a>`;
 
-  const list = (pg) => (jobs.length ? jobs.slice((pg - 1) * PER, pg * PER).map(jobRow).join('') : `<div class="empty"><h3>Chưa có tin phù hợp</h3><p class="mute">Xem <a href="/viec-lam">tất cả việc làm bảo vệ</a> hoặc dùng <a href="/tim-kiem">tìm kiếm chi tiết</a>.</p></div>`);
+  const list = (pg) => (jobs.length ? jobs.slice((pg - 1) * PER, pg * PER).map(jobRow).join('') : `<div class="empty"><h3>Chưa có tin phù hợp</h3><p class="mute">Xem <a href="/viec-lam-bao-ve">tất cả việc làm bảo vệ</a> hoặc dùng <a href="/tim-kiem">tìm kiếm chi tiết</a>.</p></div>`);
 
   const html = `<div class="wrap" style="padding-top:20px">
-    ${crumbs([['Trang chủ', '/'], ['Việc làm', '/viec-lam'], ...(pv ? [[t.short, topicPath(t)]] : []), [pv ? pv.name : t.short, null]])}
+    ${crumbs([['Trang chủ', '/'], ['Việc làm', '/viec-lam-bao-ve'], ...(pv ? [[t.short, topicPath(t)]] : []), [pv ? pv.name : t.short, null]])}
     <div class="topic-head">
       <h1 class="page-h">${esc(h1)}</h1>
       <p class="topic-stat">${stat}</p>
