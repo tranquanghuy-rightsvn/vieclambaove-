@@ -1547,7 +1547,7 @@ img[src$="blog-tuan-tra.jpg"] { object-position: 50% 75% !important; }
 @media (max-width: 380px) { .mast-quick span { font-size: 12.5px; } }
 /* Hero dùng ảnh đội bảo vệ chào: người đứng nổi bật ở bên phải */
 @media (min-width: 961px) { .hero-img { width: 52%; object-position: 70% 20%; } }
-@media (max-width: 960px) { .hero-img { object-position: 75% 20%; } }
+@media (max-width: 960px) { .hero-img { object-position: 58% 30%; } }
 .eb-img { object-position: 30% 35%; }
 /* Ảnh hero hiện mờ dần khi tải xong, không lộ cảnh ảnh vẽ dần từng dòng */
 .hero-img { opacity: 0; transition: opacity .35s ease; }
